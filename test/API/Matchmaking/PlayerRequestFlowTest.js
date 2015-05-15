@@ -4,6 +4,11 @@ var Models = require('../../../lib/Models');
 
 Models.init('mongodb://localhost/polynect-test')
 
+// Start matchmaker
+require('../../../lib/Matchmaker/main')
+// Start API
+require('../../../lib/API')
+
 describe('Player matchmaking request', function () {
 
   it('can be matched on request', function (done) {
