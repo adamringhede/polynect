@@ -25,6 +25,7 @@ describe('Player matchmaking request', function () {
         body: {requirements:{}}
       }, function (err, res, body) {
         assert.equal(res.statusCode, 200);
+        assert.equal(body.status, 'finished')
         done()
       })
     })

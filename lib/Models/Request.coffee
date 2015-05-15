@@ -20,7 +20,7 @@ request = new Schema
   max: Number
 
 request.path('status').validate( (value) ->
-  return /matched|queued|cancelled|none/i.test(value);
+  return /matched|queued|cancelled|finished|none/i.test(value);
 , 'Invalid status');
 
 request.methods =

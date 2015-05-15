@@ -267,7 +267,12 @@ class Matchmaker extends Emitter
   groupMatchSuccess: (party) ->
     # Create a room, select server to use and backup list in case the server faults
     # Notify players about the success and possibly their delegations
-    party.broadcast 'finished', party
+    #party.broadcast
+    for request in party.requests
+      request.emit 'finished', party
+      request.status = 'finished'
+      request.save()
+
     @emit 'groupMatchSuccess', party
 
   groupMatchHold: (party) ->
