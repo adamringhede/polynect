@@ -45,7 +45,7 @@ server.put('/start/:id', (req, res, next) ->
       res.send(202, 'Could not finish matchmaking within ' + wait + ' seconds');
     , wait * 1000)
 
-    model.on 'matched', (match) ->
+    model.on 'finished', (match) ->
       if responded
         return;
       responded = true
