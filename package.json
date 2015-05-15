@@ -1,18 +1,22 @@
 {
-  "name": "Polynect-Models",
+  "name": "Polynect",
   "version": "1.0.0",
   "description": "Models used by Polynect software",
   "main": "index.js",
-  "private": true,
   "dependencies": {
     "grunt": "^0.4.5",
     "grunt-component-tree": "^0.1.0",
-    "mongoose": "^4.0.2"
+    "mongoose": "^4.0.2",
+    "puid": "^1.0.5",
+    "request": "^2.55.0",
+    "restify": "^3.0.2",
+    "socket.io": "^1.3.5",
+    "underscore": "^1.8.3"
   },
   "devDependencies": {},
   "scripts": {
     "test": "mocha",
-    "install": "coffee -cm lib/Models/*.coffee; grunt component_tree"
+    "build": "coffee -cm lib/**/*.coffee; grunt component_tree"
   },
   "author": "Adam Ringhede",
   "license": "ISC"

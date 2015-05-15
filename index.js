@@ -1,3 +1,7 @@
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/polynect-test');
-module.exports = require('./lib/Models');
+var Models = require('./lib/Models');
+
+Models.init = function (uri, options) {
+  mongoose.connect(uri, options);
+}
+module.exports = Models;

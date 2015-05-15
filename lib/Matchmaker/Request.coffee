@@ -1,30 +1,21 @@
-mongoose = require 'mongoose'
-Models = require '../Models'
-Schema = mongoose.Schema
+puid = require('puid')
+p = new puid()
+_ = require('underscore');
 
-request = new Schema
-  player: ref: 'Player', type: Schema.Types.ObjectId
-  requirements: type: Object
-  roles: [String]
-  created: type: Date, default: Date.now
-  game: type: Schema.Types.ObjectId, ref: 'Game'
-  status: type: String, default: 'none'
+class Request extends require('events').EventEmitter
+  constructor: (@requirements = {}) ->
+    @id = p.generate()
+    @min = 2
+    @max = 2
+    @created = (new Date).getTime()
+    @removed = true
+    @game = null
+    @setRequirements()
 
-  # Matchmaking algorithm variables
-  reserved: type: Boolean, default: false
-  reserved_at: type: Date
-  matchmaker:
-    host: type: String, default: 'localhost'
-    port: type: Number, default: 48001
-  min: Number
-  max: Number
 
-request.path('status').validate( (value) ->
-  return /matched|queued|cancelled|none/i.test(value);
-, 'Invalid status');
+  timeSinceCreated: -> (new Date).getTime() - @created_on
 
-request.methods =
-  setRequirements: (requirements) ->
+  setRequirements: (requirements = @requirements) ->
     if requirements.min? and typeof requirements.min is 'number'
       @min = requirements.min
     @max = if requirements.max? and typeof requirements.max is 'number' then requirements.max else @min
@@ -37,21 +28,28 @@ request.methods =
         for interval in requirement.intervals
           if interval[0] <= requirement.value <= interval[1]
             requirement.acceptedIntervals.push interval
-      if requirement.type is 'close'
-        if requirement.distance?
-          requirement.min = requirement.value - requirement.distance
-          requirement.max = requirement.value + requirement.distance
-        else if requirement.under? and requirement.over?
-          requirement.min = requirement.value - requirement.under
-          requirement.max = requirement.value + requirement.over
-    @requirements = requirements
+      if requirement.type is 'close' and requirement.under? and requirement.over?
+        requirement.min = requirement.value - requirement.under
+        requirement.max = requirement.value + requirement.over
+
+
+  ###
+  Consider breaking this function into smaller ones.
+  For instance, each comparison type could be seperate function in a seperate file.
+  Such as: SameComparator, CloseComparator, IntervalComparator, ListComparator
+  ###
   matches: (target) ->
+    # check if min >= min and max <= max  and  min < max
+    # Variable group sizes can be a bad idea
+    # Instead players will be able to create rooms with their own specifications
+    # used to create the PartyMatch object and players who join will not affect the the min and max of the partyMatch.
+
     if (target.game isnt this.game)
       return false
 
     map = {}
     for path, requirement of @requirements
-      if target instanceof Models.Request
+      if target instanceof Request
         if target.requirements[path]?
           value = target.requirements[path].value
         else if requirement.required == true
@@ -97,4 +95,5 @@ request.methods =
 
 
 
-module.exports = mongoose.model 'Request', request
+
+module.exports = Request

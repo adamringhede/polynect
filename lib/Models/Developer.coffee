@@ -2,7 +2,8 @@ mongoose = require 'mongoose'
 Schema = mongoose.Schema
 
 dev = new Schema
-  name: String
+  firstname: String
+  lastname: String
   username: String
   password: String
   token: String

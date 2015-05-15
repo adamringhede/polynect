@@ -4,7 +4,8 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
     component_tree: {
       source: {
-        cwd: 'lib'
+        includeDir: true,
+        cwd: ['lib/Models', 'lib/API/Views', 'lib/Matchmaker']
       }
     },
   });

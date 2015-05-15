@@ -1,3 +1,7 @@
 node_modules
-lib/**/*.js
 lib/**/*.map
+
+
+# Compoments that uses coffeescript
+lib/Models/*.js
+lib/Matchmaker/*.js
