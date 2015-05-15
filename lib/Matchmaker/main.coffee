@@ -34,17 +34,26 @@ server.put('/start/:id', (req, res, next) ->
       port: PORT
   }, (err, model) ->
     wait = 1;
+    responded = false;
     if parseFloat(req.query.wait) > 0
       wait = parseFloat(req.query.wait);
 
     tO = setTimeout( () ->
+      if responded
+        return;
+      responded = true
       res.send(202, 'Could not finish matchmaking within ' + wait + ' seconds');
     , wait * 1000)
 
-    model.once 'finished', (match) ->
+    model.on 'matched', (match) ->
+      if responded
+        return;
+      responded = true
       clearTimeout(tO);
       if (match.isDone())
         res.send(200, 'Finished matchmaking');
     matchmaker.put(model, true) # Put first in queue
+    if matchmaker.queue.length > 1
+      matchmaker.start();
   )
 )

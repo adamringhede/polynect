@@ -5,8 +5,9 @@ var Models = require('../../../lib/Models');
 Models.init('mongodb://localhost/polynect-test')
 
 describe('Player matchmaking request', function () {
-  /*
+
   it('can be matched on request', function (done) {
+    this.timeout(3000);
     request({
       json: true,
       method: 'POST',
@@ -29,7 +30,6 @@ describe('Player matchmaking request', function () {
     })
 
   });
-  */
   it('can be put on queue', function (done) {
     request({
       json: true,
