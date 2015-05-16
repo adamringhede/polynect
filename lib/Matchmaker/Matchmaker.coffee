@@ -228,12 +228,13 @@ class Matchmaker extends Emitter
       if party.isDone()
         @parties.splice(@parties.indexOf(party), 1)
         @groupMatchSuccess(party)
-        restart()
+      else
+        request.emit('matched', party)
+        request.status = 'matched'
+        request.save()
+      restart()
 
     if found_party
-      request.emit('matched', found_party)
-      request.status = 'matched'
-      request.save()
       return
 
     # Try to form a party with other request
