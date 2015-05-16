@@ -4,6 +4,8 @@ var Models = require('../../../lib/Models');
 
 Models.init('mongodb://localhost/polynect-test')
 
+process.env.POLYNECT_API_PORT = 8090;
+
 // Start matchmaker
 require('../../../lib/Matchmaker/main')
 // Start API
@@ -19,7 +21,7 @@ describe('Player matchmaking request', function () {
     request({
       json: true,
       method: 'POST',
-      url: 'http://localhost/matchmaking/requests',
+      url: 'http://localhost:8090/matchmaking/requests',
       body: {requirements:{}}
     }, function (err, res, body) {
       if (res.statusCode == 500) {
@@ -29,7 +31,7 @@ describe('Player matchmaking request', function () {
       request({
         json: true,
         method: 'POST',
-        url: 'http://localhost/matchmaking/requests',
+        url: 'http://localhost:8090/matchmaking/requests',
         body: {requirements:{}}
       }, function (err, res, body) {
         assert.equal(res.statusCode, 200);
@@ -43,7 +45,7 @@ describe('Player matchmaking request', function () {
     request({
       json: true,
       method: 'POST',
-      url: 'http://localhost/matchmaking/requests?wait=false',
+      url: 'http://localhost:8090/matchmaking/requests?wait=false',
       body: {
         "requirements": {
           "mode": {
@@ -68,7 +70,7 @@ describe('Player matchmaking request', function () {
       request({
         json: true,
         method: 'PUT',
-        url: 'http://localhost/matchmaking/requests/' + r._id + '/cancel'
+        url: 'http://localhost:8090/matchmaking/requests/' + r._id + '/cancel'
       }, function (err, res, body) {
         assert.equal(res.statusCode, 200);
         assert.ok(!err);
