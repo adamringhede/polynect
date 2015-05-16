@@ -21,4 +21,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-component-tree');
   grunt.loadNpmTasks('grunt-mocha-test');
 
+  grunt.registerTask('test', ['mochaTest']);
+
 };
