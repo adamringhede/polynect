@@ -6,8 +6,8 @@ Matchmaker = require('./Matchmaker');
 matchmaker = new Matchmaker();
 
 # Get configuration
-HOST = process.env.MATCHMAKER_SERVER_PUBLIC_HOST? or process.argv[2]?.split(':')[0] or 'localhost'
-PORT = parseInt(process.env.MATCHMAKER_SERVER_PUBLIC_PORT? or process.argv[2]?.split(':')[1] or 48001)
+HOST = process.env.MATCHMAKER_SERVER_PUBLIC_HOST? or 'localhost'
+PORT = parseInt(process.env.MATCHMAKER_SERVER_PUBLIC_PORT? or 48001)
 
 Models.init('mongodb://localhost/polynect-test');
 
@@ -23,6 +23,11 @@ server.use(restify.jsonp());
 # Start
 server.listen(PORT);
 console.log("Listening on port " + PORT);
+
+matchmaker.on('new request', (request) ->
+    request.matchmaker.host = HOST
+    request.matchmaker.port = PORT
+)
 
 server.put('/start/:id', (req, res, next) ->
 

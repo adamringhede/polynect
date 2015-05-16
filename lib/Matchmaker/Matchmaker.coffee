@@ -23,6 +23,8 @@ class Matchmaker extends Emitter
 
   put: (request, queue = true, first = false) ->
     request.removed = false
+    unless @requests[request._id]
+      @emit 'new request', request
     @requests[request._id] = request
     if queue
       if first
