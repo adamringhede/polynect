@@ -9,6 +9,9 @@ require('../../../lib/Matchmaker/main')
 // Start API
 require('../../../lib/API')
 
+// Clear database
+Models.Request.collection.remove();
+
 describe('Player matchmaking request', function () {
 
   it('can be matched on request', function (done) {
