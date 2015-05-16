@@ -8,7 +8,17 @@ module.exports = function(grunt) {
         cwd: ['lib/Models', 'lib/API/Views', 'lib/Matchmaker']
       }
     },
+    mochaTest: {
+        test: {
+            options: {
+              reporter: 'spec',
+              clearRequireCache: true
+            },
+            src: ['test/**/*Test.js']
+        }
+    }
   });
   grunt.loadNpmTasks('grunt-component-tree');
+  grunt.loadNpmTasks('grunt-mocha-test');
 
 };

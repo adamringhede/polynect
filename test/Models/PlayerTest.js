@@ -1,5 +1,5 @@
 var assert = require('assert');
-var Models = require('../');
+var Models = require('../../lib/Models');
 
 Models.init('mongodb://localhost/polynect-test');
 
