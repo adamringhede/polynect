@@ -232,6 +232,8 @@ class Matchmaker extends Emitter
 
     if found_party
       request.emit('matched', found_party)
+      request.status = 'matched'
+      request.save()
       return
 
     # Try to form a party with other request
