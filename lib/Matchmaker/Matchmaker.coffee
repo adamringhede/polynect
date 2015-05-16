@@ -82,6 +82,7 @@ class Matchmaker extends Emitter
     @running = true
     @shift =>
       if @queue.length <= 1
+        @running = false
         false
       else
         true

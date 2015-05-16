@@ -22,7 +22,7 @@ describe('Matchmaking request events', function () {
     it('occures after a request is added to an existing match', function (done) {
       var m = new Matchmaker();
       var r1 = new Request({
-        min: 3
+        min: 4
       });
       var r2 = new Request();
       r1.requirements = {};
