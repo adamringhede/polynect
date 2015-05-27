@@ -5,7 +5,7 @@ module.exports = function(grunt) {
     component_tree: {
       source: {
         includeDir: true,
-        cwd: ['lib/Models', 'lib/API/Views', 'lib/Matchmaker']
+        cwd: ['lib/Models', 'lib/API/Views', 'lib/Matchmaker', 'lib/API/Controllers']
       }
     },
     mochaTest: {
