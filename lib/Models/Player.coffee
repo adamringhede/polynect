@@ -24,7 +24,7 @@ schema = new Schema
 schema.methods =
   # This is used after the player has been authenticated
   getToken: () ->
-    unless this.token?
+    if !this.token? or !this.verifyWithToken(this.token)
       this.createToken()
       this.save()
     return this.token

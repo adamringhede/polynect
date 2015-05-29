@@ -1,0 +1,16 @@
+var def = function (model) {
+  return {
+    id: model._id,
+  }
+}
+
+def.authenticated = function (model) {
+  model.getToken();
+  return {
+    id: model._id,
+    token: model.token,
+    token_expires: model.token_expires
+  }
+}
+
+module.exports = def

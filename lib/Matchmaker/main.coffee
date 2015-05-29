@@ -22,7 +22,7 @@ server.use(restify.jsonp());
 
 # Start
 server.listen(PORT);
-console.log("Listening on port " + PORT);
+console.log("Mathcmaker listening on port " + PORT);
 
 matchmaker.on('new request', (request) ->
     request.matchmaker.host = HOST
