@@ -20,8 +20,9 @@ describe('Login with provider', function () {
   it('works with facebook', function (done) {
     request({ method: 'POST', json: true, url: 'http://localhost:8090/login/facebook',
       body: {access_token: access_tokens.facebook} }, function (err, res, body) {
-        console.log(body);
         assert.equal(res.statusCode, 200);
+        assert.equal(typeof body.token, 'string');
+        assert.equal(typeof body.token_expires, 'string');
         done();
       });
 
