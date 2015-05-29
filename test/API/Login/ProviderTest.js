@@ -19,10 +19,10 @@ var player = new Models.Player({
 });
 player.save(function () {
   describe('Login with credentials', function () {
-    it('returns 403 if player does not exist with sent credentials', function (done) {
+    it('returns 401 if player does not exist with sent credentials', function (done) {
       request({ method: 'POST', json: true, url: 'http://localhost:8090/login',
         body: {username: 'adamringhede@live.com', password: 'wrong password'} }, function (err, res, body) {
-          assert.equal(res.statusCode, 403);
+          assert.equal(res.statusCode, 401);
           done();
         });
     });
