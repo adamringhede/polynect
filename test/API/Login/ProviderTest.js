@@ -15,7 +15,7 @@ Models.Player.collection.remove();
 
 describe('Login with provider', function () {
   it('works with facebook', function (done) {
-    request({ method: 'POST', json: true, url: 'http://localhost:8090/login/facebook',
+    request({ method: 'POST', json: true, url: 'http://localhost:8090/game/213/login/facebook',
       body: {access_token: 'token'} }, function (err, res, body) {
         assert.equal(res.statusCode, 200);
         assert.equal(typeof body.token, 'string');

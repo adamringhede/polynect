@@ -19,19 +19,20 @@ describe('Login with credentials', function () {
   before(function (done) {
     // Clear database
     Models.Player.collection.remove();
-    Models.Player.createWithCredentials(player.username, player.password, function (err, model) {
+    Models.Player.createWithCredentials(player.username, player.password, '213', function (err, model) {
       done();
     });
   });
   it('returns 401 if player does not exist with sent credentials', function (done) {
-    request({ method: 'POST', json: true, url: 'http://localhost:8090/login',
+    request({ method: 'POST', json: true, url: 'http://localhost:8090/game/213/login',
       body: {username: player.username, password: 'wrong password'} }, function (err, res, body) {
+
         assert.equal(res.statusCode, 401);
         done();
       });
   });
   it('returns 200 if valid credentials are used', function (done) {
-    request({ method: 'POST', json: true, url: 'http://localhost:8090/login',
+    request({ method: 'POST', json: true, url: 'http://localhost:8090/game/213/login',
       body: {username: player.username, password: player.password} }, function (err, res, body) {
         assert.equal(res.statusCode, 200);
         assert.equal(typeof body.token, 'string');

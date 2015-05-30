@@ -20,8 +20,11 @@ schema = new Schema
   token: String
   token_expires: Date
 
-  # A player is tied to a developer
-  developer: ref: 'Developer', type: Schema.Types.ObjectId
+  # A player is tied to a game
+  game: ref: 'Game', type: String
+
+  # Misc
+  created: type: Date, default: Date.now()
 
 schema.methods =
   # This is used after the player has been authenticated
@@ -46,19 +49,19 @@ schema.methods =
     return false
 
 schema.statics =
-  createWithCredentials: (username, password, callback) ->
+  createWithCredentials: (username, password, game, callback) ->
     hash = crypto.createHash('sha1').update(password + SALT).digest('hex')
     # Include developer id here
-    this.findOne username: username, (err, model) =>
+    this.findOne username: username, game: game, (err, model) =>
       if model
         callback? 'username taken', null
       else
-        p = new this username: username, password: hash
+        p = new this username: username, password: hash, game: game
         p.save (err, model) -> callback? err, model
-  findWithCredentials: (username, password, callback) ->
+  findWithCredentials: (username, password, game, callback) ->
     hash = crypto.createHash('sha1').update(password + SALT).digest('hex')
     # Include developer id here
-    this.findOne username: username, password: hash, (err, model) ->
+    this.findOne username: username, password: hash, game: game, (err, model) ->
       callback? err, model
 
 
