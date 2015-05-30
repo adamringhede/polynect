@@ -13,31 +13,6 @@ require('../../../lib/API')
 // Clear database
 Models.Player.collection.remove();
 
-var player = new Models.Player({
-  username: 'adam.ringhede@live.com',
-  password: 'secret'
-});
-player.save(function () {
-  describe('Login with credentials', function () {
-    it('returns 401 if player does not exist with sent credentials', function (done) {
-      request({ method: 'POST', json: true, url: 'http://localhost:8090/login',
-        body: {username: 'adamringhede@live.com', password: 'wrong password'} }, function (err, res, body) {
-          assert.equal(res.statusCode, 401);
-          done();
-        });
-    });
-    it('returns a token if authentication suceeds', function (done) {
-      request({ method: 'POST', json: true, url: 'http://localhost:8090/login',
-        body: {username: player.username, password: player.password} }, function (err, res, body) {
-          assert.equal(res.statusCode, 200);
-          assert.equal(typeof body.token, 'string');
-          assert.equal(typeof body.token_expires, 'string');
-          done();
-        });
-    });
-  })
-})
-
 describe('Login with provider', function () {
   it('works with facebook', function (done) {
     request({ method: 'POST', json: true, url: 'http://localhost:8090/login/facebook',
