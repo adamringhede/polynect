@@ -2,8 +2,10 @@ mongoose = require 'mongoose'
 Schema = mongoose.Schema
 random = require 'randomstring'
 moment = require 'moment'
+crypto = require 'crypto'
 
 TOKEN_LIFETIME = 24 * 30 # hours
+SALT = '!NPnp9apdufnyfb3twbi73hd0wjwh2ueno'
 
 schema = new Schema
   provider:
@@ -42,5 +44,23 @@ schema.methods =
     return false unless this.token? and this.token_expires instanceof Date
     return true if Date.now() <= this.token_expires.getTime() and token is this.token
     return false
+
+schema.statics =
+  createWithCredentials: (username, password, callback) ->
+    hash = crypto.createHash('sha1').update(password + SALT).digest('hex')
+    # Include developer id here
+    this.findOne username: username, (err, model) =>
+      if model
+        callback? 'username taken', null
+      else
+        p = new this username: username, password: hash
+        p.save (err, model) -> callback? err, model
+  findWithCredentials: (username, password, callback) ->
+    hash = crypto.createHash('sha1').update(password + SALT).digest('hex')
+    # Include developer id here
+    this.findOne username: username, password: hash, (err, model) ->
+      callback? err, model
+
+
 
 module.exports = mongoose.model 'Player', schema

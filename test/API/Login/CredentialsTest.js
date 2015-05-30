@@ -10,22 +10,22 @@ process.env.MOCK_SERVICES = true;
 // Start API
 require('../../../lib/API')
 
-var player = new Models.Player({
-  username: 'adam.ringhede@live.com',
+var player = {
+  username: 'adamringhede@live.com',
   password: 'secret'
-});
+};
 
 describe('Login with credentials', function () {
   before(function (done) {
     // Clear database
     Models.Player.collection.remove();
-    player.save(function () {
+    Models.Player.createWithCredentials(player.username, player.password, function (err, model) {
       done();
-    })
+    });
   });
   it('returns 401 if player does not exist with sent credentials', function (done) {
     request({ method: 'POST', json: true, url: 'http://localhost:8090/login',
-      body: {username: 'adamringhede@live.com', password: 'wrong password'} }, function (err, res, body) {
+      body: {username: player.username, password: 'wrong password'} }, function (err, res, body) {
         assert.equal(res.statusCode, 401);
         done();
       });
