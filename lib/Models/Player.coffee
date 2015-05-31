@@ -49,6 +49,7 @@ schema.methods =
     return false
 
 schema.statics =
+  ERROR_USERNAME_TAKEN: 'username is already taken'
   createWithCredentials: (username, password, game, callback) ->
     hash = crypto.createHash('sha1').update(password + SALT).digest('hex')
     # Include developer id here
