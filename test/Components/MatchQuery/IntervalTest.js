@@ -18,5 +18,19 @@ describe('Interval query', function() {
       'x.1':3
     })
   });
+  describe('validation result', function() {
+    it('is null if it is valid', function() {
+      var errors = Interval.validate({
+        intervals: [[1,4],[5,6]]
+      })
+      assert.equal(errors, null);
+    });
+    it('contains an error if given overlapping intervals', function() {
+      var errors = Interval.validate({
+        intervals: [[1,4],[3,5],[5,6]]
+      })
+      assert.equal(errors.length, 1);
+      assert.equal(errors[0], 'There are 2 overlapping intervals in [[1,4],[3,5],[5,6]]');
+    });
+  })
 });
-// TODO Add tests for all faulty options
