@@ -1,0 +1,24 @@
+{
+  "attributes": {
+    "x": {
+      "type": "interval",
+      "intervals": [[1,4], [5,9], 10],
+      "value": "player.a"
+    },
+    "y": {
+      "type": "same",
+      "default": "foo",
+      "value": "input.y"
+    },
+    "z": {
+      "type": "close",
+      "distance": [1,5],
+      "value": "character.b"
+    },
+    "v": {
+      "type": "list",
+      "value": "player.c",
+      "default": [4,5]
+    }
+  }
+}
