@@ -19,12 +19,8 @@
     "z": {
       "type": "close",
       "distance": [1, 8],
-      "value": "character.b"
-    },
-    "v": {
-      "type": "list",
-      "value": "player.c",
-      "default": [4,5]
+      "value": "character.b",
+      "default": 4
     }
   }
 }
