@@ -1,4 +1,8 @@
 {
+  "general": {
+    "min": 2,
+    "max": 2
+  },
   "attributes": {
     "x": {
       "type": "interval",

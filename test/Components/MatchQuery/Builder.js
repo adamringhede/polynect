@@ -27,9 +27,11 @@ describe('MatchQueryBuilder', function() {
         require('./Configs/Complex'),
         { y: 'bar' }, // Values
         { a: 5 }, // Player
-        { b: 10 } // Character
+        { b: 10 }, // Character
+        'attributes' // Prefix
       );
       var query = builder.build();
+      console.log(query);
       assert.ok(JSON.parse(query).$and.length > 0)
     });
   })
