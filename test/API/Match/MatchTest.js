@@ -38,4 +38,16 @@ describe('Match POST', function () {
         done();
       });
   });
+  it('adds the request to an existing match if one can be found', function (done) {
+    Models.Match.collection.remove(function () {
+      request({ method: 'POST', json: true, url: 'http://localhost:8090/games/'+gameId+'/match',
+        body: { player: playerId, values: {y: 'bar'} } }, function (err, res, body) {
+          request({ method: 'POST', json: true, url: 'http://localhost:8090/games/'+gameId+'/match',
+            body: { player: playerId, values: {y: 'bar'} } }, function (err, res, body) {
+              assert.equal(body.requests.length, 2);
+              done();
+            });
+        });
+    });
+  });
 });
