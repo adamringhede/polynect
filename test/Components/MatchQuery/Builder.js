@@ -31,8 +31,16 @@ describe('MatchQueryBuilder', function() {
         'attributes' // Prefix
       );
       var query = builder.build();
-      console.log(query);
-      assert.ok(JSON.parse(query).$and.length > 0)
+      assert.ok(query.$and.length > 0)
+    });
+    it('relaxes values on each attempt', function() {
+      var builder = new Builder(
+        require('./Configs/Complex'), null, null,
+        { b: 10 } // Character
+      );
+      builder.setAttempt(2);
+      var query = builder.build();
+      assert.equal(query.$and[3].z.$gte, 5.5);
     });
   })
 });
