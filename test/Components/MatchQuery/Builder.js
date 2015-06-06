@@ -19,5 +19,18 @@ describe('MatchQueryBuilder', function() {
       var value = builder.getValue(builder.config.attributes.y)
       assert.equal(value, 'foo');
     });
+  });
+
+  describe('build', function() {
+    it('compiles requirements into a mongo query', function() {
+      var builder = new Builder(
+        require('./Configs/Complex'),
+        { y: 'bar' }, // Values
+        { a: 5 }, // Player
+        { b: 10 } // Character
+      );
+      var query = builder.build();
+      assert.ok(JSON.parse(query).$and.length > 0)
+    });
   })
 });
