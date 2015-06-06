@@ -12,7 +12,7 @@
     },
     "z": {
       "type": "close",
-      "distance": [1,5],
+      "distance": 5,
       "value": "character.b"
     },
     "v": {
