@@ -47,9 +47,13 @@ schema.methods =
     return false unless this.token? and this.token_expires instanceof Date
     return true if Date.now() <= this.token_expires.getTime() and token is this.token
     return false
+  tokenIsValid: (token) ->
+    this.token? and Date.now() <= this.token_expires.getTime() and token is this.token
+
 
 schema.statics =
   ERROR_USERNAME_TAKEN: 'username is already taken'
+  ERROR_TOKEN_INVALID: 'token_invalid'
   createWithCredentials: (username, password, game, callback) ->
     hash = crypto.createHash('sha1').update(password + SALT).digest('hex')
     # Include developer id here
@@ -58,12 +62,25 @@ schema.statics =
         callback? 'username taken', null
       else
         p = new this username: username, password: hash, game: game
+        p.createToken();
         p.save (err, model) -> callback? err, model
   findWithCredentials: (username, password, game, callback) ->
     hash = crypto.createHash('sha1').update(password + SALT).digest('hex')
     # Include developer id here
     this.findOne username: username, password: hash, game: game, (err, model) ->
       callback? err, model
+  findWithToken: (token, callback) ->
+    this.findOne token: token, (err, model) =>
+      if model?
+        if (model.tokenIsValid(token))
+          callback? null, model
+        else
+          console.log this.ERROR_TOKEN_INVALID
+          callback?(this.ERROR_TOKEN_INVALID, model)
+      else
+        callback? null, null
+
+
 
 
 
