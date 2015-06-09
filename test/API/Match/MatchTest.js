@@ -51,8 +51,9 @@ describe('Match POST', function () {
         body: { values: {y: 'bar'} }, headers: { Authorization: token } }, function (err, res, body) {
           request({ method: 'POST', json: true, url: 'http://localhost:8090/games/'+gameId+'/match' + '?access_token=' + token2,
             body: { values: {y: 'bar'} }, headers: { Authorization: token2 } }, function (err, res, body) {
+              console.log(JSON.stringify(body));
               assert.equal(res.statusCode, 200);
-              assert.equal(body.requests.length, 2);
+              assert.equal(body.players.length, 2);
               done();
             });
         });

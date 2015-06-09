@@ -3,21 +3,31 @@ Builder = require '../Components/MatchQueryBuilder/MatchQueryBuilder'
 Schema = mongoose.Schema
 
 
+WAITING = 'waiting' # Still waiting for additional requests to meet requirements.
+                    # A match can still be in this state if using a delay after minimum has
+                    # been reached but maximum has not.
+READY = 'ready' # Match has met requirements, any delay has expired and it is ready to start
+
+
 schema = new Schema
   requests: [{
-      player: type: Schema.Types.ObjectId, ref: 'Player'
+      player: {
+        id: String
+      }
       attributes: {},
       roles: [String],
       min: Number,
       max: Number
   }]
   open: type: Boolean, default: true
+  status: type: String, default: WAITING
   requirements: {}
   size: type: Number, default: 0
   attributes: {}
   roles:
     need: {}
     delegations: {}
+
 
 schema.methods =
   calculateAttributes: `function() {
