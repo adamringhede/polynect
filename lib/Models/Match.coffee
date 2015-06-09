@@ -11,6 +11,7 @@ schema = new Schema
       min: Number,
       max: Number
   }]
+  open: type: Boolean, default: true
   requirements: {}
   size: type: Number, default: 0
   attributes: {}

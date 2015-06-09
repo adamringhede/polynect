@@ -40,7 +40,6 @@ describe('Match POST', function () {
   it('creates a match if one cannot be found', function (done) {
     request({ method: 'POST', json: true, url: 'http://localhost:8090/games/'+gameId+'/match' + '?access_token=' + token ,
       body: { values: {y: 'bar'} }, headers: { Authorization: token } }, function (err, res, body) {
-        console.log(body);
         assert.equal(res.statusCode, 200);
         assert.equal(body.requests.length, 1);
         done();
