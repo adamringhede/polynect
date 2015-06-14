@@ -1,5 +1,6 @@
 node_modules
 lib/**/*.map
+lib/Components/**/index.js
 
 
 # Compoments that uses coffeescript
