@@ -26,6 +26,11 @@ var fixtures = {
       _id: ObjectId(),
       name: 'Test game',
       matchmaking_config: require('./Configs/Simple')
+    },
+    g2: {
+      _id: ObjectId(),
+      name: 'Another game',
+      matchmaking_config: require('./Configs/Simple')
     }
   },
   Match: {}
@@ -130,7 +135,24 @@ describe('Matchmaker', function () {
         });
       });
     });
-  })
+  });
+  it('does not match players if the game differs', function (done) {
+    Matchmaker.findMatch({
+      player: f.Player.p1,
+      game: f.Game.g1,
+    }, function (err, match) {
+      Matchmaker.findMatch({
+        player: f.Player.p2,
+        game: f.Game.g2
+      }, function (err, match2) {
+        assert.equal(match.size, 1);
+        assert.equal(match2.size, 1);
+        assert.notEqual(match._id.toString(), match2._id.toString());
+        done();
+      });
+    });
+  });
+
 
 
 });
