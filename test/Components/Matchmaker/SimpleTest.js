@@ -124,6 +124,8 @@ describe('Matchmaker', function () {
         }, function (err, match3) {
           assert.equal(match2.size, 2);
           assert.equal(match3.size, 1);
+          assert.equal(match._id.toString(), match2._id.toString());
+          assert.notEqual(match._id.toString(), match3._id.toString());
           done();
         });
       });
