@@ -1,10 +1,12 @@
 mongoose = require 'mongoose'
 
-x =
-  connected: false
-  init: (dbURL) ->
-    return if x.connected
-    mongoose.connect dbURL
-    x.connected = true
+exports.connected = false
 
-module.exports = x
+exports.connection = null
+
+exports.init = (dbURL) ->
+  return if exports.connected
+  unless dbURL? then dbURL = process.MONGODB_URL
+  mongoose.connect dbURL
+  exports.connection = mongoose.connection
+  exports.connected = true

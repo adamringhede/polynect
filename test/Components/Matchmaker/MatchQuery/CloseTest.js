@@ -1,4 +1,4 @@
-var Close = require('../../../lib/Components/MatchQueryBuilder/Close');
+var Close = require('../../../../lib/Components/MatchQueryBuilder/Close');
 var assert = require('assert');
 
 describe('Close query', function() {

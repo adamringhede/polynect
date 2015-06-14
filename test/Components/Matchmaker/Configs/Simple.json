@@ -1,0 +1,14 @@
+{
+  "attempts": 1,
+  "general": {
+    "min": 2,
+    "max": 2
+  },
+  "attributes": {
+    "y": {
+      "type": "same",
+      "default": "foo",
+      "value": "input.y"
+    }
+  }
+}

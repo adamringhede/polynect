@@ -1,4 +1,4 @@
-var Interval = require('../../../lib/Components/MatchQueryBuilder/Interval');
+var Interval = require('../../../../lib/Components/MatchQueryBuilder/Interval');
 var assert = require('assert');
 
 

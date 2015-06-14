@@ -1,4 +1,4 @@
-var Same = require('../../../lib/Components/MatchQueryBuilder/Same');
+var Same = require('../../../../lib/Components/MatchQueryBuilder/Same');
 var assert = require('assert');
 
 describe('Same query', function() {

@@ -1,0 +1,26 @@
+{
+  "attempts": 3,
+  "general": {
+    "min": 2,
+    "max": 2
+  },
+  "attributes": {
+    "x": {
+      "type": "interval",
+      "intervals": [[1,4], [5,9], 10],
+      "value": "player.a",
+      "default": 1
+    },
+    "y": {
+      "type": "same",
+      "default": "foo",
+      "value": "input.y"
+    },
+    "z": {
+      "type": "close",
+      "distance": [1, 8],
+      "value": "character.b",
+      "default": 4
+    }
+  }
+}
