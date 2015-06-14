@@ -32,24 +32,10 @@ var fixtures = {
 describe('Matchmaker', function () {
   var f = {};
   beforeEach(function (done) {
-    Fixtures.load(fixtures, Models.connection, function () {
-      var count = 0;
-      Object.keys(fixtures).forEach(function (modelName) {
-        f[modelName] = {};
-        Object.keys(fixtures[modelName]).forEach(function (i) {
-          if (fixtures[modelName][i]['_id']) {
-            count += 1;
-            Models[modelName].findOne({_id: fixtures[modelName][i]['_id']}, function (err, model) {
-              f[modelName][i] = model;
-              count -= 1;
-              if (count == 0) {
-                done();
-              }
-            });
-          }
-        });
-      });
-    });
+    Models.load(fixtures, function (fixtures) {
+      f = fixtures;
+      done();
+    })
   })
 
   it('creates a match if one cannot be found', function (done) {
