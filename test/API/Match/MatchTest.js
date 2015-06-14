@@ -1,6 +1,7 @@
 var assert = require('assert');
 var request = require('request');
 var Models = require('../../../lib/Models');
+var Matchmaker = require('../../../lib/Components/Matchmaker');
 var mongoose = require('mongoose');
 
 Models.init('mongodb://localhost/polynect-test')
@@ -57,5 +58,16 @@ describe('Match POST', function () {
             });
         });
     });
+  });
+  describe('Match GET', function () {
+    it('returns the view of an existing match', function (done) {
+      request({ method: 'POST', json: true, url: 'http://localhost:8090/games/'+gameId+'/match' + '?access_token=' + token ,
+        body: { values: {y: 'bar'} }, headers: { Authorization: token } }, function (err, res, body) {
+          request.get('http://localhost:8090/games/'+gameId+'/matches/' + body.id + '?access_token=' + token, function (err, res, body2) {
+            console.log(body2);
+            done();
+          })
+        });
+    })
   });
 });
