@@ -16,6 +16,10 @@ var fixtures = {
       _id: ObjectId(),
       username: 'david@polynect.io'
     },
+    p3: {
+      _id: ObjectId(),
+      username: 'hacker@polynect.io'
+    },
   },
   Game: {
     g1: {
@@ -105,6 +109,26 @@ describe('Matchmaker', function () {
       });
     });
   });
+  it('does not add a player to a full match', function (done) {
+    Matchmaker.findMatch({
+      player: f.Player.p1,
+      game: f.Game.g1,
+    }, function (err, match) {
+      Matchmaker.findMatch({
+        player: f.Player.p2,
+        game: f.Game.g1,
+      }, function (err, match2) {
+        Matchmaker.findMatch({
+          player: f.Player.p3,
+          game: f.Game.g1,
+        }, function (err, match3) {
+          assert.equal(match2.size, 2);
+          assert.equal(match3.size, 1);
+          done();
+        });
+      });
+    });
+  })
 
 
 });
