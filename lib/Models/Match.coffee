@@ -25,9 +25,34 @@ schema = new Schema
   requirements: {}
   size: type: Number, default: 0
   attributes: {}
+  rolesEnabled: type: Boolean, default: false
   roles:
     need: {}
     delegations: {}
+
+
+schema.statics =
+  initWithGame: (game) ->
+    Match = mongoose.model('Match')
+    match = new Match();
+    match.game = game._id;
+    match.requirements = game.matchmaking_config.attributes;
+    if game.matchmaking_config.roles? and game.matchmaking_config.roles.limits?
+      match.rolesEnabled = true;
+      match.roles.need = {}
+      match.roles.delegations = {}
+      for role, limit of game.matchmaking_config.roles.limits
+        match.roles.delegations[role] = []
+        if limit instanceof Array
+          if limit.length is 2 and limit[0] <= limit[1]
+            match.roles.need[role] = limit
+          else if limit.length is 1
+            match.roles.need[role] = [limit[0], limit[1]]
+          else
+            throw "Invalid role limit " + limit
+        else if typeof limit is 'number'
+          match.roles.need[role] = [limit, limit]
+    return match
 
 
 schema.methods =
@@ -57,12 +82,54 @@ schema.methods =
     }
   }`
   addRequest: (request) ->
+    if @rolesEnabled
+      if @delegateRequest(request, false)
+        this.markModified('roles.delegations')
+      else return false
     this.size += 1;
     this.requests.push(request);
     this.calculateAttributes();
+    return true;
+
   removeRequest: (request) ->
     this.size -= 1;
     this.calculateAttributes();
+
+  delegateRequest: (request, allowSwitching = false) ->
+    `
+    var limit = 1;
+    for (role in this.roles.need) {
+      var need = this.roles.need[role];
+      if (need[0] > this.roles.delegations[role].length) {
+        limit = 0;
+        break;
+      }
+    }
+
+    for (var i = 0, l = request.roles.length; i < l; i++) {
+      var role = request.roles[i];
+      if (this.roles.need[role] && this.roles.need[role][limit] > this.roles.delegations[role].length) {
+        this.roles.delegations[role].push(request.player);
+        return true;
+      }
+    }`
+
+    return false unless allowSwitching
+
+    # This is less restrictive
+    for role in request.roles
+      if @roles.need[role].minimum > 0 # there is a need for this role to begin with but it is occupied
+        for other, i in @delegations[role] # find another request with the same role which can fulfill another role
+          if other.roles.length > 1 # it may fulfill more roles than the one it is currently assigned
+            # TODO: make this function recursive to make multiple switches a possibility
+            for otherRole in other.roles
+              continue if otherRole is role # we have already determined that there are no spots for this role
+              if @roles.need[otherRole]? and @roles.need[otherRole][1] > @roles.delegations[otherRole].length
+                @roles.delegations[otherRole].push other
+                @roles.delegations[role].splice i, 1
+                @roles.delegations[role].push request.player
+                return true
+    return false
 
 
 

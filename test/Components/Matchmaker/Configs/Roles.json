@@ -1,0 +1,15 @@
+{
+  "attempts": 1,
+  "general": {
+    "min": 2,
+    "max": 2
+  },
+  "attributes": {},
+  "roles": {
+    "value": "input.roles",
+    "limits": {
+      "a": 1,
+      "b": 2
+    }
+  }
+}

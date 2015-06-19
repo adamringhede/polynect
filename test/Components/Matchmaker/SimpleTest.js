@@ -2,7 +2,6 @@ var assert = require('assert');
 var Models = require('../../../lib/Models');
 var Matchmaker = require('../../../lib/Components/Matchmaker')
 var ObjectId = require('objectid');
-var Fixtures = require('pow-mongoose-fixtures');
 
 Models.init('mongodb://localhost/polynect-test');
 

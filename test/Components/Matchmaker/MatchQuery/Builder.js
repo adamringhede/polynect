@@ -50,5 +50,28 @@ describe('MatchQueryBuilder', function() {
       var query = builder.build();
       assert.equal(query.$and[3].z.$gte, 5.5);
     });
-  })
+  });
+
+  describe('getPlayerRoles', function () {
+    it('can derive roles from input', function () {
+      var builder = new Builder(
+        require('../Configs/Roles'),
+        { roles: ['a'] },
+        player
+      );
+      var roles = builder.getPlayerRoles();
+      assert.equal(roles[0], 'a');
+    })
+  });
+  describe('getRolesQuery', function () {
+    it('returns a valid roles query', function () {
+      var builder = new Builder(
+        require('../Configs/Roles'),
+        { roles: ['a'] },
+        player
+      );
+      var query = builder.getRolesQuery();
+      console.log(query);
+    });
+  });
 });
