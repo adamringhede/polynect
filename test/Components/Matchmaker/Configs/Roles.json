@@ -7,6 +7,7 @@
   "attributes": {},
   "roles": {
     "value": "input.roles",
+    "allowSwitching": true,
     "limits": {
       "a": 1,
       "b": 2

@@ -43,9 +43,7 @@ describe('Matchmaking (roles)', function () {
       values: {
         roles: roles
       }
-    }, function (err, match) {
-      callback(err, match);
-    });
+    }, callback);
   }
 
   beforeEach(function (done) {
@@ -56,16 +54,10 @@ describe('Matchmaking (roles)', function () {
   });
   describe ('delegations', function () {
     it ('selects the first role in the array', function (done) {
-      Matchmaker.findMatch({
-        player: f.Player.p1,
-        game: f.Game.g1,
-        values: {
-          roles: ['b', 'a']
-        }
-      }, function (err, match) {
+      match('p1', ['b', 'a'], function (err, match) {
         assert.equal(err, null);
         done();
-      });
+      })
     });
   });
   describe('matching', function () {
@@ -95,6 +87,41 @@ describe('Matchmaking (roles)', function () {
         }
       ], done);
     });
+    it ('matches if the first request can fall back on another role', function (done) {
+      async.series([
+        function (callback) {
+          match('p1', ['a', 'b'], callback)
+        },
+        function (callback) {
+          match('p2', ['a'], function (err, match) {
+            assert.equal(match.size, 2);
+            assert.equal(match.roles.delegations.a.length, 1);
+            assert.equal(match.roles.delegations.b.length, 1);
+            assert.equal(match.roles.delegations.a[0].id.toString(), f.Player.p2._id.toString());
+            assert.equal(match.roles.delegations.b[0].id.toString(), f.Player.p1._id.toString());
+            callback();
+          })
+        }
+      ], done);
+    });
+    it ('does not switch roles if switching is disabled', function (done) {
+      f.Game.g1.matchmaking_config.roles.allowSwitching = false;
+      f.Game.g1.markModified('matchmaking_config');
+      f.Game.g1.save(function () {
+        async.series([
+          function (callback) {
+            match('p1', ['a', 'b'], callback)
+          },
+          function (callback) {
+            match('p2', ['a'], function (err, match) {
+              assert.equal(match.size, 1);
+              callback();
+            })
+          }
+        ], done);
+      })
+    });
+
   })
 
 

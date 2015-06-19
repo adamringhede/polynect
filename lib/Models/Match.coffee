@@ -83,7 +83,7 @@ schema.methods =
   }`
   addRequest: (request) ->
     if @rolesEnabled
-      if @delegateRequest(request, false)
+      if @delegateRequest(request, true)
         this.markModified('roles.delegations')
       else return false
     this.size += 1;
@@ -109,7 +109,10 @@ schema.methods =
     for (var i = 0, l = request.roles.length; i < l; i++) {
       var role = request.roles[i];
       if (this.roles.need[role] && this.roles.need[role][limit] > this.roles.delegations[role].length) {
-        this.roles.delegations[role].push(request.player);
+        this.roles.delegations[role].push({
+          id: request.player.id,
+          roles: request.roles
+        });
         return true;
       }
     }`
@@ -118,8 +121,8 @@ schema.methods =
 
     # This is less restrictive
     for role in request.roles
-      if @roles.need[role].minimum > 0 # there is a need for this role to begin with but it is occupied
-        for other, i in @delegations[role] # find another request with the same role which can fulfill another role
+      if @roles.need[role][0] > 0 # there is a need for this role to begin with but it is occupied
+        for other, i in @roles.delegations[role] # find another request with the same role which can fulfill another role
           if other.roles.length > 1 # it may fulfill more roles than the one it is currently assigned
             # TODO: make this function recursive to make multiple switches a possibility
             for otherRole in other.roles
@@ -127,7 +130,10 @@ schema.methods =
               if @roles.need[otherRole]? and @roles.need[otherRole][1] > @roles.delegations[otherRole].length
                 @roles.delegations[otherRole].push other
                 @roles.delegations[role].splice i, 1
-                @roles.delegations[role].push request.player
+                @roles.delegations[role].push {
+                  id: request.player.id,
+                  roles: request.roles
+                }
                 return true
     return false
 
