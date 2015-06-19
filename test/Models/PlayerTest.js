@@ -17,4 +17,21 @@ describe('Player', function () {
     player.removeToken();
     assert.equal(player.verifyWithToken(token), false);
   })
+
+  describe('data', function () {
+    it ('can be set using dot notation');
+  });
+
+  describe('item', function () {
+    it ('receives and id when created if one is not specified')
+    it ('is stored in a box')
+    it ('is stored in a default box if one is not specified')
+    it ('can be stacked if it has the same code')
+  });
+
+  describe('currency', function () {
+    it ('can be incremented')
+    it ('can be decremented')
+  });
+
 });
