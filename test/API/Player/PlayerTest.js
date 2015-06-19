@@ -68,3 +68,52 @@ describe('Players GET', function () {
       });
   })
 });
+
+describe('Players PUT', function () {
+  var playerId = null;
+  var gameId = null;
+  var token = null;
+  beforeEach(function (done) {
+    Models.Game.collection.remove(function () {
+      Models.Player.collection.remove(function () {
+        var g = new Models.Game({name: 'TestGame'});
+        gameId = g._id;
+        g.save(function () {
+          Models.Player.createWithCredentials('adamringhede@live.com', 'secret', gameId, function (err, model) {
+            playerId = model._id;
+            token = model.token;
+            done()
+          })
+        });
+      });
+    })
+  })
+
+  describe('data', function () {
+    it ('changes the data property of the player', function (done) {
+      var actions = [{
+          do: 'set',
+          at: 'a.b',
+          v: 123
+        }, {
+          do: 'push',
+          at: 'b',
+          v: 'x'
+        }
+      ];
+
+      request({ method: 'PUT', json: true, url: 'http://localhost:8090/games/'+gameId+'/players/' + playerId + '/data?access_token=' + token,
+        body: {actions: actions} },
+        function (err, res, body) {
+          assert.equal(res.statusCode, 200);
+          assert.deepEqual(body.data, {
+            a: {
+              b: 123
+            },
+            b: ['x']
+          });
+          done();
+        });
+    })
+  })
+})
