@@ -22,7 +22,7 @@ schema = new Schema
   token_expires: Date
 
   # A player is tied to a game
-  game: ref: 'Game', type: String
+  game: ref: 'Game', type: Schema.Types.ObjectId
 
   # Misc
   created: type: Date, default: Date.now()
