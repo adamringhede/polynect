@@ -1,8 +1,9 @@
-mongoose = require 'mongoose'
-Schema = mongoose.Schema
 random = require 'randomstring'
 moment = require 'moment'
 crypto = require 'crypto'
+OPath = require 'object-path'
+mongoose = require 'mongoose'
+Schema = mongoose.Schema
 
 TOKEN_LIFETIME = 24 * 30 # hours
 SALT = '!NPnp9apdufnyfb3twbi73hd0wjwh2ueno'
@@ -25,6 +26,9 @@ schema = new Schema
 
   # Misc
   created: type: Date, default: Date.now()
+
+  # Data
+  data: type: Schema.Types.Mixed, default: {}
 
 schema.methods =
   # This is used after the player has been authenticated
@@ -49,7 +53,12 @@ schema.methods =
     return false
   tokenIsValid: (token) ->
     this.token? and Date.now() <= this.token_expires.getTime() and token is this.token
-
+  push: (path, value) ->
+    OPath.push(this, path, value);
+  insert: (path, value, index) ->
+    OPath.insert(this, path, value, index);
+  empty: (path) ->
+    OPath.empty(this, path);
 
 schema.statics =
   ERROR_USERNAME_TAKEN: 'username is already taken'
