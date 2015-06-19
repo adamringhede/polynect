@@ -94,11 +94,21 @@ describe('Players PUT', function () {
       var actions = [{
           do: 'set',
           at: 'a.b',
-          v: 123
+          v: {
+            n: 123,
+            a: ['a']
+          }
         }, {
           do: 'push',
           at: 'b',
           v: 'x'
+        }, {
+          do: 'insert',
+          at: 'b',
+          v: 'y'
+        }, {
+          do: 'empty',
+          at: 'a.b.a'
         }
       ];
 
@@ -108,9 +118,12 @@ describe('Players PUT', function () {
           assert.equal(res.statusCode, 200);
           assert.deepEqual(body.data, {
             a: {
-              b: 123
+              b: {
+                n: 123,
+                a: []
+              }
             },
-            b: ['x']
+            b: ['y', 'x']
           });
           done();
         });
