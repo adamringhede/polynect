@@ -4,6 +4,8 @@ crypto = require 'crypto'
 OPath = require 'object-path'
 mongoose = require 'mongoose'
 Schema = mongoose.Schema
+Plugins = require './Plugins'
+
 
 TOKEN_LIFETIME = 24 * 30 # hours
 SALT = '!NPnp9apdufnyfb3twbi73hd0wjwh2ueno'
@@ -53,12 +55,6 @@ schema.methods =
     return false
   tokenIsValid: (token) ->
     this.token? and Date.now() <= this.token_expires.getTime() and token is this.token
-  push: (path, value) ->
-    OPath.push(this, path, value);
-  insert: (path, value, index) ->
-    OPath.insert(this, path, value, index);
-  empty: (path) ->
-    OPath.empty(this, path);
 
 schema.statics =
   ERROR_USERNAME_TAKEN: 'username is already taken'
@@ -90,7 +86,7 @@ schema.statics =
         callback? null, null
 
 
-
+schema.plugin Plugins.DataStore
 
 
 module.exports = mongoose.model 'Player', schema

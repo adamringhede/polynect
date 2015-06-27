@@ -4,5 +4,5 @@ lib/Components/**/index.js
 
 
 # Compoments that uses coffeescript
-lib/Models/*.js
+lib/Models/**/*.js
 lib/Matchmaker/*.js
