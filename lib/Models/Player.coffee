@@ -29,8 +29,6 @@ schema = new Schema
   # Misc
   created: type: Date, default: Date.now()
 
-  # Data
-  data: type: Schema.Types.Mixed, default: {}
 
 schema.methods =
   # This is used after the player has been authenticated

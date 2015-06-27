@@ -1,8 +1,10 @@
 OPath = require 'object-path'
+mongoose = require 'mongoose'
+Schema = mongoose.Schema
 
 module.exports = (schema, options) ->
   schema.add
-    data: {}
+    data: type: Schema.Types.Mixed, default: {}
 
   schema.methods.push =  (path, value) ->
     OPath.push(this, path, value);
