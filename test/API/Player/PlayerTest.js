@@ -1,7 +1,10 @@
 var assert = require('assert');
-var request = require('request');
+//var request = require('request');
 var Models = require('../../../lib/Models');
 var mongoose = require('mongoose');
+var ObjectId = require('objectid');
+var request = require('supertest');
+var moment = require('moment');
 
 Models.init('mongodb://localhost/polynect-test')
 
@@ -11,83 +14,84 @@ process.env.MOCK_SERVICES = true;
 // Start API
 require('../../../lib/API')
 
+var api = 'http://localhost:8090';
 
+var gameId = ObjectId();
+var playerId = ObjectId();
+var clientId = ObjectId();
+var fixtures = {
+  Game: {
+    g1: {
+      _id: gameId,
+      name: 'Test game'
+    }
+  },
+  Account: {
+    d1: {
+      _id: playerId,
+      role: 'player',
+      username: 'adamringhede@live.com', // No need to provide password really
+      game: gameId
+    }
+  },
+  Client: {
+    c1: {
+      _id: clientId,
+      name: 'Games',
+      client_id: 'games',
+      secret: 'secret'
+    }
+  },
+  AccessToken: {
+    t1: {
+      token: 'testtoken',
+      expires: moment().add(1, 'hours'),
+      client_id: clientId,
+      holder: playerId
+    }
+  }
+}
+
+var f;
+beforeEach(function (done) {
+  Models.load(fixtures, function (fixtures) {
+    f = fixtures;
+    done()
+  });
+})
 
 describe('Players POST', function () {
-  var gameId = null;
-  before(function (done) {
-    // Clear database
-    Models.Game.collection.remove(function () {
-      Models.Player.collection.remove(function () {
-        var g = new Models.Game({name: 'TestGame'});
-        gameId = g._id; g.save(done);
-      });
-    });
-  })
   it('creates a new player', function (done) {
-    request({ method: 'POST', json: true, url: 'http://localhost:8090/games/'+gameId+'/players',
-      body: {username: 'adamringhede@live.com', password: 'password'} }, function (err, res, body) {
-        assert.equal(res.statusCode, 200);
-        assert.equal(typeof body.token, 'string')
-        done();
-      });
+    request(api).post('/games/' + gameId + '/players')
+      .set('Content-Type', 'application/json')
+      // This endpoint does not need a token. Maybe a client/game id though?
+      .send({username: 'adamringhede2@live.com', password: 'password'})
+      .expect('Content-Type', 'application/json')
+      .expect(200, /adamringhede2/i, done);
   })
 });
 
 
 describe('Players GET', function () {
-  var playerId = null;
-  var gameId = null;
-  before(function (done) {
-    Models.Game.collection.remove(function () {
-      Models.Player.collection.remove(function () {
-        var g = new Models.Game({name: 'TestGame'});
-        gameId = g._id;
-        g.save(function () {
-          Models.Player.createWithCredentials('adamringhede@live.com', 'secret', gameId, function (err, model) {
-            playerId = model._id;
-            done()
-          })
-        });
-      });
-    })
-  })
+
   it('retrieves a player by id', function (done) {
-    request({ method: 'GET', json: true, url: 'http://localhost:8090/games/'+gameId+'/players/' + playerId},
-      function (err, res, body) {
-        assert.equal(res.statusCode, 200);
-        assert.equal(body.username, 'adamringhede@live.com');
-        done();
-      });
+    request(api).get('/games/' + gameId + '/players/' + playerId)
+      .set('Content-Type', 'application/json')
+      .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+      .expect('Content-Type', 'application/json')
+      .expect(200, /adamringhede/i, done);
+
   });
   it('returns 404 if player can not be found', function (done) {
-    request({ method: 'GET', json: true, url: 'http://localhost:8090/games/'+gameId+'/players/' + mongoose.Types.ObjectId()},
-      function (err, res, body) {
-        assert.equal(res.statusCode, 404);
-        done();
-      });
+    request(api).get('/games/' + gameId + '/players/' + ObjectId())
+      .set('Content-Type', 'application/json')
+      .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+      .expect(404, done);
   })
 });
 
 describe('Players PUT', function () {
-  var playerId = null;
-  var gameId = null;
-  var token = null;
-  beforeEach(function (done) {
-    Models.Game.collection.remove(function () {
-      Models.Player.collection.remove(function () {
-        var g = new Models.Game({name: 'TestGame'});
-        gameId = g._id;
-        g.save(function () {
-          Models.Player.createWithCredentials('adamringhede@live.com', 'secret', gameId, function (err, model) {
-            playerId = model._id;
-            token = model.token;
-            done()
-          })
-        });
-      });
-    })
-  })
+
 
   describe('data', function () {
     it ('changes the data property of the player', function (done) {
@@ -112,11 +116,14 @@ describe('Players PUT', function () {
         }
       ];
 
-      request({ method: 'PUT', json: true, url: 'http://localhost:8090/games/'+gameId+'/players/' + playerId + '/data?access_token=' + token,
-        body: {actions: actions} },
-        function (err, res, body) {
+
+      request(api).put('/games/' + gameId + '/players/' + playerId + '/data')
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+        .send({actions: actions})
+        .end(function (err, res) {
           assert.equal(res.statusCode, 200);
-          assert.deepEqual(body.data, {
+          assert.deepEqual(res.body.data, {
             a: {
               b: {
                 n: 123,

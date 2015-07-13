@@ -10,7 +10,7 @@ module.exports = (schema, options) ->
     token: String
     expires: Date
     client_id: String
-    holder: type: Schema.Types.ObjectId, ref: 'Developer'
+    holder: type: Schema.Types.ObjectId, ref: 'Account'
 
 
   schema.statics.create = (lifetime = null) ->

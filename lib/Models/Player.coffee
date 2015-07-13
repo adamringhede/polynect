@@ -20,10 +20,6 @@ schema = new Schema
   username: String
   password: String
 
-  # A player has only one token at one time until it expires.
-  token: String
-  token_expires: Date
-
   # A player is tied to a game
   game: ref: 'Game', type: Schema.Types.ObjectId
 
@@ -33,9 +29,6 @@ schema = new Schema
     name: String,
     _id: Schema.Types.ObjectId
   }]
-
-  # Misc
-  created: type: Date, default: Date.now()
 
 
 schema.methods =

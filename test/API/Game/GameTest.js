@@ -20,9 +20,10 @@ require('../../../lib/API')
 var devId = ObjectId();
 var clientId = ObjectId();
 var fixtures = {
-  Developer: {
+  Account: {
     d1: {
       _id: devId,
+      role: 'developer',
       username: 'dev',
       password: 'pass'
     }
@@ -63,17 +64,5 @@ describe('Games POST', function () {
         name: 'New game'
       })
       .expect(200, /new game/i, done);
-   /*
-    request('http://localhost:8090').post('/oauth/token')
-      .set('Content-Type', 'application/x-www-form-urlencoded')
-      .send({
-        grant_type: 'password',
-        client_id: 'client',
-        client_secret: 'secret',
-        username: 'dev',
-        password: 'pass'
-      })
-      .expect(200, /user credentials are invalid/i, done);
-      */
   })
 });

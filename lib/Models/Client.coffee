@@ -17,10 +17,8 @@ Client = new Schema
   redirect_uri: String
 
 Client.pre 'save', (next) ->
-  unless @client_id
-    @client_id = @_id.toString()
+  @client_id = @_id.toString()
   next()
-    # TODO make sure that the client_id is unique if a custom one is used
 
 
 module.exports = mongoose.model 'Client', Client, 'clients'
