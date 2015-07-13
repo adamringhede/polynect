@@ -16,8 +16,13 @@ exports.load = `function (fixtures, callback) {
   var f = {};
   Fixtures.load(fixtures, mongoose.connection, function () {
     var count = 0;
+    var non_empty_count = 0;
+    if (Object.keys(fixtures).length === 0 && typeof callback === 'function') callback(f);
     Object.keys(fixtures).forEach(function (modelName) {
       f[modelName] = {};
+      if (Object.keys(fixtures[modelName]).length > 0) {
+        non_empty_count += 1;
+      }
       Object.keys(fixtures[modelName]).forEach(function (i) {
         if (fixtures[modelName][i]['_id']) {
           count += 1;
@@ -32,5 +37,6 @@ exports.load = `function (fixtures, callback) {
         }
       });
     });
+    if (non_empty_count == 0 && typeof callback === 'function') callback(f);
   });
 };`

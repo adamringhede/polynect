@@ -1,6 +1,7 @@
 var assert = require('assert');
 var request = require('request');
 var Models = require('../../../lib/Models');
+var ObjectId = require('objectid');
 
 Models.init('mongodb://localhost/polynect-test')
 
@@ -15,16 +16,29 @@ var player = {
   password: 'secret'
 };
 
+var gameId = ObjectId();
+var fixtures = {
+  Game: {
+    g1: {
+      _id: gameId,
+      name: 'Test game'
+    }
+  },
+  Player: {}
+
+};
+
 describe('Login with credentials', function () {
-  before(function (done) {
-    // Clear database
-    Models.Player.collection.remove();
-    Models.Player.createWithCredentials(player.username, player.password, '213', function (err, model) {
-      done();
-    });
+  var f = {};
+  beforeEach(function (done) {
+    Models.load(fixtures, function (fixtures) {
+      f = fixtures;
+      Models.Player.createWithCredentials(player.username, player.password, gameId, done)
+    })
   });
+
   it('returns 401 if player does not exist with sent credentials', function (done) {
-    request({ method: 'POST', json: true, url: 'http://localhost:8090/games/213/login',
+    request({ method: 'POST', json: true, url: 'http://localhost:8090/games/'+f.Game.g1._id+'/login',
       body: {username: player.username, password: 'wrong password'} }, function (err, res, body) {
 
         assert.equal(res.statusCode, 401);
@@ -32,7 +46,7 @@ describe('Login with credentials', function () {
       });
   });
   it('returns 200 if valid credentials are used', function (done) {
-    request({ method: 'POST', json: true, url: 'http://localhost:8090/games/213/login',
+    request({ method: 'POST', json: true, url: 'http://localhost:8090/games/'+f.Game.g1._id+'/login',
       body: {username: player.username, password: player.password} }, function (err, res, body) {
         assert.equal(res.statusCode, 200);
         assert.equal(typeof body.token, 'string');

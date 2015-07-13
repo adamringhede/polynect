@@ -1,6 +1,7 @@
 OPath = require 'object-path'
 mongoose = require 'mongoose'
 Schema = mongoose.Schema
+Schemas = require '../Schemas'
 
 module.exports = (schema, options) ->
   schema.add

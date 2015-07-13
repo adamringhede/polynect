@@ -5,6 +5,7 @@ OPath = require 'object-path'
 mongoose = require 'mongoose'
 Schema = mongoose.Schema
 Plugins = require './Plugins'
+Item = require './Item'
 
 
 TOKEN_LIFETIME = 24 * 30 # hours
@@ -25,6 +26,13 @@ schema = new Schema
 
   # A player is tied to a game
   game: ref: 'Game', type: Schema.Types.ObjectId
+
+  # Currencies
+  currencies: [{
+    count: Number,
+    name: String,
+    _id: Schema.Types.ObjectId
+  }]
 
   # Misc
   created: type: Date, default: Date.now()
@@ -56,7 +64,8 @@ schema.methods =
 
 schema.statics =
   ERROR_USERNAME_TAKEN: 'username is already taken'
-  ERROR_TOKEN_INVALID: 'token_invalid'
+  ERROR_TOKEN_INVALID: 'token invalid'
+
   createWithCredentials: (username, password, game, callback) ->
     hash = crypto.createHash('sha1').update(password + SALT).digest('hex')
     # Include developer id here
@@ -67,11 +76,13 @@ schema.statics =
         p = new this username: username, password: hash, game: game
         p.createToken();
         p.save (err, model) -> callback? err, model
+
   findWithCredentials: (username, password, game, callback) ->
     hash = crypto.createHash('sha1').update(password + SALT).digest('hex')
     # Include developer id here
     this.findOne username: username, password: hash, game: game, (err, model) ->
       callback? err, model
+
   findWithToken: (token, callback) ->
     this.findOne token: token, (err, model) =>
       if model?

@@ -1,10 +1,17 @@
 var assert = require('assert');
 var Models = require('../../lib/Models');
+var mongoose = require('mongoose');
+var ObjectId = require('objectid');
+var Schema = mongoose.Schema;
 var Player = Models.Player;
+var Schemas = Models.Schemas;
 
 Models.init('mongodb://localhost/polynect-test');
 
 describe('Player', function () {
+  beforeEach(function (done) {
+    Models.load({Player: {}}, function () { done() })
+  });
   it('can be verified using a token', function () {
     var player = new Player();
     var token = player.getToken();
@@ -42,18 +49,6 @@ describe('Player', function () {
         })
       });
     });
-  });
-
-  describe('item', function () {
-    it ('receives and id when created if one is not specified')
-    it ('is stored in a box')
-    it ('is stored in a default box if one is not specified')
-    it ('can be stacked if it has the same code')
-  });
-
-  describe('currency', function () {
-    it ('can be incremented')
-    it ('can be decremented')
   });
 
 });
