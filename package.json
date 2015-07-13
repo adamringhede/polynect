@@ -11,6 +11,7 @@
     "mocha": "^2.2.5",
     "moment": "^2.10.3",
     "mongoose": "^4.0.2",
+    "oauth2-server-restify": "git+https://github.com/adamringhede/node-oauth2-server-restify.git",
     "object-path": "^0.9.2",
     "objectid": "^3.2.0",
     "puid": "^1.0.5",
