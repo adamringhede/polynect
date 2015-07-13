@@ -3,6 +3,7 @@ var request = require('request');
 var Models = require('../../../lib/Models');
 var Matchmaker = require('../../../lib/Components/Matchmaker');
 var mongoose = require('mongoose');
+var ObjectId = require('objectid');
 
 Models.init('mongodb://localhost/polynect-test')
 
@@ -12,32 +13,38 @@ process.env.MOCK_SERVICES = true;
 // Start API
 require('../../../lib/API')
 
+var gameId = ObjectId();
+var fixtures = {
+  Player: {},
+  Match: {},
+  Game: {
+    g1: {
+      _id: gameId,
+      name: 'TestGame',
+      matchmaking_config: require('../../Components/MatchQuery/Configs/Complex')
+    }
+  }
+};
 
 describe('Match POST', function () {
   var playerId = null;
   var token = null;
   var token2 = null;
-  var gameId = null;
-  before(function (done) {
-    Models.Game.collection.remove(function () {
-      Models.Player.collection.remove(function () {
-        var g = new Models.Game({name: 'TestGame'});
-        g.matchmaking_config = require('../../Components/MatchQuery/Configs/Complex');
-
-        gameId = g._id;
-        g.save(function () {
-          Models.Player.createWithCredentials('adamringhede@live.com', 'secret', gameId, function (err, p1) {
-            Models.Player.createWithCredentials('adamringhede2@live.com', 'secret', gameId, function (err, p2) {
-              playerId = p1._id;
-              token = p1.token;
-              token2 = p2.token;
-              Models.Match.collection.remove(done);
-            });
-          })
+  var f;
+  beforeEach(function (done) {
+    Models.load(fixtures, function (fixtures) {
+      f = fixtures;
+      Models.Player.createWithCredentials('adamringhede@live.com', 'secret', gameId, function (err, p1) {
+        Models.Player.createWithCredentials('adamringhede2@live.com', 'secret', gameId, function (err, p2) {
+          playerId = p1._id;
+          token = p1.token;
+          token2 = p2.token;
+          done();
         });
-      });
+      })
     });
-  })
+  });
+
   it('creates a match if one cannot be found', function (done) {
     request({ method: 'POST', json: true, url: 'http://localhost:8090/games/'+gameId+'/match' + '?access_token=' + token ,
       body: { values: {y: 'bar'} }, headers: { Authorization: token } }, function (err, res, body) {
