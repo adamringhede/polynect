@@ -10,7 +10,7 @@ Models.init('mongodb://localhost/polynect-test');
 
 describe('Player', function () {
   beforeEach(function (done) {
-    Models.load({Player: {}}, function () { done() })
+    Models.load({Account: {}}, function () { done() })
   });
 
 
