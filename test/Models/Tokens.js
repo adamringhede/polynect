@@ -11,13 +11,6 @@ describe('Tokens', function () {
     Models.load({AccessToken: {}, RefreshToken: {}}, function () { done() })
   });
 
-  it ('can be created using a common create method', function (done) {
-    var token = Models.OAuth.AccessToken.create(100);
-    console.log(token);
-
-    var token = Models.OAuth.RefreshToken.create();
-    console.log(token);
-
-  });
+  it ('can be created using a common create method');
 
 });

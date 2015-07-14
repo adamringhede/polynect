@@ -16,9 +16,18 @@ Client = new Schema
 
   redirect_uri: String
 
+Client.statics =
+  BASE_CLIENT_GAMES: 'games'
+
 Client.pre 'save', (next) ->
-  @client_id = @_id.toString()
+  unless @client_id then @client_id = @_id.toString()
   next()
+
+Client.path('client_id').validate(function (value, callback) {
+  return Timezone.findOne({client_id: value}, "_id" function (err, client) {
+    callback(client == null);
+  });
+}, 'Client_id taken');
 
 
 module.exports = mongoose.model 'Client', Client, 'clients'

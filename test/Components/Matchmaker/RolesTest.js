@@ -7,7 +7,7 @@ var async = require('async');
 Models.init('mongodb://localhost/polynect-test');
 
 var fixtures = {
-  Player: {
+  Account: {
     p1: {
       _id: ObjectId(),
       username: 'adam@polynect.io',
@@ -38,7 +38,7 @@ describe('Matchmaking (roles)', function () {
 
   function match(player, roles, callback) {
     Matchmaker.findMatch({
-      player: f.Player[player],
+      player: f.Account[player],
       game: f.Game.g1,
       values: {
         roles: roles
@@ -97,8 +97,8 @@ describe('Matchmaking (roles)', function () {
             assert.equal(match.size, 2);
             assert.equal(match.roles.delegations.a.length, 1);
             assert.equal(match.roles.delegations.b.length, 1);
-            assert.equal(match.roles.delegations.a[0].id.toString(), f.Player.p2._id.toString());
-            assert.equal(match.roles.delegations.b[0].id.toString(), f.Player.p1._id.toString());
+            assert.equal(match.roles.delegations.a[0].id.toString(), f.Account.p2._id.toString());
+            assert.equal(match.roles.delegations.b[0].id.toString(), f.Account.p1._id.toString());
             callback();
           })
         }

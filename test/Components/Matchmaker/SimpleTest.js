@@ -6,7 +6,7 @@ var ObjectId = require('objectid');
 Models.init('mongodb://localhost/polynect-test');
 
 var fixtures = {
-  Player: {
+  Account: {
     p1: {
       _id: ObjectId(),
       username: 'adam@polynect.io',
@@ -48,7 +48,7 @@ describe('Matchmaker', function () {
 
   it('creates a match if one cannot be found', function (done) {
     Matchmaker.findMatch({
-      player: f.Player.p1,
+      player: f.Account.p1,
       game: f.Game.g1,
       values: {
         y: 'bar'
@@ -58,17 +58,17 @@ describe('Matchmaker', function () {
       assert.equal(match.attributes.y, 'bar');
       assert.equal(match.status, 'waiting');
       assert.equal(match.open, true);
-      assert.equal(match.requests[0].player.id, f.Player.p1._id);
+      assert.equal(match.requests[0].player.id, f.Account.p1._id);
       done();
     });
   });
   it('does not put a player in the the same match twice', function (done) {
     Matchmaker.findMatch({
-      player: f.Player.p1,
+      player: f.Account.p1,
       game: f.Game.g1
     }, function (err, match) {
       Matchmaker.findMatch({
-        player: f.Player.p1,
+        player: f.Account.p1,
         game: f.Game.g1
       }, function (err, match2) {
         assert.equal(match.size, 1);
@@ -79,12 +79,12 @@ describe('Matchmaker', function () {
   });
   it('matches players with matching values', function (done) {
     Matchmaker.findMatch({
-      player: f.Player.p1,
+      player: f.Account.p1,
       game: f.Game.g1,
       values: { y: 'test' }
     }, function (err, match) {
       Matchmaker.findMatch({
-        player: f.Player.p2,
+        player: f.Account.p2,
         game: f.Game.g1,
         values: { y: 'test' }
       }, function (err, match2) {
@@ -97,12 +97,12 @@ describe('Matchmaker', function () {
   });
   it('does not match players if their values differ', function (done) {
     Matchmaker.findMatch({
-      player: f.Player.p1,
+      player: f.Account.p1,
       game: f.Game.g1,
       values: { y: 'test' }
     }, function (err, match) {
       Matchmaker.findMatch({
-        player: f.Player.p2,
+        player: f.Account.p2,
         game: f.Game.g1,
         values: { y: 'not test' }
       }, function (err, match2) {
@@ -115,15 +115,15 @@ describe('Matchmaker', function () {
   });
   it('does not add a player to a full match', function (done) {
     Matchmaker.findMatch({
-      player: f.Player.p1,
+      player: f.Account.p1,
       game: f.Game.g1,
     }, function (err, match) {
       Matchmaker.findMatch({
-        player: f.Player.p2,
+        player: f.Account.p2,
         game: f.Game.g1,
       }, function (err, match2) {
         Matchmaker.findMatch({
-          player: f.Player.p3,
+          player: f.Account.p3,
           game: f.Game.g1,
         }, function (err, match3) {
           assert.equal(match2.size, 2);
@@ -137,11 +137,11 @@ describe('Matchmaker', function () {
   });
   it('does not match players if the game differs', function (done) {
     Matchmaker.findMatch({
-      player: f.Player.p1,
+      player: f.Account.p1,
       game: f.Game.g1,
     }, function (err, match) {
       Matchmaker.findMatch({
-        player: f.Player.p2,
+        player: f.Account.p2,
         game: f.Game.g2
       }, function (err, match2) {
         assert.equal(match.size, 1);

@@ -44,7 +44,7 @@ describe('MatchQueryBuilder', function() {
     it('relaxes values on each attempt', function() {
       var builder = new Builder(
         require('../Configs/Complex'), null, player,
-        { b: 10 } // Character
+        { data: { b: 10 } } // Character
       );
       builder.setAttempt(2);
       var query = builder.build();
@@ -71,7 +71,6 @@ describe('MatchQueryBuilder', function() {
         player
       );
       var query = builder.getRolesQuery();
-      console.log(query);
     });
   });
 });

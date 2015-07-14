@@ -35,19 +35,26 @@ schema = new Schema
 schema.methods =
 
 schema.statics =
-  ERROR_USERNAME_TAKEN: 'username_taken'
-  createWithCredentials: (username, password, game, callback) ->
-    hash = crypto.createHash('sha1').update(password + SALT).digest('hex')
-    
-    this.findOne username: username, (err, model) =>
+  ERROR_USERNAME_TAKEN: 'Username taken'
+  createWithCredentials: (input, callback) ->
+    hash = crypto.createHash('sha1').update(input.password + SALT).digest('hex')
+    unless input.role? then input.role = 'developer'
+
+    query = username: input.username
+    if input.role? then query.role = input.role
+    if input.game? then query.game = input.game
+    this.findOne query, (err, model) =>
       if model
         callback? @ERROR_USERNAME_TAKEN, null
       else
-        p = new this username: username, password: hash, game: game
+        if input.game?
+          p = new this username: input.username, password: hash, game: input.game, role: 'player'
+        else
+          p = new this username: input.username, password: hash, role: input.role
         p.save (err, model) -> callback? err, model
-  findWithCredentials: (username, password, game, callback) ->
-    hash = crypto.createHash('sha1').update(password + SALT).digest('hex')
-    this.findOne username: username, password: hash, (err, model) ->
+  findWithCredentials: (input, callback) ->
+    hash = crypto.createHash('sha1').update(input.password + SALT).digest('hex')
+    this.findOne username: input.username, password: hash, (err, model) ->
       callback? err, model
 
 schema.plugin Plugins.DataStore

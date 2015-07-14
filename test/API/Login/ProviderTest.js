@@ -13,7 +13,7 @@ require('../../../lib/API')
 
 
 var fixtures = {
-  Player: {},
+  Account: {},
   Game: {
     g1: {
       _id: ObjectId(),
@@ -36,8 +36,7 @@ describe('Login with provider', function () {
     request({ method: 'POST', json: true, url: 'http://localhost:8090/games/'+f.Game.g1._id+'/login/facebook',
       body: {access_token: 'token'} }, function (err, res, body) {
         assert.equal(res.statusCode, 200);
-        assert.equal(typeof body.token, 'string');
-        assert.equal(typeof body.token_expires, 'string');
+        assert.equal(typeof body.token.access_token, 'string');
         done();
       });
 

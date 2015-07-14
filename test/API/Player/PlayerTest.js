@@ -65,7 +65,7 @@ describe('Players POST', function () {
     request(api).post('/games/' + gameId + '/players')
       .set('Content-Type', 'application/json')
       // This endpoint does not need a token. Maybe a client/game id though?
-      .send({username: 'adamringhede2@live.com', password: 'password'})
+      .send({username: 'adamringhede2@live.com', password: 'password', game: gameId})
       .expect('Content-Type', 'application/json')
       .expect(200, /adamringhede2/i, done);
   })

@@ -24,7 +24,7 @@ var fixtures = {
       name: 'Test game'
     }
   },
-  Player: {}
+  Account: {}
 
 };
 
@@ -33,24 +33,22 @@ describe('Login with credentials', function () {
   beforeEach(function (done) {
     Models.load(fixtures, function (fixtures) {
       f = fixtures;
-      Models.Player.createWithCredentials(player.username, player.password, gameId, done)
+      Models.Account.createWithCredentials({username: player.username, password: player.password, game: gameId}, done)
     })
   });
 
   it('returns 401 if player does not exist with sent credentials', function (done) {
-    request({ method: 'POST', json: true, url: 'http://localhost:8090/games/'+f.Game.g1._id+'/login',
+    request({ method: 'POST', json: true, url: 'http://localhost:8090/games/'+gameId+'/login',
       body: {username: player.username, password: 'wrong password'} }, function (err, res, body) {
-
         assert.equal(res.statusCode, 401);
         done();
       });
   });
   it('returns 200 if valid credentials are used', function (done) {
-    request({ method: 'POST', json: true, url: 'http://localhost:8090/games/'+f.Game.g1._id+'/login',
+    request({ method: 'POST', json: true, url: 'http://localhost:8090/games/'+gameId+'/login',
       body: {username: player.username, password: player.password} }, function (err, res, body) {
         assert.equal(res.statusCode, 200);
-        assert.equal(typeof body.token, 'string');
-        assert.equal(typeof body.token_expires, 'string');
+        assert.equal(typeof body.token.access_token, 'string');
         done();
       });
   });
