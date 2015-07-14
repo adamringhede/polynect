@@ -1,9 +1,11 @@
 var assert = require('assert');
-var request = require('request');
+//var request = require('request');
 var Models = require('../../../lib/Models');
 var Matchmaker = require('../../../lib/Components/Matchmaker');
 var mongoose = require('mongoose');
 var ObjectId = require('objectid');
+var request = require('supertest');
+var moment = require('moment');
 
 Models.init('mongodb://localhost/polynect-test')
 
@@ -13,9 +15,13 @@ process.env.MOCK_SERVICES = true;
 // Start API
 require('../../../lib/API')
 
+var api = 'http://localhost:8090';
+
 var gameId = ObjectId();
+var playerId = ObjectId();
+var playerId2 = ObjectId();
+var clientId = ObjectId();
 var fixtures = {
-  Player: {},
   Match: {},
   Game: {
     g1: {
@@ -23,58 +29,104 @@ var fixtures = {
       name: 'TestGame',
       matchmaking_config: require('../../Components/MatchQuery/Configs/Complex')
     }
+  },
+  Account: {
+    p1: {
+      _id: playerId,
+      role: 'player',
+      username: 'adamringhede@live.com', // No need to provide password really
+      game: gameId
+    },
+    p2: {
+      _id: playerId2,
+      role: 'player',
+      username: 'adamringhede2@live.com', // No need to provide password really
+      game: gameId
+    }
+  },
+  Client: {
+    c1: {
+      _id: clientId,
+      name: 'Games',
+      client_id: 'games',
+      secret: 'secret'
+    }
+  },
+  AccessToken: {
+    t1: {
+      token: 'testtoken',
+      expires: moment().add(1, 'hours'),
+      client_id: clientId,
+      holder: playerId
+    },
+    t2: {
+      token: 'testtoken2',
+      expires: moment().add(1, 'hours'),
+      client_id: clientId,
+      holder: playerId2
+    }
   }
 };
 
-describe('Match POST', function () {
-  var playerId = null;
-  var token = null;
-  var token2 = null;
-  var f;
-  beforeEach(function (done) {
-    Models.load(fixtures, function (fixtures) {
-      f = fixtures;
-      Models.Player.createWithCredentials('adamringhede@live.com', 'secret', gameId, function (err, p1) {
-        Models.Player.createWithCredentials('adamringhede2@live.com', 'secret', gameId, function (err, p2) {
-          playerId = p1._id;
-          token = p1.token;
-          token2 = p2.token;
-          done();
-        });
-      })
-    });
+var f;
+beforeEach(function (done) {
+  Models.load(fixtures, function (fixtures) {
+    f = fixtures;
+    done()
   });
+})
+
+describe('Match POST', function () {
 
   it('creates a match if one cannot be found', function (done) {
-    request({ method: 'POST', json: true, url: 'http://localhost:8090/games/'+gameId+'/match' + '?access_token=' + token ,
-      body: { values: {y: 'bar'} }, headers: { Authorization: token } }, function (err, res, body) {
+    request(api).post('/games/' + gameId + '/matches')
+      .set('Content-Type', 'application/json')
+      .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+      .send({ values: {y: 'bar'} })
+      .expect('Content-Type', 'application/json')
+      .end(function (err, res) {
         assert.equal(res.statusCode, 200);
-        assert.equal(body.players.length, 1);
+        assert.equal(res.body.players.length, 1);
         done();
       });
+
   });
   it('adds the request to an existing match if one can be found', function (done) {
-    Models.Match.collection.remove(function () {
-      request({ method: 'POST', json: true, url: 'http://localhost:8090/games/'+gameId+'/match' + '?access_token=' + token,
-        body: { values: {y: 'bar'} }, headers: { Authorization: token } }, function (err, res, body) {
-          request({ method: 'POST', json: true, url: 'http://localhost:8090/games/'+gameId+'/match' + '?access_token=' + token2,
-            body: { values: {y: 'bar'} }, headers: { Authorization: token2 } }, function (err, res, body) {
-              assert.equal(res.statusCode, 200);
-              assert.equal(body.players.length, 2);
-              done();
-            });
-        });
-    });
-  });
-  describe('Match GET', function () {
-    it('returns the view of an existing match', function (done) {
-      request({ method: 'POST', json: true, url: 'http://localhost:8090/games/'+gameId+'/match' + '?access_token=' + token ,
-        body: { values: {y: 'bar'} }, headers: { Authorization: token } }, function (err, res, body) {
-          request.get('http://localhost:8090/games/'+gameId+'/matches/' + body.id + '?access_token=' + token, function (err, res, body2) {
-            assert.equal(res.statusCode, 200);
+    request(api).post('/games/' + gameId + '/matches')
+      .set('Content-Type', 'application/json')
+      .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+      .send({ values: {y: 'bar'} })
+      .end(function (err, res) {
+        request(api).post('/games/' + gameId + '/matches')
+          .set('Content-Type', 'application/json')
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.t2.token)
+          .send({ values: {y: 'bar'} })
+          .end(function (err, res2) {
+            assert.equal(res2.statusCode, 200);
+            assert.equal(res2.body.players.length, 2);
             done();
-          })
-        });
-    })
+          });
+      });
   });
+});
+
+describe('Match GET', function () {
+  it('returns the view of an existing match', function (done) {
+    request(api).post('/games/' + gameId + '/matches')
+      .set('Content-Type', 'application/json')
+      .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+      .send({ values: {y: 'bar'} })
+      .end(function (err, res) {
+        request(api).get('/games/' + gameId + '/matches/' + res.body.id)
+          .set('Content-Type', 'application/json')
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+          .expect('Content-Type', 'application/json')
+          .end(function (err, res) {
+            assert.equal(res.statusCode, 200);
+            assert.equal(res.body.players.length, 1);
+            done();
+          });
+      });
+
+  })
 });
