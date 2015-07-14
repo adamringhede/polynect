@@ -1,5 +1,6 @@
 mongoose = require 'mongoose'
 Schema = mongoose.Schema
+uniqueValidator = require('mongoose-unique-validator');
 
 
 Client = new Schema
@@ -8,7 +9,7 @@ Client = new Schema
   holder: type: Schema.Types.ObjectId
 
   secret: String
-  client_id: type: String, index: true
+  client_id: type: String, index: true, required: true, unique: true
 
   name: String
 
@@ -19,12 +20,14 @@ Client = new Schema
 Client.statics =
   BASE_CLIENT_GAMES: 'games'
 
+Client.plugin uniqueValidator
+
 Client.pre 'save', (next) ->
   unless @client_id then @client_id = @_id.toString()
   next()
 
 Client.path('client_id').validate(function (value, callback) {
-  return Timezone.findOne({client_id: value}, "_id" function (err, client) {
+  mongoose.model('Client').findOne({client_id: value}, "_id" function (err, client) {
     callback(client == null);
   });
 }, 'Client_id taken');
