@@ -91,6 +91,20 @@ describe('Games POST', function () {
         name: 'New game'
       })
       .expect(200, /new game/i, done);
+  });
+
+  describe('with another holder as developer', function () {
+    it('returns 403', function (done) {
+      request(api).post('/games')
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+        .expect('Content-Type', 'application/json')
+        .send({
+          name: 'New game',
+          holder: adminId
+        })
+        .expect(403, done);
+    })
   })
 });
 
