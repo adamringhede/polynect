@@ -19,6 +19,7 @@ require('../../../lib/API')
 
 var devId = ObjectId();
 var clientId = ObjectId();
+var adminId = ObjectId();
 var fixtures = {
   Account: {
     d1: {
@@ -26,8 +27,15 @@ var fixtures = {
       role: 'developer',
       username: 'dev',
       password: 'pass'
+    },
+    admin: {
+      _id: adminId,
+      role: 'admin',
+      username: 'dev',
+      password: 'pass'
     }
   },
+
   Client: {
     c1: {
       _id: clientId,
@@ -42,6 +50,12 @@ var fixtures = {
       expires: moment().add(1, 'hours'),
       client_id: 'client',
       holder: devId
+    },
+    admin: {
+      token: 'testtoken2',
+      expires: moment().add(1, 'hours'),
+      client_id: 'client',
+      holder: adminId
     }
   },
   Game: {
@@ -49,6 +63,11 @@ var fixtures = {
       _id: ObjectId(),
       name: 'Game',
       holder: devId
+    },
+    g2: {
+      _id: ObjectId(),
+      name: 'Game',
+      holder: ObjectId()
     }
   }
 }
@@ -76,6 +95,32 @@ describe('Games POST', function () {
 });
 
 describe('Games GET', function () {
+
+  describe('list', function () {
+    it('fetches a list of games', function (done) {
+      request(api).get('/games')
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
+        .expect('Content-Type', 'application/json')
+        .end(function (err, res) {
+          assert.equal(res.body.count, 2);
+          assert.equal(res.body.data.length, 2);
+          done()
+        })
+    });
+    describe('as developer', function () {
+      it('only fetches games held by the developer', function (done) {
+        request(api).get('/games')
+          .set('Content-Type', 'application/json')
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+          .end(function (err, res) {
+            assert.equal(res.body.count, 1);
+            assert.equal(res.body.data.length, 1);
+            done()
+          })
+      });
+    })
+  })
 
   describe('with id', function () {
     it('fetches the game', function (done) {

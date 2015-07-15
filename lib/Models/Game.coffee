@@ -6,7 +6,7 @@ game = new Schema
   alias: String
   created: type: Date, default: Date.now()
   matchmaking_config: {}
-  developer: type: Schema.Types.ObjectId, ref: 'Developer'
+  holder: type: Schema.Types.ObjectId, ref: 'Account'
 
 
 module.exports = mongoose.model 'Game', game
