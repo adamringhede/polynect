@@ -21,6 +21,7 @@ schema = new Schema
 
   firstname: String
   lastname: String
+  email: String
 
   #### Player ####
 
