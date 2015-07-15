@@ -94,6 +94,23 @@ describe('Games POST', function () {
   })
 });
 
+describe('Games PUT', function () {
+  it('changes a game by id', function (done) {
+    request(api).put('/games/' + fixtures.Game.g1._id)
+      .set('Content-Type', 'application/json')
+      .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+      .expect('Content-Type', 'application/json')
+      .send({
+        _id: '123', // this should not affect anything
+        name: 'New name'
+      })
+      .end(function (err, res) {
+        assert.equal(res.body.data.name, 'New name');
+        done()
+      })
+  });
+});
+
 describe('Games GET', function () {
 
   describe('list', function () {
