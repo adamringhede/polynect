@@ -1,5 +1,6 @@
 crypto = require 'crypto'
 Plugins = require './Plugins'
+validator = require 'validator'
 mongoose = require 'mongoose'
 Schema = mongoose.Schema
 
@@ -21,7 +22,7 @@ schema = new Schema
 
   firstname: String
   lastname: String
-  email: String
+  email: type: String, validate: [validator.isEmail, 'Invalid email']
 
   #### Player ####
 

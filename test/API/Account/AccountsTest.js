@@ -106,12 +106,45 @@ describe('Accounts GET', function () {
         request(api).get('/accounts/' + fixtures.Account.admin._id)
           .set('Content-Type', 'application/json')
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.d1.token)
-          .expect(403, done);
+          .expect(403)
+          .end(function (err, res) {
+            assert.equal(res.body.code, 'ForbiddenError');
+            done();
+          });
       })
     })
 
   })
 
+});
+
+describe('Accounts PUT', function () {
+  it('changes attributes', function (done) {
+    request(api).put('/accounts/' + fixtures.Account.d1._id)
+      .set('Content-Type', 'application/json')
+      .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
+      .send({
+        username: 'newusername'
+      })
+      .expect(200)
+      .end(function (err, res) {
+        assert.equal(res.body.data.username, 'newusername');
+        done();
+      });
+  });
+  it('performs validation', function (done) {
+    request(api).put('/accounts/' + fixtures.Account.d1._id)
+      .set('Content-Type', 'application/json')
+      .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
+      .send({
+        email: 'invalid email'
+      })
+      .expect(400)
+      .end(function (err, res) {
+        assert.ok('email' in res.body.errors)
+        done();
+      });
+  });
 });
 
 describe('Accounts DELETE', function () {
