@@ -20,7 +20,13 @@ require('../../../lib/API')
 var devId = ObjectId();
 var clientId = ObjectId();
 var fixtures = {
-  Account: {},
+  Account: {
+    d1: {
+      _id: devId,
+      username: 'dev',
+      password_hash: Models.Account.hashPassword('pass')
+    }
+  },
   Client: {
     c1: {
       _id: clientId,
@@ -38,7 +44,7 @@ describe('Access Token', function () {
   beforeEach(function (done) {
     Models.load(fixtures, function (fixtures) {
       f = fixtures;
-      Models.Account.createWithCredentials({username: 'dev', password:'pass'}, done);
+      done();
     });
   })
   it('can be created using password grant', function (done) {
