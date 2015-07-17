@@ -1,5 +1,5 @@
 var assert = require('assert');
-var request = require('request');
+var request = require('supertest');
 var Models = require('../../../lib/Models');
 var ObjectId = require('objectid');
 
@@ -11,13 +11,26 @@ process.env.MOCK_SERVICES = true;
 // Start API
 require('../../../lib/API')
 
+var api = 'http://localhost:8090';
 
+var gameId = ObjectId();
+var playerId = ObjectId()
 var fixtures = {
-  Account: {},
+  Account: {
+    p1: {
+      _id: playerId,
+      role: 'player',
+      provider: {
+        alias: 'facebook',
+        uid: '10153397865655452'
+      },
+      game: gameId
+    }
+  },
   Game: {
     g1: {
-      _id: ObjectId(),
-      name: 'Test game'
+      _id: gameId,
+      name: 'player',
     }
   }
 
@@ -33,12 +46,9 @@ describe('Login with provider', function () {
   });
 
   it('works with facebook', function (done) {
-    request({ method: 'POST', json: true, url: 'http://localhost:8090/games/'+f.Game.g1._id+'/login/facebook',
-      body: {access_token: 'token'} }, function (err, res, body) {
-        assert.equal(res.statusCode, 200);
-        assert.equal(typeof body.token.access_token, 'string');
-        done();
-      });
-
-  });
+    request(api).post('/games/' + gameId + '/login/facebook')
+      .set('Content-Type', 'application/json')
+      .send({access_token: 'token'})
+      .expect(200, /bearer/i, done);
+  })
 });

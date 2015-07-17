@@ -17,6 +17,7 @@ require('../../../lib/API')
 var api = 'http://localhost:8090';
 
 var gameId = ObjectId();
+var gameId2 = ObjectId();
 var playerId = ObjectId();
 var clientId = ObjectId();
 var fixtures = {
@@ -24,6 +25,10 @@ var fixtures = {
     g1: {
       _id: gameId,
       name: 'Test game'
+    },
+    g2: {
+      _id: gameId2,
+      name: 'Another game'
     }
   },
   Account: {
@@ -64,11 +69,27 @@ describe('Players POST', function () {
   it('creates a new player', function (done) {
     request(api).post('/games/' + gameId + '/players')
       .set('Content-Type', 'application/json')
-      // This endpoint does not need a token. Maybe a client/game id though?
-      .send({username: 'adamringhede2@live.com', password: 'password', game: gameId})
+      .send({username: 'adamringhede2@live.com', password: 'password'})
       .expect('Content-Type', 'application/json')
       .expect(200, /adamringhede2/i, done);
-  })
+  });
+
+  it('fails if combination of game and username exists', function (done) {
+    request(api).post('/games/' + gameId + '/players')
+      .set('Content-Type', 'application/json')
+      .send({username: 'adamringhede@live.com', password: 'password'})
+      .expect('Content-Type', 'application/json')
+      .expect(400, /Not unique/i, done);
+  });
+
+  it('does not fail if the same username is used multiple time on different games', function (done) {
+    request(api).post('/games/' + gameId2 + '/players')
+      .set('Content-Type', 'application/json')
+      .send({username: 'adamringhede@live.com', password: 'password'})
+      .expect('Content-Type', 'application/json')
+      .expect(200, /adamringhede/i, done);
+  });
+
 });
 
 

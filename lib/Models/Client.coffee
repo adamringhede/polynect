@@ -19,6 +19,7 @@ Client = new Schema
 
 Client.statics =
   BASE_CLIENT_GAMES: 'games'
+  DEV_PORTAL: 'dev_portal'
 
 Client.plugin uniqueValidator
 

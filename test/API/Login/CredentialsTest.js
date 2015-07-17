@@ -24,7 +24,13 @@ var fixtures = {
       name: 'Test game'
     }
   },
-  Account: {}
+  Account: {
+    p1: {
+      _id: ObjectId(),
+      username: player.username,
+      password_hash: Models.Account.hashPassword(player.password)
+    }
+  }
 
 };
 
@@ -33,7 +39,8 @@ describe('Login with credentials', function () {
   beforeEach(function (done) {
     Models.load(fixtures, function (fixtures) {
       f = fixtures;
-      Models.Account.createWithCredentials({username: player.username, password: player.password, game: gameId}, done)
+    //  Models.Account.createWithCredentials({username: player.username, password: player.password, game: gameId}, done)
+      done()
     })
   });
 
@@ -48,7 +55,7 @@ describe('Login with credentials', function () {
     request({ method: 'POST', json: true, url: 'http://localhost:8090/games/'+gameId+'/login',
       body: {username: player.username, password: player.password} }, function (err, res, body) {
         assert.equal(res.statusCode, 200);
-        assert.equal(typeof body.token.access_token, 'string');
+        assert.equal(typeof body.data.token.access_token, 'string');
         done();
       });
   });

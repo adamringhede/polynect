@@ -34,6 +34,12 @@ var fixtures = {
       role: 'admin',
       username: 'dev',
       password: 'pass'
+    },
+    p1: {
+      _id: ObjectId(),
+      role: 'player',
+      username: 'playername',
+      password: 'secret'
     }
   },
 
@@ -61,6 +67,49 @@ beforeEach(function (done) {
   });
 })
 
+describe('Accounts POST', function () {
+  it('creates a new Account', function (done) {
+    request(api).post('/accounts')
+      .set('Content-Type', 'application/json')
+      .send({
+        username: 'adam',
+        password: 'secret'
+      })
+      .expect(200)
+      .end(function (err, res) {
+        assert.equal(res.body.data.username, 'adam');
+        done()
+      })
+  })
+  it('fails if duplicate username', function (done) {
+    request(api).post('/accounts')
+      .set('Content-Type', 'application/json')
+      .send({
+        username: 'dev',
+        password: 'secret'
+      })
+      .expect(400)
+      .end(function (err, res) {
+        assert.ok('username' in res.body.errors);
+        done()
+      })
+  })
+  it('does not fail if a player has the same username', function (done) {
+    request(api).post('/accounts')
+      .set('Content-Type', 'application/json')
+      .send({
+        username: 'playername',
+        password: 'secret'
+      })
+      .expect(200)
+      .end(function (err, res) {
+        assert.equal(res.body.data.role, 'developer');
+        assert.equal(res.body.data.username, 'playername');
+        done()
+      })
+  });
+});
+
 
 describe('Accounts GET', function () {
 
@@ -71,8 +120,9 @@ describe('Accounts GET', function () {
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
         .expect('Content-Type', 'application/json')
         .end(function (err, res) {
-          assert.equal(res.body.count, 2);
-          assert.equal(res.body.data.length, 2);
+          console.log(res.body);
+          assert.equal(res.body.count, 3);
+          assert.equal(res.body.data.length, 3);
           done()
         })
     });
