@@ -71,103 +71,107 @@ var fixtures = {
     }
   }
 }
+describe('Games API', function () {
 
-var f;
-beforeEach(function (done) {
-  Models.load(fixtures, function (fixtures) {
-    f = fixtures;
-    done();
-  });
-})
 
-describe('Games POST', function () {
+  var f;
+  beforeEach(function (done) {
+    Models.load(fixtures, function (fixtures) {
+      f = fixtures;
+      done();
+    });
+  })
 
-  it('creates a new game', function (done) {
-    request(api).post('/games')
-      .set('Content-Type', 'application/json')
-      .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
-      .expect('Content-Type', 'application/json')
-      .send({
-        name: 'New game'
-      })
-      .expect(200, /new game/i, done);
-  });
+  describe('POST', function () {
 
-  describe('with another holder as developer', function () {
-    it('returns 403', function (done) {
+    it('creates a new game', function (done) {
       request(api).post('/games')
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
         .expect('Content-Type', 'application/json')
         .send({
-          name: 'New game',
-          holder: adminId
+          name: 'New game'
         })
-        .expect(403, done);
+        .expect(200, /new game/i, done);
+    });
+
+    describe('with another holder as developer', function () {
+      it('returns 403', function (done) {
+        request(api).post('/games')
+          .set('Content-Type', 'application/json')
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+          .expect('Content-Type', 'application/json')
+          .send({
+            name: 'New game',
+            holder: adminId
+          })
+          .expect(403, done);
+      })
     })
-  })
-});
-
-describe('Games PUT', function () {
-  it('changes a game by id', function (done) {
-    request(api).put('/games/' + fixtures.Game.g1._id)
-      .set('Content-Type', 'application/json')
-      .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
-      .expect('Content-Type', 'application/json')
-      .send({
-        _id: '123', // this should not affect anything
-        name: 'New name'
-      })
-      .end(function (err, res) {
-        assert.equal(res.body.data.name, 'New name');
-        done()
-      })
   });
-});
 
-describe('Games GET', function () {
-
-  describe('list', function () {
-    it('fetches a list of games', function (done) {
-      request(api).get('/games')
+  describe('PUT', function () {
+    it('changes a game by id', function (done) {
+      request(api).put('/games/' + fixtures.Game.g1._id)
         .set('Content-Type', 'application/json')
-        .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
         .expect('Content-Type', 'application/json')
+        .send({
+          _id: '123', // this should not affect anything
+          name: 'New name'
+        })
         .end(function (err, res) {
-          assert.equal(res.body.count, 2);
-          assert.equal(res.body.data.length, 2);
+          assert.equal(res.body.data.name, 'New name');
           done()
         })
     });
-    describe('as developer', function () {
-      it('only fetches games held by the developer', function (done) {
+  });
+
+  describe('GET', function () {
+
+    describe('list', function () {
+      it('fetches a list of games', function (done) {
         request(api).get('/games')
           .set('Content-Type', 'application/json')
-          .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
+          .expect('Content-Type', 'application/json')
           .end(function (err, res) {
-            assert.equal(res.body.count, 1);
-            assert.equal(res.body.data.length, 1);
+            assert.equal(res.body.count, 2);
+            assert.equal(res.body.data.length, 2);
             done()
           })
       });
+      describe('as developer', function () {
+        it('only fetches games held by the developer', function (done) {
+          request(api).get('/games')
+            .set('Content-Type', 'application/json')
+            .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+            .end(function (err, res) {
+              assert.equal(res.body.count, 1);
+              assert.equal(res.body.data.length, 1);
+              done()
+            })
+        });
+      })
     })
-  })
 
-  describe('with id', function () {
-    it('fetches the game', function (done) {
-      request(api).get('/games/' + fixtures.Game.g1._id)
-        .set('Content-Type', 'application/json')
-        .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
-        .expect('Content-Type', 'application/json')
-        .expect(200, /Game/, done);
-    });
+    describe('with id', function () {
+      it('fetches the game', function (done) {
+        request(api).get('/games/' + fixtures.Game.g1._id)
+          .set('Content-Type', 'application/json')
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+          .expect('Content-Type', 'application/json')
+          .expect(200, /Game/, done);
+      });
 
-    it('returns 404 if game does not exist', function (done) {
-      request(api).get('/games/' + ObjectId())
-        .set('Content-Type', 'application/json')
-        .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
-        .expect(404, done);
+      it('returns 404 if game does not exist', function (done) {
+        request(api).get('/games/' + ObjectId())
+          .set('Content-Type', 'application/json')
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+          .expect(404, done);
+      })
     })
-  })
+
+  });
 
 });

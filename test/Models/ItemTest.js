@@ -3,14 +3,14 @@ var Models = require('../../lib/Models');
 var mongoose = require('mongoose');
 var ObjectId = require('objectid');
 var Item = Models.Item;
-var Player = Models.Player;
+var account = Models.Account;
 
 Models.init('mongodb://localhost/polynect-test');
 
 var gameId = ObjectId();
 
 var fixtures = {
-  Player: {},
+  Account: {},
   Game: {
     g0: {
       _id: gameId,

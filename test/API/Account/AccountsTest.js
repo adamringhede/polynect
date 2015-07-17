@@ -58,150 +58,152 @@ var fixtures = {
     }
   }
 }
+describe('Accounts API', function () {
 
-var f;
-beforeEach(function (done) {
-  Models.load(fixtures, function (fixtures) {
-    f = fixtures;
-    done();
-  });
-})
-
-describe('Accounts POST', function () {
-  it('creates a new Account', function (done) {
-    request(api).post('/accounts')
-      .set('Content-Type', 'application/json')
-      .send({
-        username: 'adam',
-        password: 'secret'
-      })
-      .expect(200)
-      .end(function (err, res) {
-        assert.equal(res.body.data.username, 'adam');
-        done()
-      })
+  var f;
+  beforeEach(function (done) {
+    Models.load(fixtures, function (fixtures) {
+      f = fixtures;
+      done();
+    });
   })
-  it('fails if duplicate username', function (done) {
-    request(api).post('/accounts')
-      .set('Content-Type', 'application/json')
-      .send({
-        username: 'dev',
-        password: 'secret'
-      })
-      .expect(400)
-      .end(function (err, res) {
-        assert.ok('username' in res.body.errors);
-        done()
-      })
-  })
-  it('does not fail if a player has the same username', function (done) {
-    request(api).post('/accounts')
-      .set('Content-Type', 'application/json')
-      .send({
-        username: 'playername',
-        password: 'secret'
-      })
-      .expect(200)
-      .end(function (err, res) {
-        assert.equal(res.body.data.role, 'developer');
-        assert.equal(res.body.data.username, 'playername');
-        done()
-      })
-  });
-});
 
-
-describe('Accounts GET', function () {
-
-  describe('list', function () {
-    it('fetches a list of accounts', function (done) {
-      request(api).get('/accounts')
+  describe('POST', function () {
+    it('creates a new Account', function (done) {
+      request(api).post('/accounts')
         .set('Content-Type', 'application/json')
-        .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
-        .expect('Content-Type', 'application/json')
+        .send({
+          username: 'adam',
+          password: 'secret'
+        })
+        .expect(200)
         .end(function (err, res) {
-          console.log(res.body);
-          assert.equal(res.body.count, 3);
-          assert.equal(res.body.data.length, 3);
+          assert.equal(res.body.data.username, 'adam');
+          done()
+        })
+    })
+    it('fails if duplicate username', function (done) {
+      request(api).post('/accounts')
+        .set('Content-Type', 'application/json')
+        .send({
+          username: 'dev',
+          password: 'secret'
+        })
+        .expect(400)
+        .end(function (err, res) {
+          assert.ok('username' in res.body.errors);
+          done()
+        })
+    })
+    it('does not fail if a player has the same username', function (done) {
+      request(api).post('/accounts')
+        .set('Content-Type', 'application/json')
+        .send({
+          username: 'playername',
+          password: 'secret'
+        })
+        .expect(200)
+        .end(function (err, res) {
+          assert.equal(res.body.data.role, 'developer');
+          assert.equal(res.body.data.username, 'playername');
           done()
         })
     });
-    describe('as developer', function () {
-      it('is forbidden', function (done) {
+  });
+
+
+  describe('GET', function () {
+
+    describe('list', function () {
+      it('fetches a list of accounts', function (done) {
         request(api).get('/accounts')
           .set('Content-Type', 'application/json')
-          .set('Authorization', 'Bearer ' + fixtures.AccessToken.d1.token)
-          .expect(403, done);
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
+          .expect('Content-Type', 'application/json')
+          .end(function (err, res) {
+            assert.equal(res.body.count, 3);
+            assert.equal(res.body.data.length, 3);
+            done()
+          })
       });
+      describe('as developer', function () {
+        it('is forbidden', function (done) {
+          request(api).get('/accounts')
+            .set('Content-Type', 'application/json')
+            .set('Authorization', 'Bearer ' + fixtures.AccessToken.d1.token)
+            .expect(403, done);
+        });
+      })
     })
-  })
 
-  describe('with id', function () {
-    it('fetches the account', function (done) {
-      request(api).get('/accounts/' + fixtures.Account.d1._id)
-        .set('Content-Type', 'application/json')
-        .set('Authorization', 'Bearer ' + fixtures.AccessToken.d1.token)
-        .expect('Content-Type', 'application/json')
-        .expect(200, /adamringhede/, done);
-    });
-
-    it('returns 404 if account does not exist', function (done) {
-      request(api).get('/accounts/' + ObjectId())
-        .set('Content-Type', 'application/json')
-        .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
-        .expect(404, done);
-    })
-    describe('as developer', function () {
-      it('returns 403 if trying to access another\'s account', function (done) {
-        request(api).get('/accounts/' + fixtures.Account.admin._id)
+    describe('with id', function () {
+      it('fetches the account', function (done) {
+        request(api).get('/accounts/' + fixtures.Account.d1._id)
           .set('Content-Type', 'application/json')
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.d1.token)
-          .expect(403)
-          .end(function (err, res) {
-            assert.equal(res.body.code, 'ForbiddenError');
-            done();
-          });
+          .expect('Content-Type', 'application/json')
+          .expect(200, /adamringhede/, done);
+      });
+
+      it('returns 404 if account does not exist', function (done) {
+        request(api).get('/accounts/' + ObjectId())
+          .set('Content-Type', 'application/json')
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
+          .expect(404, done);
       })
+      describe('as developer', function () {
+        it('returns 403 if trying to access another\'s account', function (done) {
+          request(api).get('/accounts/' + fixtures.Account.admin._id)
+            .set('Content-Type', 'application/json')
+            .set('Authorization', 'Bearer ' + fixtures.AccessToken.d1.token)
+            .expect(403)
+            .end(function (err, res) {
+              assert.equal(res.body.code, 'ForbiddenError');
+              done();
+            });
+        })
+      })
+
     })
 
+  });
+
+  describe('PUT', function () {
+    it('changes attributes', function (done) {
+      request(api).put('/accounts/' + fixtures.Account.d1._id)
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
+        .send({
+          username: 'newusername'
+        })
+        .expect(200)
+        .end(function (err, res) {
+          assert.equal(res.body.data.username, 'newusername');
+          done();
+        });
+    });
+    it('performs validation', function (done) {
+      request(api).put('/accounts/' + fixtures.Account.d1._id)
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
+        .send({
+          email: 'invalid email'
+        })
+        .expect(400)
+        .end(function (err, res) {
+          assert.ok('email' in res.body.errors)
+          done();
+        });
+    });
+  });
+
+  describe('DELETE', function () {
+    it('removes the account', function (done) {
+      request(api).delete('/accounts/' + fixtures.Account.d1._id)
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
+        .expect(200, /deleted account/i, done);
+    });
   })
 
 });
-
-describe('Accounts PUT', function () {
-  it('changes attributes', function (done) {
-    request(api).put('/accounts/' + fixtures.Account.d1._id)
-      .set('Content-Type', 'application/json')
-      .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
-      .send({
-        username: 'newusername'
-      })
-      .expect(200)
-      .end(function (err, res) {
-        assert.equal(res.body.data.username, 'newusername');
-        done();
-      });
-  });
-  it('performs validation', function (done) {
-    request(api).put('/accounts/' + fixtures.Account.d1._id)
-      .set('Content-Type', 'application/json')
-      .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
-      .send({
-        email: 'invalid email'
-      })
-      .expect(400)
-      .end(function (err, res) {
-        assert.ok('email' in res.body.errors)
-        done();
-      });
-  });
-});
-
-describe('Accounts DELETE', function () {
-  it('removes the account', function (done) {
-    request(api).delete('/accounts/' + fixtures.Account.d1._id)
-      .set('Content-Type', 'application/json')
-      .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
-      .expect(200, /deleted account/i, done);
-  });
-})

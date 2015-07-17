@@ -47,41 +47,44 @@ var fixtures = {
     }
   }
 }
+describe('General API', function () {
+  
+  var f;
+  beforeEach(function (done) {
+    Models.load(fixtures, function (fixtures) {
+      f = fixtures;
+      done();
+    });
+  })
 
-var f;
-beforeEach(function (done) {
-  Models.load(fixtures, function (fixtures) {
-    f = fixtures;
-    done();
+  describe('Supress status codes', function () {
+
+    it('sets status code to 200 when resource is not found', function (done) {
+      request(api).get('/games/' + ObjectId() + '?suppress_response_codes=true')
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+        .expect(200, /could not find Game/i)
+        .end(function (err, res) {
+          assert.equal(res.body.response_code, 404);
+          done();
+        });
+    });
+
   });
-})
 
-describe('Supress status codes', function () {
-
-  it('sets status code to 200 when resource is not found', function (done) {
-    request(api).get('/games/' + ObjectId() + '?suppress_response_codes=true')
-      .set('Content-Type', 'application/json')
-      .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
-      .expect(200, /could not find Game/i)
-      .end(function (err, res) {
-        assert.equal(res.body.response_code, 404);
-        done();
-      });
-  });
+  describe('Error', function () {
+    it ('includes a message and code', function (done) {
+      request(api).get('/errors/internal')
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+        .expect(500)
+        .end(function (err, res) {
+          assert.equal(res.body.response_code, 500);
+          assert.equal(res.body.code, 'InternalError');
+          assert.equal(res.body.message, 'string is not a function')
+          done();
+        });
+    })
+  })
 
 });
-
-describe('Error', function () {
-  it ('includes a message and code', function (done) {
-    request(api).get('/errors/internal')
-      .set('Content-Type', 'application/json')
-      .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
-      .expect(500)
-      .end(function (err, res) {
-        assert.equal(res.body.response_code, 500);
-        assert.equal(res.body.code, 'InternalError');
-        assert.equal(res.body.message, 'string is not a function')
-        done();
-      });
-  })
-})

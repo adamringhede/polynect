@@ -56,105 +56,107 @@ var fixtures = {
     }
   }
 }
+describe('Players API', function () {
 
-var f;
-beforeEach(function (done) {
-  Models.load(fixtures, function (fixtures) {
-    f = fixtures;
-    done()
-  });
-})
-
-describe('Players POST', function () {
-  it('creates a new player', function (done) {
-    request(api).post('/games/' + gameId + '/players')
-      .set('Content-Type', 'application/json')
-      .send({username: 'adamringhede2@live.com', password: 'password'})
-      .expect('Content-Type', 'application/json')
-      .expect(200, /adamringhede2/i, done);
-  });
-
-  it('fails if combination of game and username exists', function (done) {
-    request(api).post('/games/' + gameId + '/players')
-      .set('Content-Type', 'application/json')
-      .send({username: 'adamringhede@live.com', password: 'password'})
-      .expect('Content-Type', 'application/json')
-      .expect(400, /Not unique/i, done);
-  });
-
-  it('does not fail if the same username is used multiple time on different games', function (done) {
-    request(api).post('/games/' + gameId2 + '/players')
-      .set('Content-Type', 'application/json')
-      .send({username: 'adamringhede@live.com', password: 'password'})
-      .expect('Content-Type', 'application/json')
-      .expect(200, /adamringhede/i, done);
-  });
-
-});
-
-
-describe('Players GET', function () {
-
-  it('retrieves a player by id', function (done) {
-    request(api).get('/games/' + gameId + '/players/' + playerId)
-      .set('Content-Type', 'application/json')
-      .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
-      .expect('Content-Type', 'application/json')
-      .expect(200, /adamringhede/i, done);
-
-  });
-  it('returns 404 if player can not be found', function (done) {
-    request(api).get('/games/' + gameId + '/players/' + ObjectId())
-      .set('Content-Type', 'application/json')
-      .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
-      .expect(404, done);
+  var f;
+  beforeEach(function (done) {
+    Models.load(fixtures, function (fixtures) {
+      f = fixtures;
+      done()
+    });
   })
-});
 
-describe('Players PUT', function () {
+  describe('POST', function () {
+    it('creates a new player', function (done) {
+      request(api).post('/games/' + gameId + '/players')
+        .set('Content-Type', 'application/json')
+        .send({username: 'adamringhede2@live.com', password: 'password'})
+        .expect('Content-Type', 'application/json')
+        .expect(200, /adamringhede2/i, done);
+    });
+
+    it('fails if combination of game and username exists', function (done) {
+      request(api).post('/games/' + gameId + '/players')
+        .set('Content-Type', 'application/json')
+        .send({username: 'adamringhede@live.com', password: 'password'})
+        .expect('Content-Type', 'application/json')
+        .expect(400, /Not unique/i, done);
+    });
+
+    it('does not fail if the same username is used multiple time on different games', function (done) {
+      request(api).post('/games/' + gameId2 + '/players')
+        .set('Content-Type', 'application/json')
+        .send({username: 'adamringhede@live.com', password: 'password'})
+        .expect('Content-Type', 'application/json')
+        .expect(200, /adamringhede/i, done);
+    });
+
+  });
 
 
-  describe('data', function () {
-    it ('changes the data property of the player', function (done) {
-      var actions = [{
-          do: 'set',
-          at: 'a.b',
-          v: {
-            n: 123,
-            a: ['a']
-          }
-        }, {
-          do: 'push',
-          at: 'b',
-          v: 'x'
-        }, {
-          do: 'insert',
-          at: 'b',
-          v: 'y'
-        }, {
-          do: 'empty',
-          at: 'a.b.a'
-        }
-      ];
+  describe('GET', function () {
 
-
-      request(api).put('/games/' + gameId + '/players/' + playerId + '/data')
+    it('retrieves a player by id', function (done) {
+      request(api).get('/games/' + gameId + '/players/' + playerId)
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
-        .send({actions: actions})
-        .end(function (err, res) {
-          assert.equal(res.statusCode, 200);
-          assert.deepEqual(res.body.data, {
-            a: {
-              b: {
-                n: 123,
-                a: []
-              }
-            },
-            b: ['y', 'x']
+        .expect('Content-Type', 'application/json')
+        .expect(200, /adamringhede/i, done);
+
+    });
+    it('returns 404 if player can not be found', function (done) {
+      request(api).get('/games/' + gameId + '/players/' + ObjectId())
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+        .expect(404, done);
+    })
+  });
+
+  describe('Players PUT', function () {
+
+
+    describe('data', function () {
+      it ('changes the data property of the player', function (done) {
+        var actions = [{
+            do: 'set',
+            at: 'a.b',
+            v: {
+              n: 123,
+              a: ['a']
+            }
+          }, {
+            do: 'push',
+            at: 'b',
+            v: 'x'
+          }, {
+            do: 'insert',
+            at: 'b',
+            v: 'y'
+          }, {
+            do: 'empty',
+            at: 'a.b.a'
+          }
+        ];
+
+
+        request(api).put('/games/' + gameId + '/players/' + playerId + '/data')
+          .set('Content-Type', 'application/json')
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+          .send({actions: actions})
+          .end(function (err, res) {
+            assert.equal(res.statusCode, 200);
+            assert.deepEqual(res.body.data, {
+              a: {
+                b: {
+                  n: 123,
+                  a: []
+                }
+              },
+              b: ['y', 'x']
+            });
+            done();
           });
-          done();
-        });
+      })
     })
   })
 })

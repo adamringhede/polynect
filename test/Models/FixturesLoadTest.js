@@ -5,7 +5,7 @@ var ObjectId = require('objectid');
 Models.init('mongodb://localhost/polynect-test');
 
 var fixturesData = {
-  Player: {
+  Account: {
     p1: {
       _id: ObjectId(),
       username: 'test@test.com'
@@ -22,7 +22,7 @@ var fixturesData = {
 describe('Loading fixtures', function () {
   it('returns created models', function (done) {
     Models.load(fixturesData, function (f) {
-      assert.equal(f.Player.p1.username, 'test@test.com');
+      assert.equal(f.Account.p1.username, 'test@test.com');
       done();
     })
   });

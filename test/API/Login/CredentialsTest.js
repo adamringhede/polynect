@@ -47,50 +47,53 @@ var fixtures = {
   }
 
 };
+describe('Login API', function () {
 
-var f = {};
-beforeEach(function (done) {
-  Models.load(fixtures, function (fixtures) {
-    f = fixtures;
-    done()
+  var f = {};
+  beforeEach(function (done) {
+    Models.load(fixtures, function (fixtures) {
+      f = fixtures;
+      done()
+    })
+  });
+
+  describe('Login as player', function () {
+
+    it('returns 401 if player does not exist with sent credentials', function (done) {
+      request({ method: 'POST', json: true, url: 'http://localhost:8090/games/'+gameId+'/login',
+        body: {username: player.username, password: 'wrong password'} }, function (err, res, body) {
+          assert.equal(res.statusCode, 401);
+          done();
+        });
+    });
+    it('returns 200 if valid credentials are used', function (done) {
+      request({ method: 'POST', json: true, url: 'http://localhost:8090/games/'+gameId+'/login',
+        body: {username: player.username, password: player.password} }, function (err, res, body) {
+          assert.equal(res.statusCode, 200);
+          assert.equal(typeof body.data.token.access_token, 'string');
+          done();
+        });
+    });
   })
-});
 
-describe('Login as player', function () {
+  describe('Login as developer', function () {
 
-  it('returns 401 if player does not exist with sent credentials', function (done) {
-    request({ method: 'POST', json: true, url: 'http://localhost:8090/games/'+gameId+'/login',
-      body: {username: player.username, password: 'wrong password'} }, function (err, res, body) {
-        assert.equal(res.statusCode, 401);
-        done();
-      });
-  });
-  it('returns 200 if valid credentials are used', function (done) {
-    request({ method: 'POST', json: true, url: 'http://localhost:8090/games/'+gameId+'/login',
-      body: {username: player.username, password: player.password} }, function (err, res, body) {
-        assert.equal(res.statusCode, 200);
-        assert.equal(typeof body.data.token.access_token, 'string');
-        done();
-      });
-  });
-})
+    it('works', function (done) {
+      request({ method: 'POST', json: true, url: 'http://localhost:8090/accounts/login',
+        body: {username: 'dev', password: 'secret'} }, function (err, res, body) {
+          assert.equal(res.statusCode, 200);
+          done();
+        });
+    });
 
-describe('Login as developer', function () {
+    it('works when a player has the same username', function (done) {
+      request({ method: 'POST', json: true, url: 'http://localhost:8090/accounts/login',
+        body: {username: player.username, password: player.password} }, function (err, res, body) {
+          assert.equal(body.data.role, 'developer')
+          assert.equal(res.statusCode, 200);
+          done();
+        });
+    });
+  })
 
-  it('works', function (done) {
-    request({ method: 'POST', json: true, url: 'http://localhost:8090/accounts/login',
-      body: {username: 'dev', password: 'secret'} }, function (err, res, body) {
-        assert.equal(res.statusCode, 200);
-        done();
-      });
-  });
-
-  it('works when a player has the same username', function (done) {
-    request({ method: 'POST', json: true, url: 'http://localhost:8090/accounts/login',
-      body: {username: player.username, password: player.password} }, function (err, res, body) {
-        assert.equal(body.data.role, 'developer')
-        assert.equal(res.statusCode, 200);
-        done();
-      });
-  });
 })

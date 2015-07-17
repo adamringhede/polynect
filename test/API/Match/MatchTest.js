@@ -67,66 +67,70 @@ var fixtures = {
     }
   }
 };
+describe ('Match API', function () {
 
-var f;
-beforeEach(function (done) {
-  Models.load(fixtures, function (fixtures) {
-    f = fixtures;
-    done()
-  });
-})
 
-describe('Match POST', function () {
-
-  it('creates a match if one cannot be found', function (done) {
-    request(api).post('/games/' + gameId + '/matches')
-      .set('Content-Type', 'application/json')
-      .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
-      .send({ values: {y: 'bar'} })
-      .expect('Content-Type', 'application/json')
-      .end(function (err, res) {
-        assert.equal(res.statusCode, 200);
-        assert.equal(res.body.players.length, 1);
-        done();
-      });
-
-  });
-  it('adds the request to an existing match if one can be found', function (done) {
-    request(api).post('/games/' + gameId + '/matches')
-      .set('Content-Type', 'application/json')
-      .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
-      .send({ values: {y: 'bar'} })
-      .end(function (err, res) {
-        request(api).post('/games/' + gameId + '/matches')
-          .set('Content-Type', 'application/json')
-          .set('Authorization', 'Bearer ' + fixtures.AccessToken.t2.token)
-          .send({ values: {y: 'bar'} })
-          .end(function (err, res2) {
-            assert.equal(res2.statusCode, 200);
-            assert.equal(res2.body.players.length, 2);
-            done();
-          });
-      });
-  });
-});
-
-describe('Match GET', function () {
-  it('returns the view of an existing match', function (done) {
-    request(api).post('/games/' + gameId + '/matches')
-      .set('Content-Type', 'application/json')
-      .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
-      .send({ values: {y: 'bar'} })
-      .end(function (err, res) {
-        request(api).get('/games/' + gameId + '/matches/' + res.body.id)
-          .set('Content-Type', 'application/json')
-          .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
-          .expect('Content-Type', 'application/json')
-          .end(function (err, res) {
-            assert.equal(res.statusCode, 200);
-            assert.equal(res.body.players.length, 1);
-            done();
-          });
-      });
-
+  var f;
+  beforeEach(function (done) {
+    Models.load(fixtures, function (fixtures) {
+      f = fixtures;
+      done()
+    });
   })
-});
+
+  describe('POST', function () {
+
+    it('creates a match if one cannot be found', function (done) {
+      request(api).post('/games/' + gameId + '/matches')
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+        .send({ values: {y: 'bar'} })
+        .expect('Content-Type', 'application/json')
+        .end(function (err, res) {
+          assert.equal(res.statusCode, 200);
+          assert.equal(res.body.players.length, 1);
+          done();
+        });
+
+    });
+    it('adds the request to an existing match if one can be found', function (done) {
+      request(api).post('/games/' + gameId + '/matches')
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+        .send({ values: {y: 'bar'} })
+        .end(function (err, res) {
+          request(api).post('/games/' + gameId + '/matches')
+            .set('Content-Type', 'application/json')
+            .set('Authorization', 'Bearer ' + fixtures.AccessToken.t2.token)
+            .send({ values: {y: 'bar'} })
+            .end(function (err, res2) {
+              assert.equal(res2.statusCode, 200);
+              assert.equal(res2.body.players.length, 2);
+              done();
+            });
+        });
+    });
+  });
+
+  describe('GET', function () {
+    it('returns the view of an existing match', function (done) {
+      request(api).post('/games/' + gameId + '/matches')
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+        .send({ values: {y: 'bar'} })
+        .end(function (err, res) {
+          request(api).get('/games/' + gameId + '/matches/' + res.body.id)
+            .set('Content-Type', 'application/json')
+            .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+            .expect('Content-Type', 'application/json')
+            .end(function (err, res) {
+              assert.equal(res.statusCode, 200);
+              assert.equal(res.body.players.length, 1);
+              done();
+            });
+        });
+
+    })
+  });
+
+})
