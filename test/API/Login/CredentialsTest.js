@@ -27,6 +27,20 @@ var fixtures = {
   Account: {
     p1: {
       _id: ObjectId(),
+      role: 'player',
+      game: gameId,
+      username: player.username,
+      password_hash: Models.Account.hashPassword(player.password)
+    },
+    d1: {
+      _id: ObjectId(),
+      role: 'developer',
+      username: 'dev',
+      password_hash: Models.Account.hashPassword('secret')
+    },
+    d2: {
+      _id: ObjectId(),
+      role: 'developer',
       username: player.username,
       password_hash: Models.Account.hashPassword(player.password)
     }
@@ -34,15 +48,15 @@ var fixtures = {
 
 };
 
-describe('Login with credentials', function () {
-  var f = {};
-  beforeEach(function (done) {
-    Models.load(fixtures, function (fixtures) {
-      f = fixtures;
-    //  Models.Account.createWithCredentials({username: player.username, password: player.password, game: gameId}, done)
-      done()
-    })
-  });
+var f = {};
+beforeEach(function (done) {
+  Models.load(fixtures, function (fixtures) {
+    f = fixtures;
+    done()
+  })
+});
+
+describe('Login as player', function () {
 
   it('returns 401 if player does not exist with sent credentials', function (done) {
     request({ method: 'POST', json: true, url: 'http://localhost:8090/games/'+gameId+'/login',
@@ -56,6 +70,26 @@ describe('Login with credentials', function () {
       body: {username: player.username, password: player.password} }, function (err, res, body) {
         assert.equal(res.statusCode, 200);
         assert.equal(typeof body.data.token.access_token, 'string');
+        done();
+      });
+  });
+})
+
+describe('Login as developer', function () {
+
+  it('works', function (done) {
+    request({ method: 'POST', json: true, url: 'http://localhost:8090/accounts/login',
+      body: {username: 'dev', password: 'secret'} }, function (err, res, body) {
+        assert.equal(res.statusCode, 200);
+        done();
+      });
+  });
+
+  it('works when a player has the same username', function (done) {
+    request({ method: 'POST', json: true, url: 'http://localhost:8090/accounts/login',
+      body: {username: player.username, password: player.password} }, function (err, res, body) {
+        assert.equal(body.data.role, 'developer')
+        assert.equal(res.statusCode, 200);
         done();
       });
   });

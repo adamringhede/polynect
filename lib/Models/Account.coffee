@@ -85,7 +85,13 @@ schema.statics =
         p.save (err, model) -> callback? err, model
   findWithCredentials: (input, callback) ->
     hash = this.hashPassword(input.password)
-    this.findOne username: input.username, password_hash: hash, (err, model) ->
+    query = username: input.username, password_hash: hash
+    if input.game?
+      query.game = input.game
+      query.role = 'player'
+    else
+      query.role = $ne: 'player'
+    this.findOne query, (err, model) ->
       callback? err, model
 
 schema.plugin Plugins.DataStore
