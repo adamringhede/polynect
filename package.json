@@ -6,6 +6,7 @@
   "dependencies": {
     "async": "^1.2.0",
     "grunt": "^0.4.5",
+    "grunt-cli": "^0.1.13",
     "grunt-component-tree": "^0.1.0",
     "grunt-mocha-test": "^0.12.7",
     "mocha": "^2.2.5",
@@ -30,7 +31,8 @@
   },
   "scripts": {
     "test": "npm run build && grunt test",
-    "build": "coffee -cm lib/**/*.coffee; grunt component_tree"
+    "build": "coffee -cm lib/**/*.coffee; ./node_modules/grunt-cli/bin/grunt component_tree",
+    "postinstall": "npm run build"
   },
   "author": "Adam Ringhede",
   "license": "ISC"
