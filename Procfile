@@ -1,2 +1,2 @@
-web: npm run build
+npm run build
 web: node lib/API
