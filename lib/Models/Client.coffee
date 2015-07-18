@@ -27,11 +27,6 @@ Client.pre 'save', (next) ->
   unless @client_id then @client_id = @_id.toString()
   next()
 
-Client.path('client_id').validate(function (value, callback) {
-  mongoose.model('Client').findOne({client_id: value}, "_id" function (err, client) {
-    callback(client == null);
-  });
-}, 'Client_id taken');
 
 
 module.exports = mongoose.model 'Client', Client, 'clients'
