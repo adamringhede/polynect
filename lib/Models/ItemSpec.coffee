@@ -15,7 +15,9 @@ ItemSpec = new Schema
   access_level: type: Number, default: 0
 
   # Data
+  # Attributes are not writable by clients can act as base values
   attributes: {}
+  # Data can contain anything and might be writable by games
   data: {}
 
   # Type
