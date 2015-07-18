@@ -4,7 +4,7 @@ var Matchmaker = require('../../../lib/Components/Matchmaker')
 var ObjectId = require('objectid');
 var async = require('async');
 
-Models.init('mongodb://localhost/polynect-test');
+Models.init();
 
 var fixtures = {
   Account: {

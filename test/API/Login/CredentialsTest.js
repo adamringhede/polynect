@@ -3,7 +3,7 @@ var request = require('request');
 var Models = require('../../../lib/Models');
 var ObjectId = require('objectid');
 
-Models.init('mongodb://localhost/polynect-test')
+Models.init()
 
 process.env.POLYNECT_API_PORT = 8090;
 process.env.MOCK_SERVICES = true;

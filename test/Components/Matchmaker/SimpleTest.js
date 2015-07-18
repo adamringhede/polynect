@@ -3,7 +3,7 @@ var Models = require('../../../lib/Models');
 var Matchmaker = require('../../../lib/Components/Matchmaker')
 var ObjectId = require('objectid');
 
-Models.init('mongodb://localhost/polynect-test');
+Models.init();
 
 var fixtures = {
   Account: {

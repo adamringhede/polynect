@@ -5,16 +5,17 @@ exports.connected = false
 
 exports.connection = null
 
-exports.init = (dbURL) ->
+exports.init = (dbURL = process.env.POLYNECT_MONGO_URI || 'mongodb://localhost/polynect-test') ->
   return if exports.connected
-  unless dbURL? then dbURL = process.MONGODB_URL
   mongoose.connect dbURL
+  #mongoose.set('debug', true)
+
   exports.connection = mongoose.connection
   exports.connected = true
 
 exports.load = `function (fixtures, callback) {
   var f = {};
-  Fixtures.load(fixtures, mongoose.connection, function () {
+  Fixtures.load(fixtures, mongoose.connection, function (err) {
     var count = 0;
     var non_empty_count = 0;
     if (Object.keys(fixtures).length === 0 && typeof callback === 'function') callback(f);

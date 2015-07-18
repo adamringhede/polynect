@@ -5,7 +5,7 @@ var ObjectId = require('objectid');
 var Item = Models.Item;
 var account = Models.Account;
 
-Models.init('mongodb://localhost/polynect-test');
+Models.init();
 
 var gameId = ObjectId();
 

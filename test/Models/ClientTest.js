@@ -5,20 +5,20 @@ var ObjectId = require('objectid');
 var Schema = mongoose.Schema;
 var Client = Models.Client;
 
-Models.init('mongodb://localhost/polynect-test');
+Models.init();
 
-beforeEach(function (done) {
-  Models.load({
-    Client: {
-      c1: {
-        _id: ObjectId(),
-        client_id: 'client'
-      }
-    }
-  }, function () { done() })
-});
 
 describe('Client', function () {
+  beforeEach(function (done) {
+    Models.load({
+      Client: {
+        c1: {
+          _id: ObjectId(),
+          client_id: 'client'
+        }
+      }
+    }, function () { done() })
+  });
 
 
   it ('needs a unique client id', function (done) {

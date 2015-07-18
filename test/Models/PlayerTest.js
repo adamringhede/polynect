@@ -6,7 +6,7 @@ var Schema = mongoose.Schema;
 var Account = Models.Account;
 var Schemas = Models.Schemas;
 
-Models.init('mongodb://localhost/polynect-test');
+Models.init();
 
 describe('Player', function () {
   beforeEach(function (done) {

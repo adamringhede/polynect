@@ -6,7 +6,7 @@ var ObjectId = require('objectid');
 var request = require('supertest');
 var moment = require('moment');
 
-Models.init('mongodb://localhost/polynect-test')
+Models.init()
 
 process.env.POLYNECT_API_PORT = 8090;
 process.env.MOCK_SERVICES = true;

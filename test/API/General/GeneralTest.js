@@ -6,7 +6,7 @@ var ObjectId = require('objectid');
 var request = require('supertest');
 var moment = require('moment');
 
-Models.init('mongodb://localhost/polynect-test')
+Models.init()
 
 var api = 'http://localhost:8090';
 
@@ -48,7 +48,7 @@ var fixtures = {
   }
 }
 describe('General API', function () {
-  
+
   var f;
   beforeEach(function (done) {
     Models.load(fixtures, function (fixtures) {

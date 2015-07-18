@@ -2,7 +2,7 @@ var assert = require('assert');
 var Models = require('../../lib/Models');
 var ObjectId = require('objectid');
 
-Models.init('mongodb://localhost/polynect-test');
+Models.init();
 
 var fixturesData = {
   Account: {
