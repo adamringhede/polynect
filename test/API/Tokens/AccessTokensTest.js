@@ -46,6 +46,7 @@ var fixtures = {
   },
   AccessToken: {
     admin: {
+      _id: ObjectId(),
       token: 'testtoken2',
       expires: moment().add(1, 'hours'),
       client_id: 'client',
@@ -82,6 +83,18 @@ describe('Access Token API', function () {
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
         .expect('Content-Type', 'application/json')
         .expect(200, /token/, done);
+    });
+  });
+  describe('GET', function () {
+    it('fetches an access token', function (done) {
+      request(api).get('/v1/accessTokens/' + fixtures.AccessToken.admin._id)
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
+        .expect('Content-Type', 'application/json')
+        .expect(200, /token/)
+        .end(function (err, res) {
+          done();
+        });
     });
   });
 
