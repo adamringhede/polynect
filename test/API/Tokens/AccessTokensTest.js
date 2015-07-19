@@ -98,6 +98,16 @@ describe('Access Token API', function () {
     });
   });
 
+  describe('DELETE', function () {
+    it('removes the token', function (done) {
+      request(api).delete('/v1/accessTokens/' + fixtures.AccessToken.admin._id)
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
+        .expect('Content-Type', 'application/json')
+        .expect(200, /deleted/i, done);
+    });
+  });
+
   describe('POST', function () {
     it('creates a new access token', function (done) {
       request(api).post('/v1/accessTokens')
