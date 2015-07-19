@@ -7,7 +7,7 @@ Schema = mongoose.Schema
 
 module.exports = (schema, options) ->
   schema.add
-    token: String
+    token: type: String, index: true, unique: true
     expires: type: Date, default: undefined
     client_id: String
     holder: type: Schema.Types.ObjectId, ref: 'Account'

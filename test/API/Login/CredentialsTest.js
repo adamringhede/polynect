@@ -44,7 +44,8 @@ var fixtures = {
       username: player.username,
       password_hash: Models.Account.hashPassword(player.password)
     }
-  }
+  },
+  AccessToken: {}
 
 };
 describe('Login API', function () {
@@ -82,7 +83,10 @@ describe('Login API', function () {
       request({ method: 'POST', json: true, url: 'http://localhost:8090/v1/accounts/login',
         body: {username: 'dev', password: 'secret'} }, function (err, res, body) {
           assert.equal(res.statusCode, 200);
-          done();
+          Models.AccessToken.findOne({token: body.data.token.access_token}, function (err, model) {
+            assert.equal(model.client_id, Models.Client.DEV_PORTAL);
+            done();
+          });
         });
     });
 
