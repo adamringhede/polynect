@@ -12,6 +12,11 @@ module.exports = (schema, options) ->
     client_id: String
     holder: type: Schema.Types.ObjectId, ref: 'Account'
 
+  schema.pre 'save', (next) ->
+    if @expires === undefined
+      expires = moment().add(1 , 'month')
+    next()
+
 
   schema.statics.create = (lifetime = null) ->
     str = randomstring.generate(40)

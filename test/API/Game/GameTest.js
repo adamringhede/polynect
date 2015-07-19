@@ -18,6 +18,7 @@ require('../../../lib/API')
 
 
 var devId = ObjectId();
+var devId2 = ObjectId();
 var clientId = ObjectId();
 var adminId = ObjectId();
 var fixtures = {
@@ -26,6 +27,12 @@ var fixtures = {
       _id: devId,
       role: 'developer',
       username: 'dev',
+      password: 'pass'
+    },
+    d2: {
+      _id: devId2,
+      role: 'developer',
+      username: 'dev2',
       password: 'pass'
     },
     admin: {
@@ -51,6 +58,12 @@ var fixtures = {
       client_id: 'client',
       holder: devId
     },
+    d2: {
+      token: 'testtoken3',
+      expires: moment().add(1, 'hours'),
+      client_id: 'client',
+      holder: devId2
+    },
     admin: {
       token: 'testtoken2',
       expires: moment().add(1, 'hours'),
@@ -68,6 +81,11 @@ var fixtures = {
       _id: ObjectId(),
       name: 'Game',
       holder: ObjectId()
+    },
+    g3: {
+      _id: ObjectId(),
+      name: 'Game',
+      holder: devId2
     }
   }
 }
@@ -136,8 +154,8 @@ describe('Games API', function () {
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
           .expect('Content-Type', 'application/json')
           .end(function (err, res) {
-            assert.equal(res.body.count, 2);
-            assert.equal(res.body.data.length, 2);
+            assert.equal(res.body.count, 3);
+            assert.equal(res.body.data.length, 3);
             done()
           })
       });
@@ -173,5 +191,26 @@ describe('Games API', function () {
     })
 
   });
+
+  describe('DELETE', function () {
+    it('fails if not held by developer', function (done) {
+      request(api).delete('/games/' + fixtures.Game.g1._id)
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.d2.token)
+        .expect(403, done);
+    });
+    it('works if admin', function (done) {
+      request(api).delete('/games/' + fixtures.Game.g1._id)
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
+        .expect(200, /deleted/i, done);
+    });
+    it('works holder of the game', function (done) {
+      request(api).delete('/games/' + fixtures.Game.g3._id)
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.d2.token)
+        .expect(200, /deleted/i, done);
+    });
+  })
 
 });

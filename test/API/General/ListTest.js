@@ -20,14 +20,8 @@ require('../../../lib/API')
 var devId = ObjectId();
 var clientId = ObjectId();
 var adminId = ObjectId();
-
 var fixtures = {
   Account: {
-    d1: {
-      _id: devId,
-      username: 'dev',
-      password_hash: Models.Account.hashPassword('pass')
-    },
     admin: {
       _id: adminId,
       role: 'admin',
@@ -35,13 +29,13 @@ var fixtures = {
       password: 'pass'
     }
   },
+
   Client: {
     c1: {
       _id: clientId,
       name: 'Test Client',
       client_id: 'client',
-      secret: 'secret',
-      holder: devId
+      secret: 'secret'
     }
   },
   AccessToken: {
@@ -51,10 +45,10 @@ var fixtures = {
       client_id: 'client',
       holder: adminId
     }
-  }
+  },
+  Game: {}
 }
-
-describe('Access Token API', function () {
+describe('API General', function () {
   var f;
   beforeEach(function (done) {
     Models.load(fixtures, function (fixtures) {
@@ -62,27 +56,20 @@ describe('Access Token API', function () {
       done();
     });
   })
-  it('can be created using password grant', function (done) {
-    request(api).post('/oauth/token')
-      .set('Content-Type', 'application/x-www-form-urlencoded')
-      .send({
-        grant_type: 'password',
-        client_id: 'client',
-        client_secret: 'secret',
-        username: 'dev',
-        password: 'pass'
-      })
-      .expect(200, /access_token/i, done);
-  });
 
-  describe('LIST', function () {
-    it('fetches all access tokens', function (done) {
-      request(api).get('/accessTokens')
-        .set('Content-Type', 'application/json')
-        .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
-        .expect('Content-Type', 'application/json')
-        .expect(200, /token/, done);
-    });
-
+  describe('listing', function () {
+    describe('without records', function () {
+      it('only fetches games held by the developer', function (done) {
+        request(api).get('/games')
+          .set('Content-Type', 'application/json')
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
+          .end(function (err, res) {
+            assert.equal(res.body.count, 0);
+            assert.equal(res.body.data.length, 0);
+            done()
+          })
+      });
+    })
   })
+
 });
