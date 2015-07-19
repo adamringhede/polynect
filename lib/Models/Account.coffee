@@ -64,7 +64,6 @@ schema = new Schema
 schema.methods =
 
 schema.statics =
-  ERROR_USERNAME_TAKEN: 'Username taken'
   hashPassword: (password) ->
     return crypto.createHash('sha1').update(password + SALT).digest('hex');
   findWithCredentials: (input, callback) ->
@@ -84,9 +83,5 @@ schema.pre 'save', (next) ->
   if @password
     @password_hash = mongoose.model('Account').hashPassword(@password)
   next()
-
-#schema.index({ username: 1, game: 1 }, { unique: true, sparse: true })
-#schema.index({ 'provider.uid': 1, 'provider.alias', game: 1 }, { unique: true, sparse: true })
-#schema.index({ username: 1, role: 1 }, { unique: true, sparse: true })
 
 module.exports = mongoose.model 'Account', schema

@@ -44,6 +44,29 @@ var fixtures = {
       game: gameId
     }
   },
+  Character: {
+    c1: {
+      _id: ObjectId(),
+      game: gameId,
+      player: playerId,
+      name: 'A character',
+      data: {
+        b: 10
+      }
+    },
+    c2: {
+      _id: ObjectId(),
+      game: gameId,
+      player: playerId,
+      name: 'Another character'
+    },
+    c3: {
+      _id: ObjectId(),
+      game: gameId,
+      player: playerId2,
+      name: 'Another players character'
+    }
+  },
   Client: {
     c1: {
       _id: clientId,
@@ -84,7 +107,7 @@ describe ('Match API', function () {
       request(api).post('/v1/games/' + gameId + '/matches')
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
-        .send({ values: {y: 'bar'} })
+        .send({ values: {y: 'bar'}, character: fixtures.Character.c1._id })
         .expect('Content-Type', 'application/json')
         .end(function (err, res) {
           assert.equal(res.statusCode, 200);
@@ -97,12 +120,12 @@ describe ('Match API', function () {
       request(api).post('/v1/games/' + gameId + '/matches')
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
-        .send({ values: {y: 'bar'} })
+        .send({ values: {y: 'bar'}, character: fixtures.Character.c1._id })
         .end(function (err, res) {
           request(api).post('/v1/games/' + gameId + '/matches')
             .set('Content-Type', 'application/json')
             .set('Authorization', 'Bearer ' + fixtures.AccessToken.t2.token)
-            .send({ values: {y: 'bar'} })
+            .send({ values: {y: 'bar'}, character: fixtures.Character.c3._id })
             .end(function (err, res2) {
               assert.equal(res2.statusCode, 200);
               assert.equal(res2.body.players.length, 2);
@@ -117,13 +140,14 @@ describe ('Match API', function () {
       request(api).post('/v1/games/' + gameId + '/matches')
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
-        .send({ values: {y: 'bar'} })
+        .send({ values: {y: 'bar'}, character: fixtures.Character.c1._id})
         .end(function (err, res) {
           request(api).get('/v1/games/' + gameId + '/matches/' + res.body.id)
             .set('Content-Type', 'application/json')
             .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
             .expect('Content-Type', 'application/json')
             .end(function (err, res) {
+              assert.equal(res.body.map.z, 10);
               assert.equal(res.statusCode, 200);
               assert.equal(res.body.players.length, 1);
               done();
