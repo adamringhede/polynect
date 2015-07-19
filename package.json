@@ -1,8 +1,8 @@
 {
   "name": "Polynect",
   "version": "1.0.0",
-  "description": "Models used by Polynect software",
-  "main": "index.js",
+  "description": "Polynect API",
+  "main": "lib/API/index.js",
   "dependencies": {
     "async": "^1.2.0",
     "coffee-script": "^1.9.3",
@@ -34,6 +34,7 @@
   "scripts": {
     "test": "npm run build && grunt test",
     "build": "./node_modules/coffee-script/bin/coffee -cm lib/ && ./node_modules/grunt-cli/bin/grunt component_tree",
+    "deploy": "npm run test && git push heroku master",
     "postinstall": "npm run build"
   },
   "author": "Adam Ringhede",
