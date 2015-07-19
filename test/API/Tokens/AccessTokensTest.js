@@ -83,6 +83,24 @@ describe('Access Token API', function () {
         .expect('Content-Type', 'application/json')
         .expect(200, /token/, done);
     });
+  });
 
-  })
+  describe('POST', function () {
+    it('creates a new access token', function (done) {
+      request(api).post('/accessTokens')
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
+        .send({
+          holder: devId,
+          client_id: 'client',
+          token: '0234j92093f2309f',
+          lifetime: {
+            value: 5,
+            unit: 'years'
+          }
+        })
+        .expect('Content-Type', 'application/json')
+        .expect(200, /0234j92093f2309f/, done);
+    });
+  });
 });
