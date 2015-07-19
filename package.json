@@ -33,7 +33,7 @@
   },
   "scripts": {
     "test": "npm run build && grunt test",
-    "build": "./node_modules/coffee-script/bin/coffee -cm lib/; ./node_modules/grunt-cli/bin/grunt component_tree",
+    "build": "./node_modules/coffee-script/bin/coffee -cm lib/ && ./node_modules/grunt-cli/bin/grunt component_tree",
     "postinstall": "npm run build"
   },
   "author": "Adam Ringhede",
