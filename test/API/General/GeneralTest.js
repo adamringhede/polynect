@@ -57,10 +57,19 @@ describe('General API', function () {
     });
   })
 
+  describe('without version', function () {
+    it('falls back to v1', function (done) {
+      request(api).get('/accounts/' + devId)
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+        .expect(200, /dev/i, done);
+    });
+  })
+
   describe('Supress status codes', function () {
 
     it('sets status code to 200 when resource is not found', function (done) {
-      request(api).get('/games/' + ObjectId() + '?suppress_response_codes=true')
+      request(api).get('/v1/games/' + ObjectId() + '?suppress_response_codes=true')
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
         .expect(200, /could not find Game/i)

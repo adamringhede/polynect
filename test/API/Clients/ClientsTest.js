@@ -59,7 +59,7 @@ describe('Clients API', function () {
 
     describe('list', function () {
       it('fetches a list of clients', function (done) {
-        request(api).get('/clients')
+        request(api).get('/v1/clients')
           .set('Content-Type', 'application/json')
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
           .expect('Content-Type', 'application/json')

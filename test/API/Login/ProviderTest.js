@@ -46,7 +46,7 @@ describe('Login with provider', function () {
   });
 
   it('works with facebook', function (done) {
-    request(api).post('/games/' + gameId + '/login/facebook')
+    request(api).post('/v1/games/' + gameId + '/login/facebook')
       .set('Content-Type', 'application/json')
       .send({access_token: 'token'})
       .expect(200, /bearer/i, done);

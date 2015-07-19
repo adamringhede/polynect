@@ -70,7 +70,7 @@ describe('Accounts API', function () {
 
   describe('POST', function () {
     it('creates a new Account', function (done) {
-      request(api).post('/accounts')
+      request(api).post('/v1/accounts')
         .set('Content-Type', 'application/json')
         .send({
           username: 'adam',
@@ -83,7 +83,7 @@ describe('Accounts API', function () {
         })
     })
     it('fails if duplicate username', function (done) {
-      request(api).post('/accounts')
+      request(api).post('/v1/accounts')
         .set('Content-Type', 'application/json')
         .send({
           username: 'dev',
@@ -96,7 +96,7 @@ describe('Accounts API', function () {
         })
     })
     it('does not fail if a player has the same username', function (done) {
-      request(api).post('/accounts')
+      request(api).post('/v1/accounts')
         .set('Content-Type', 'application/json')
         .send({
           username: 'playername',
@@ -116,7 +116,7 @@ describe('Accounts API', function () {
 
     describe('list', function () {
       it('fetches a list of accounts', function (done) {
-        request(api).get('/accounts')
+        request(api).get('/v1/accounts')
           .set('Content-Type', 'application/json')
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
           .expect('Content-Type', 'application/json')
@@ -128,7 +128,7 @@ describe('Accounts API', function () {
       });
       describe('as developer', function () {
         it('is forbidden', function (done) {
-          request(api).get('/accounts')
+          request(api).get('/v1/accounts')
             .set('Content-Type', 'application/json')
             .set('Authorization', 'Bearer ' + fixtures.AccessToken.d1.token)
             .expect(403, done);
@@ -138,7 +138,7 @@ describe('Accounts API', function () {
 
     describe('with id', function () {
       it('fetches the account', function (done) {
-        request(api).get('/accounts/' + fixtures.Account.d1._id)
+        request(api).get('/v1/accounts/' + fixtures.Account.d1._id)
           .set('Content-Type', 'application/json')
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.d1.token)
           .expect('Content-Type', 'application/json')
@@ -146,14 +146,14 @@ describe('Accounts API', function () {
       });
 
       it('returns 404 if account does not exist', function (done) {
-        request(api).get('/accounts/' + ObjectId())
+        request(api).get('/v1/accounts/' + ObjectId())
           .set('Content-Type', 'application/json')
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
           .expect(404, done);
       })
       describe('as developer', function () {
         it('returns 403 if trying to access another\'s account', function (done) {
-          request(api).get('/accounts/' + fixtures.Account.admin._id)
+          request(api).get('/v1/accounts/' + fixtures.Account.admin._id)
             .set('Content-Type', 'application/json')
             .set('Authorization', 'Bearer ' + fixtures.AccessToken.d1.token)
             .expect(403)
@@ -170,7 +170,7 @@ describe('Accounts API', function () {
 
   describe('PUT', function () {
     it('changes attributes', function (done) {
-      request(api).put('/accounts/' + fixtures.Account.d1._id)
+      request(api).put('/v1/accounts/' + fixtures.Account.d1._id)
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
         .send({
@@ -183,7 +183,7 @@ describe('Accounts API', function () {
         });
     });
     it('performs validation', function (done) {
-      request(api).put('/accounts/' + fixtures.Account.d1._id)
+      request(api).put('/v1/accounts/' + fixtures.Account.d1._id)
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
         .send({
@@ -199,7 +199,7 @@ describe('Accounts API', function () {
 
   describe('DELETE', function () {
     it('removes the account', function (done) {
-      request(api).delete('/accounts/' + fixtures.Account.d1._id)
+      request(api).delete('/v1/accounts/' + fixtures.Account.d1._id)
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
         .expect(200, /deleted account/i, done);

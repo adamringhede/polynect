@@ -60,7 +60,7 @@ describe('API General', function () {
   describe('listing', function () {
     describe('without records', function () {
       it('only fetches games held by the developer', function (done) {
-        request(api).get('/games')
+        request(api).get('/v1/games')
           .set('Content-Type', 'application/json')
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
           .end(function (err, res) {

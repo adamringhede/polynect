@@ -68,7 +68,7 @@ describe('Players API', function () {
 
   describe('POST', function () {
     it('creates a new player', function (done) {
-      request(api).post('/games/' + gameId + '/players')
+      request(api).post('/v1/games/' + gameId + '/players')
         .set('Content-Type', 'application/json')
         .send({username: 'adamringhede2@live.com', password: 'password'})
         .expect('Content-Type', 'application/json')
@@ -76,7 +76,7 @@ describe('Players API', function () {
     });
 
     it('fails if combination of game and username exists', function (done) {
-      request(api).post('/games/' + gameId + '/players')
+      request(api).post('/v1/games/' + gameId + '/players')
         .set('Content-Type', 'application/json')
         .send({username: 'adamringhede@live.com', password: 'password'})
         .expect('Content-Type', 'application/json')
@@ -84,7 +84,7 @@ describe('Players API', function () {
     });
 
     it('does not fail if the same username is used multiple time on different games', function (done) {
-      request(api).post('/games/' + gameId2 + '/players')
+      request(api).post('/v1/games/' + gameId2 + '/players')
         .set('Content-Type', 'application/json')
         .send({username: 'adamringhede@live.com', password: 'password'})
         .expect('Content-Type', 'application/json')
@@ -97,7 +97,7 @@ describe('Players API', function () {
   describe('GET', function () {
 
     it('retrieves a player by id', function (done) {
-      request(api).get('/games/' + gameId + '/players/' + playerId)
+      request(api).get('/v1/games/' + gameId + '/players/' + playerId)
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
         .expect('Content-Type', 'application/json')
@@ -105,7 +105,7 @@ describe('Players API', function () {
 
     });
     it('returns 404 if player can not be found', function (done) {
-      request(api).get('/games/' + gameId + '/players/' + ObjectId())
+      request(api).get('/v1/games/' + gameId + '/players/' + ObjectId())
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
         .expect(404, done);
@@ -139,7 +139,7 @@ describe('Players API', function () {
         ];
 
 
-        request(api).put('/games/' + gameId + '/players/' + playerId + '/data')
+        request(api).put('/v1/games/' + gameId + '/players/' + playerId + '/data')
           .set('Content-Type', 'application/json')
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
           .send({actions: actions})

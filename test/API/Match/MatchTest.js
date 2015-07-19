@@ -81,7 +81,7 @@ describe ('Match API', function () {
   describe('POST', function () {
 
     it('creates a match if one cannot be found', function (done) {
-      request(api).post('/games/' + gameId + '/matches')
+      request(api).post('/v1/games/' + gameId + '/matches')
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
         .send({ values: {y: 'bar'} })
@@ -94,12 +94,12 @@ describe ('Match API', function () {
 
     });
     it('adds the request to an existing match if one can be found', function (done) {
-      request(api).post('/games/' + gameId + '/matches')
+      request(api).post('/v1/games/' + gameId + '/matches')
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
         .send({ values: {y: 'bar'} })
         .end(function (err, res) {
-          request(api).post('/games/' + gameId + '/matches')
+          request(api).post('/v1/games/' + gameId + '/matches')
             .set('Content-Type', 'application/json')
             .set('Authorization', 'Bearer ' + fixtures.AccessToken.t2.token)
             .send({ values: {y: 'bar'} })
@@ -114,12 +114,12 @@ describe ('Match API', function () {
 
   describe('GET', function () {
     it('returns the view of an existing match', function (done) {
-      request(api).post('/games/' + gameId + '/matches')
+      request(api).post('/v1/games/' + gameId + '/matches')
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
         .send({ values: {y: 'bar'} })
         .end(function (err, res) {
-          request(api).get('/games/' + gameId + '/matches/' + res.body.id)
+          request(api).get('/v1/games/' + gameId + '/matches/' + res.body.id)
             .set('Content-Type', 'application/json')
             .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
             .expect('Content-Type', 'application/json')

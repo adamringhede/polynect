@@ -77,7 +77,7 @@ describe('Access Token API', function () {
 
   describe('LIST', function () {
     it('fetches all access tokens', function (done) {
-      request(api).get('/accessTokens')
+      request(api).get('/v1/accessTokens')
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
         .expect('Content-Type', 'application/json')
@@ -87,7 +87,7 @@ describe('Access Token API', function () {
 
   describe('POST', function () {
     it('creates a new access token', function (done) {
-      request(api).post('/accessTokens')
+      request(api).post('/v1/accessTokens')
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
         .send({

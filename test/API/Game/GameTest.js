@@ -103,7 +103,7 @@ describe('Games API', function () {
   describe('POST', function () {
 
     it('creates a new game', function (done) {
-      request(api).post('/games')
+      request(api).post('/v1/games')
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
         .expect('Content-Type', 'application/json')
@@ -115,7 +115,7 @@ describe('Games API', function () {
 
     describe('with another holder as developer', function () {
       it('returns 403', function (done) {
-        request(api).post('/games')
+        request(api).post('/v1/games')
           .set('Content-Type', 'application/json')
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
           .expect('Content-Type', 'application/json')
@@ -130,7 +130,7 @@ describe('Games API', function () {
 
   describe('PUT', function () {
     it('changes a game by id', function (done) {
-      request(api).put('/games/' + fixtures.Game.g1._id)
+      request(api).put('/v1/games/' + fixtures.Game.g1._id)
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
         .expect('Content-Type', 'application/json')
@@ -149,7 +149,7 @@ describe('Games API', function () {
 
     describe('list', function () {
       it('fetches a list of games', function (done) {
-        request(api).get('/games')
+        request(api).get('/v1/games')
           .set('Content-Type', 'application/json')
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
           .expect('Content-Type', 'application/json')
@@ -161,7 +161,7 @@ describe('Games API', function () {
       });
       describe('as developer', function () {
         it('only fetches games held by the developer', function (done) {
-          request(api).get('/games')
+          request(api).get('/v1/games')
             .set('Content-Type', 'application/json')
             .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
             .end(function (err, res) {
@@ -175,7 +175,7 @@ describe('Games API', function () {
 
     describe('with id', function () {
       it('fetches the game', function (done) {
-        request(api).get('/games/' + fixtures.Game.g1._id)
+        request(api).get('/v1/games/' + fixtures.Game.g1._id)
           .set('Content-Type', 'application/json')
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
           .expect('Content-Type', 'application/json')
@@ -183,7 +183,7 @@ describe('Games API', function () {
       });
 
       it('returns 404 if game does not exist', function (done) {
-        request(api).get('/games/' + ObjectId())
+        request(api).get('/v1/games/' + ObjectId())
           .set('Content-Type', 'application/json')
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
           .expect(404, done);
@@ -194,19 +194,19 @@ describe('Games API', function () {
 
   describe('DELETE', function () {
     it('fails if not held by developer', function (done) {
-      request(api).delete('/games/' + fixtures.Game.g1._id)
+      request(api).delete('/v1/games/' + fixtures.Game.g1._id)
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.d2.token)
         .expect(403, done);
     });
     it('works if admin', function (done) {
-      request(api).delete('/games/' + fixtures.Game.g1._id)
+      request(api).delete('/v1/games/' + fixtures.Game.g1._id)
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
         .expect(200, /deleted/i, done);
     });
     it('works holder of the game', function (done) {
-      request(api).delete('/games/' + fixtures.Game.g3._id)
+      request(api).delete('/v1/games/' + fixtures.Game.g3._id)
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.d2.token)
         .expect(200, /deleted/i, done);
