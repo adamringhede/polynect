@@ -22,7 +22,12 @@ var playerId = ObjectId();
 var playerId2 = ObjectId();
 var clientId = ObjectId();
 var fixtures = {
-  Match: {},
+  Match: {
+    m1: {
+      game: gameId,
+      status: 'waiting'
+    }
+  },
   Game: {
     g1: {
       _id: gameId,
@@ -154,6 +159,16 @@ describe ('Match API', function () {
             });
         });
 
+    })
+    describe('list', function () {
+      it('returns all matches for a game', function (done) {
+        request(api).get('/v1/games/' + gameId + '/matches')
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+          .end(function (err, res) {
+            assert.equal(res.body.count, 1);
+            done();
+          });
+      })
     })
   });
 
