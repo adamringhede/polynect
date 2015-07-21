@@ -312,7 +312,7 @@ describe('Create item API', function () {
           .end(function (err, res) {
             assert.equal(res.statusCode, 200);
             assert.equal(res.body.data.stackable, true);
-            assert.equal(res.body.data.count, 6); 
+            assert.equal(res.body.data.count, 6);
             done();
           });
       })
@@ -336,10 +336,26 @@ describe('Create item API', function () {
     })
   });
 
-  // TEST THAT IT SELECTS THE CORRECT CHARACTER
-
-  describe('item is non-stackable', function () {
-
+  describe('using shallow paths', function () {
+    it('works for players', function (done) {
+      request(api).post('/v1/players/' + playerId1 + '/items')
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.player1.token)
+        .send({
+          itemSpec: specId1
+        })
+        .expect(200, done)
+    });
+    it('works for characters', function (done) {
+      request(api).post('/v1/characters/' + characterId1 + '/items')
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.player1.token)
+        .send({
+          itemSpec: specId1
+        })
+        .expect(200, done)
+    });
   });
+
 
 });
