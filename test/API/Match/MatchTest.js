@@ -152,9 +152,9 @@ describe ('Match API', function () {
             .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
             .expect('Content-Type', 'application/json')
             .end(function (err, res) {
-              assert.equal(res.body.map.z, 10);
+              assert.equal(res.body.data.map.z, 10);
               assert.equal(res.statusCode, 200);
-              assert.equal(res.body.players.length, 1);
+              assert.equal(res.body.data.players.length, 1);
               done();
             });
         });
