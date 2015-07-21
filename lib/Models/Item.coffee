@@ -4,9 +4,11 @@ Schema = mongoose.Schema
 schema = new Schema
   name: String
 
+  character: type: Schema.Types.ObjectId, ref: 'Character'
   player: type: Schema.Types.ObjectId, ref: 'Player'
   game: type: Schema.Types.ObjectId, ref: 'Game'
-  spec: type: Schema.Types.ObjectId, ref: 'ItemSpec'
+  itemSpec: type: Schema.Types.ObjectId, ref: 'ItemSpec'
+
 
   product_id: String
 

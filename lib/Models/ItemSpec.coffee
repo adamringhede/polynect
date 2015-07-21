@@ -6,7 +6,7 @@ Item = require './Item'
 
 ItemSpec = new Schema
   name: String
-  product_id: type: String
+  product_id: type: String # TODO validate unique combined with game
   game: type: Schema.Types.ObjectId, ref: 'Game'
 
   # Access level
@@ -22,7 +22,7 @@ ItemSpec = new Schema
 
   # Type
   stackable: type: Boolean, default: false
-  default_count: type: Number, default: 1
+  default_count: type: Number, default: 0
 
 ItemSpec.methods =
   getCopy: () ->
@@ -30,12 +30,12 @@ ItemSpec.methods =
       name: @name,
       product_id: @product_id,
       game: @game,
-      spec: @_id,
+      itemSpec: @_id,
       access_level: @access_level,
       attributes: @attributes,
+      stackable: @stackable
     })
     if @stackable
-      item.stackable = yes
       item.count = @default_count
     else
       item.data = @data
@@ -43,9 +43,9 @@ ItemSpec.methods =
 
 ItemSpec.plugin Plugins.LastMod
 
-onUpdate = () ->
+ItemSpec.post 'save', () ->
   # Only do this if it has been changed
-  mongoose.model('Item').collection.update({ spec: @_id }, { $set: {
+  mongoose.model('Item').collection.update({ itemSpec: @_id }, { $set: {
     name: @name,
     product_id: @product_id,
     attributes: @attriubtes,
@@ -54,8 +54,6 @@ onUpdate = () ->
     multi: true,
     writeConcern: false
   })
-ItemSpec.post 'save', onUpdate
-ItemSpec.post 'update', onUpdate
 
 
 module.exports = mongoose.model 'ItemSpec', ItemSpec
