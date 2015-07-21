@@ -57,6 +57,14 @@ describe('General API', function () {
     });
   })
 
+  describe('with access token as query param', function () {
+    it('works', function (done) {
+      request(api).get('/v1/accounts/' + devId + '?access_token=' + fixtures.AccessToken.t1.token)
+        .set('Content-Type', 'application/json')
+        .expect(200, /dev/i, done);
+    });
+  });
+
   describe('without version', function () {
     it('falls back to v1', function (done) {
       request(api).get('/accounts/' + devId)
