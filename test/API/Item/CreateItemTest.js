@@ -31,6 +31,8 @@ var characterId2 = ObjectId();
 var specId1 = ObjectId();
 var specId2 = ObjectId();
 var specId3 = ObjectId();
+var itemId1 = ObjectId();
+var itemId2 = ObjectId();
 var fixtures = {
   Account: {
     admin: {
@@ -133,9 +135,18 @@ var fixtures = {
   },
   Item: {
     item1: {
+      _id: itemId1,
       itemSpec: specId2,
       count: 5,
       stackable: true,
+      player: playerId1,
+      game: gameId1
+    },
+    item2: {
+      _id: itemId2,
+      name: 'item name',
+      itemSpec: specId1,
+      character: characterId1,
       player: playerId1,
       game: gameId1
     }
@@ -175,7 +186,7 @@ var fixtures = {
     }
   }
 }
-describe('Create item API', function () {
+describe('Items API', function () {
 
   var f;
   beforeEach(function (done) {
@@ -184,25 +195,11 @@ describe('Create item API', function () {
       done();
     });
   });
-
-  // Test access
-  describe('as a player', function () {
-    it('works', function (done) {
-      request(api).post('/v1/games/' + gameId1 + '/players/' + playerId1 + '/items')
-        .set('Content-Type', 'application/json')
-        .set('Authorization', 'Bearer ' + fixtures.AccessToken.player1.token)
-        .send({
-          itemSpec: specId1
-        })
-        .end(function (err, res) {
-          assert.equal(res.statusCode, 200);
-          assert.equal(res.body.data.product_id, 'test_spec_one');
-          done()
-        });
-    });
-    describe('to character', function () {
-      it('sets the character', function (done) {
-        request(api).post('/v1/games/' + gameId1 + '/players/' + playerId1 + '/characters/' + characterId1 + '/items')
+  describe('POST', function () {
+    // Test access
+    describe('as a player', function () {
+      it('works', function (done) {
+        request(api).post('/v1/games/' + gameId1 + '/players/' + playerId1 + '/items')
           .set('Content-Type', 'application/json')
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.player1.token)
           .send({
@@ -210,18 +207,17 @@ describe('Create item API', function () {
           })
           .end(function (err, res) {
             assert.equal(res.statusCode, 200);
-            assert.equal(res.body.data.character, characterId1)
+            assert.equal(res.body.data.product_id, 'test_spec_one');
             done()
-          })
-      })
-      describe('with character as body param', function () {
-        it('works', function (done) {
-          request(api).post('/v1/games/' + gameId1 + '/players/' + playerId1 + '/items')
+          });
+      });
+      describe('to character', function () {
+        it('sets the character', function (done) {
+          request(api).post('/v1/games/' + gameId1 + '/players/' + playerId1 + '/characters/' + characterId1 + '/items')
             .set('Content-Type', 'application/json')
             .set('Authorization', 'Bearer ' + fixtures.AccessToken.player1.token)
             .send({
-              itemSpec: specId1,
-              character: characterId1
+              itemSpec: specId1
             })
             .end(function (err, res) {
               assert.equal(res.statusCode, 200);
@@ -229,133 +225,228 @@ describe('Create item API', function () {
               done()
             })
         })
-      })
-      describe('of another player', function () {
-        it('is forbidden', function (done) {
-          request(api).post('/v1/games/' + gameId1 + '/players/' + playerId2 + '/characters/' + characterId2 + '/items')
-            .set('Content-Type', 'application/json')
-            .set('Authorization', 'Bearer ' + fixtures.AccessToken.player1.token)
-            .send({
-              itemSpec: specId1
-            })
-            .expect(403, done)
+        describe('with character as body param', function () {
+          it('works', function (done) {
+            request(api).post('/v1/games/' + gameId1 + '/players/' + playerId1 + '/items')
+              .set('Content-Type', 'application/json')
+              .set('Authorization', 'Bearer ' + fixtures.AccessToken.player1.token)
+              .send({
+                itemSpec: specId1,
+                character: characterId1
+              })
+              .end(function (err, res) {
+                assert.equal(res.statusCode, 200);
+                assert.equal(res.body.data.character, characterId1)
+                done()
+              })
+          })
         })
-        describe('with self as player', function () {
+        describe('of another player', function () {
           it('is forbidden', function (done) {
-            request(api).post('/v1/games/' + gameId1 + '/players/' + playerId1 + '/characters/' + characterId2 + '/items')
+            request(api).post('/v1/games/' + gameId1 + '/players/' + playerId2 + '/characters/' + characterId2 + '/items')
               .set('Content-Type', 'application/json')
               .set('Authorization', 'Bearer ' + fixtures.AccessToken.player1.token)
               .send({
                 itemSpec: specId1
               })
-              .expect(400, done)
+              .expect(403, done)
+          })
+          describe('with self as player', function () {
+            it('is forbidden', function (done) {
+              request(api).post('/v1/games/' + gameId1 + '/players/' + playerId1 + '/characters/' + characterId2 + '/items')
+                .set('Content-Type', 'application/json')
+                .set('Authorization', 'Bearer ' + fixtures.AccessToken.player1.token)
+                .send({
+                  itemSpec: specId1
+                })
+                .expect(400, done)
+            })
           })
         })
-      })
+      });
     });
-  });
 
-  describe('as another player', function () {
-    it('is forbidden', function (done) {
-      request(api).post('/v1/games/' + gameId1 + '/players/' + playerId1 + '/items')
-        .set('Content-Type', 'application/json')
-        .set('Authorization', 'Bearer ' + fixtures.AccessToken.player2.token)
-        .send({
-          itemSpec: specId1
-        }).expect(403, done);
-    })
-  })
-
-  describe('as a developer', function () {
-    it('works', function (done) {
-      request(api).post('/v1/games/' + gameId1 + '/players/' + playerId1 + '/items')
-        .set('Content-Type', 'application/json')
-        .set('Authorization', 'Bearer ' + fixtures.AccessToken.dev1.token)
-        .send({
-          itemSpec: specId1
-        }).expect(200, done)
-    });
-    describe('not of the game the player belongs to', function () {
+    describe('as another player', function () {
       it('is forbidden', function (done) {
         request(api).post('/v1/games/' + gameId1 + '/players/' + playerId1 + '/items')
           .set('Content-Type', 'application/json')
-          .set('Authorization', 'Bearer ' + fixtures.AccessToken.dev2.token)
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.player2.token)
           .send({
             itemSpec: specId1
           }).expect(403, done);
       })
     })
-  });
 
-  describe('spec is from another game', function () {
-    it('is a bad request', function (done) {
-      request(api).post('/v1/games/' + gameId1 + '/players/' + playerId1 + '/characters/' + characterId1 + '/items')
-        .set('Content-Type', 'application/json')
-        .set('Authorization', 'Bearer ' + fixtures.AccessToken.player1.token)
-        .send({
-          itemSpec: specId3
+    describe('as a developer', function () {
+      it('works', function (done) {
+        request(api).post('/v1/games/' + gameId1 + '/players/' + playerId1 + '/items')
+          .set('Content-Type', 'application/json')
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.dev1.token)
+          .send({
+            itemSpec: specId1
+          }).expect(200, done)
+      });
+      describe('not of the game the player belongs to', function () {
+        it('is forbidden', function (done) {
+          request(api).post('/v1/games/' + gameId1 + '/players/' + playerId1 + '/items')
+            .set('Content-Type', 'application/json')
+            .set('Authorization', 'Bearer ' + fixtures.AccessToken.dev2.token)
+            .send({
+              itemSpec: specId1
+            }).expect(403, done);
         })
-        .expect(404, /of game/i, done)
+      })
+    });
+
+    describe('spec is from another game', function () {
+      it('is a bad request', function (done) {
+        request(api).post('/v1/games/' + gameId1 + '/players/' + playerId1 + '/characters/' + characterId1 + '/items')
+          .set('Content-Type', 'application/json')
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.player1.token)
+          .send({
+            itemSpec: specId3
+          })
+          .expect(404, /of game/i, done)
+      })
     })
+
+    // Test stackable item
+    describe('item is stackable', function () {
+      describe('without count as a parameter', function () {
+        it('increments by one', function (done) {
+          request(api).post('/v1/games/' + gameId1 + '/players/' + playerId1 + '/items')
+            .set('Content-Type', 'application/json')
+            .set('Authorization', 'Bearer ' + fixtures.AccessToken.dev1.token)
+            .send({
+              itemSpec: specId2
+            })
+            .end(function (err, res) {
+              assert.equal(res.statusCode, 200);
+              assert.equal(res.body.data.stackable, true);
+              assert.equal(res.body.data.count, 6);
+              done();
+            });
+        })
+      })
+      describe('with count as a parameter', function () {
+        it('increments the items current count', function (done) {
+          request(api).post('/v1/games/' + gameId1 + '/players/' + playerId1 + '/items')
+            .set('Content-Type', 'application/json')
+            .set('Authorization', 'Bearer ' + fixtures.AccessToken.dev1.token)
+            .send({
+              itemSpec: specId2,
+              count: 4
+            })
+            .end(function (err, res) {
+              assert.equal(res.statusCode, 200);
+              assert.equal(res.body.data.stackable, true);
+              assert.equal(res.body.data.count, 9); // Sets the count to one if a count is not specified
+              done();
+            });
+        })
+      })
+    });
+
+    describe('using shallow paths', function () {
+      it('works for players', function (done) {
+        request(api).post('/v1/players/' + playerId1 + '/items')
+          .set('Content-Type', 'application/json')
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.player1.token)
+          .send({
+            itemSpec: specId1
+          })
+          .expect(200, done)
+      });
+      it('works for characters', function (done) {
+        request(api).post('/v1/characters/' + characterId1 + '/items')
+          .set('Content-Type', 'application/json')
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.player1.token)
+          .send({
+            itemSpec: specId1
+          })
+          .expect(200, done)
+      });
+    });
+
   })
 
-  // Test stackable item
-  describe('item is stackable', function () {
-    describe('without count as a parameter', function () {
-      it('increments by one', function (done) {
-        request(api).post('/v1/games/' + gameId1 + '/players/' + playerId1 + '/items')
+  describe('PUT', function () {
+    describe('as a player of an item owned by one of its characters', function () {
+      it('works', function (done) {
+        request(api).put('/v1/items/' + itemId2)
+          .set('Content-Type', 'application/json')
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.player1.token)
+          .send({
+            name: 'New item name'
+          })
+          .expect(200, /new item name/i, done)
+      });
+    });
+
+    describe('as a player of an item owned by same player', function () {
+      it('works', function (done) {
+        request(api).put('/v1/items/' + itemId1)
+          .set('Content-Type', 'application/json')
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.player1.token)
+          .send({
+            name: 'New item name'
+          })
+          .expect(200, /new item name/i, done)
+      });
+    });
+
+    describe('as a developer', function () {
+      it('works if the player belongs to a game that the developer has access to', function (done) {
+        request(api).put('/v1/items/' + itemId1)
           .set('Content-Type', 'application/json')
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.dev1.token)
           .send({
-            itemSpec: specId2
+            name: 'New item name'
           })
-          .end(function (err, res) {
-            assert.equal(res.statusCode, 200);
-            assert.equal(res.body.data.stackable, true);
-            assert.equal(res.body.data.count, 6);
-            done();
-          });
-      })
-    })
-    describe('with count as a parameter', function () {
-      it('increments the items current count', function (done) {
-        request(api).post('/v1/games/' + gameId1 + '/players/' + playerId1 + '/items')
+          .expect(200, /new item name/i, done)
+      });
+      it('is forbidden if the developer does not have access to the game', function (done) {
+        request(api).put('/v1/items/' + itemId1)
           .set('Content-Type', 'application/json')
-          .set('Authorization', 'Bearer ' + fixtures.AccessToken.dev1.token)
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.dev2.token)
           .send({
-            itemSpec: specId2,
-            count: 4
+            name: 'New item name'
           })
-          .end(function (err, res) {
-            assert.equal(res.statusCode, 200);
-            assert.equal(res.body.data.stackable, true);
-            assert.equal(res.body.data.count, 9); // Sets the count to one if a count is not specified
-            done();
-          });
-      })
+          .expect(403, done)
+      });
+    });
+  });
+
+  describe('DELETE', function () {
+    describe('as a player of an item owned by one of its characters', function () {
+      it('works', function (done) {
+        request(api).delete('/v1/items/' + itemId2)
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.player1.token)
+          .expect(200, /deleted item/i, done)
+      });
     })
   });
 
-  describe('using shallow paths', function () {
-    it('works for players', function (done) {
-      request(api).post('/v1/players/' + playerId1 + '/items')
-        .set('Content-Type', 'application/json')
+  describe('GET', function () {
+    it('lists character items', function (done) {
+      request(api).get('/v1/characters/' + characterId1 + '/items')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.player1.token)
-        .send({
-          itemSpec: specId1
-        })
-        .expect(200, done)
+        .end(function (err, res) {
+          assert.equal(res.statusCode, 200);
+          assert.equal(res.body.count, 1);
+          done();
+        });
     });
-    it('works for characters', function (done) {
-      request(api).post('/v1/characters/' + characterId1 + '/items')
-        .set('Content-Type', 'application/json')
+    it('lists player items', function (done) {
+      request(api).get('/v1/players/' + playerId1 + '/items')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.player1.token)
-        .send({
-          itemSpec: specId1
-        })
-        .expect(200, done)
+        .end(function (err, res) {
+          assert.equal(res.statusCode, 200);
+          assert.equal(res.body.count, 2);
+          done();
+        });
     });
-  });
+  })
 
 
 });

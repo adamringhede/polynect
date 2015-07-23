@@ -62,6 +62,10 @@ schema = new Schema
   }]
 
 schema.methods =
+  hasAccessToGame: (gameId, callback) ->
+    if @role is 'developer'
+      mongoose.model('Game').findOne _id: gameId, (err, game) =>
+        callback? game.holder.toString() is @_id.toString()
 
 schema.statics =
   hashPassword: (password) ->
