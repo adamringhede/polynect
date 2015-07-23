@@ -208,15 +208,29 @@ describe('Characters API', function () {
       });
     });
   });
-
   describe('POST', function () {
+    describe('using a shallow path', function () {
+      it('creates a new character', function (done) {
+        request(api).post('/v1/characters')
+          .set('Content-Type', 'application/json')
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.player1.token)
+          .send({name: 'My character', data: {x: '234'}})
+          .expect(200, /my character/i, done)
+      });
+    })
     describe('as a player', function () {
       it('creates a new character', function (done) {
         request(api).post('/v1/games/' + gameId1 + '/players/' + playerId1 + '/characters')
           .set('Content-Type', 'application/json')
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.player1.token)
           .send({name: 'My character', data: {x: '234'}})
-          .expect(200, /my character/i, done)
+          .end(function (err, res) {
+            assert.equal(res.statusCode, 200);
+            assert.equal(res.body.data.name, 'My character');
+            assert.equal(res.body.data.game, gameId1);
+            assert.equal(res.body.data.player, playerId1);
+            done();
+          })
       });
       describe('with another player\'s token', function () {
         it('is forbidden', function (done) {
