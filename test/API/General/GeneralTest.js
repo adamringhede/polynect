@@ -29,7 +29,6 @@ var fixtures = {
       password: 'pass'
     }
   },
-
   Client: {
     c1: {
       _id: clientId,
@@ -99,6 +98,21 @@ describe('General API', function () {
           assert.equal(res.body.response_code, 500);
           assert.equal(res.body.code, 'InternalError');
           assert.equal(res.body.message, 'string is not a function')
+          done();
+        });
+    })
+  })
+
+  describe('Body parameter', function () {
+    it('is trimmed from whitepsace', function (done) {
+      request(api).put('/v1/accounts/' + devId)
+        .set('ContentType', 'application/json')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+        .send({
+          firstname: '    hello    '
+        })
+        .end(function (err, res) {
+          assert.equal(res.body.data.firstname, 'hello')
           done();
         });
     })

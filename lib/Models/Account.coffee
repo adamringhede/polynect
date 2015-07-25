@@ -8,7 +8,7 @@ SALT = 'do2doh!aALDDSONAnsv783nf4w9fphi9f4pwpj4hb2o'
 
 validateUniqueCredentials = (username, next) ->
   return true unless username?
-  query = username: username
+  query = username: username, _id: $ne: @_id
   if @role is 'player'
     query.game = @game
   else
