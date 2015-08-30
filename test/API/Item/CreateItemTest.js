@@ -205,7 +205,8 @@ describe('Items API', function () {
           .send({
             itemSpec: specId1
           })
-          .end(function (err, res) {
+          .end(function (err, res, data) {
+            console.log(res.body)
             assert.equal(res.statusCode, 200);
             assert.equal(res.body.data.product_id, 'test_spec_one');
             done()
@@ -225,22 +226,7 @@ describe('Items API', function () {
               done()
             })
         })
-        describe('with character as body param', function () {
-          it('works', function (done) {
-            request(api).post('/v1/games/' + gameId1 + '/players/' + playerId1 + '/items')
-              .set('Content-Type', 'application/json')
-              .set('Authorization', 'Bearer ' + fixtures.AccessToken.player1.token)
-              .send({
-                itemSpec: specId1,
-                character: characterId1
-              })
-              .end(function (err, res) {
-                assert.equal(res.statusCode, 200);
-                assert.equal(res.body.data.character, characterId1)
-                done()
-              })
-          })
-        })
+
         describe('of another player', function () {
           it('is forbidden', function (done) {
             request(api).post('/v1/games/' + gameId1 + '/players/' + playerId2 + '/characters/' + characterId2 + '/items')
@@ -321,6 +307,7 @@ describe('Items API', function () {
               itemSpec: specId2
             })
             .end(function (err, res) {
+              console.log(res.body)
               assert.equal(res.statusCode, 200);
               assert.equal(res.body.data.stackable, true);
               assert.equal(res.body.data.count, 6);

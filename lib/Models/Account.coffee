@@ -2,6 +2,7 @@ crypto = require 'crypto'
 Plugins = require './Plugins'
 validator = require 'validator'
 mongoose = require 'mongoose'
+_ = require 'underscore'
 Schema = mongoose.Schema
 
 SALT = 'do2doh!aALDDSONAnsv783nf4w9fphi9f4pwpj4hb2o'
@@ -55,17 +56,16 @@ schema = new Schema
 
   game: ref: 'Game', type: Schema.Types.ObjectId
 
-  currencies: [{
-    count: Number,
-    name: String,
-    _id: Schema.Types.ObjectId
-  }]
-
 schema.methods =
   hasAccessToGame: (gameId, callback) ->
     if @role is 'developer'
       mongoose.model('Game').findOne _id: gameId, (err, game) =>
         callback? game.holder.toString() is @_id.toString()
+
+  addItem: (itemSpec, count, callback) ->
+    if callback?
+    then @_addItem itemSpec, this._id, null, count, callback
+    else @_addItem itemSpec, this._id, null, null, count
 
 schema.statics =
   hashPassword: (password) ->
@@ -82,6 +82,7 @@ schema.statics =
       callback? err, model
 
 schema.plugin Plugins.DataStore
+schema.plugin Plugins.ItemHolder
 
 schema.pre 'save', (next) ->
   if @password

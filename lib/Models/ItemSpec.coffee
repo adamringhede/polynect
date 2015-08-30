@@ -3,7 +3,9 @@ mongoose = require 'mongoose'
 Schema = mongoose.Schema
 Item = require './Item'
 
-
+# This should be renambed to Product if it produces an item.
+# A new model should be created called Model that produces objects
+# for more complex data stores.
 ItemSpec = new Schema
   name: String
   product_id: type: String # TODO validate unique combined with game
@@ -23,6 +25,13 @@ ItemSpec = new Schema
   # Type
   stackable: type: Boolean, default: false
   default_count: type: Number, default: 0
+
+  # This should be a plugin
+  cost: [{
+    amount: Number,
+    currency: String,
+    name: String
+  }]
 
 ItemSpec.methods =
   getCopy: () ->

@@ -107,7 +107,8 @@ describe ('Match API', function () {
   })
 
   describe('POST', function () {
-
+    it('returns 400 if bad input');
+    
     it('creates a match if one cannot be found', function (done) {
       request(api).post('/v1/games/' + gameId + '/matches')
         .set('Content-Type', 'application/json')
