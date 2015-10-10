@@ -97,7 +97,7 @@ describe('General API', function () {
         .end(function (err, res) {
           assert.equal(res.body.response_code, 500);
           assert.equal(res.body.code, 'InternalError');
-          assert.equal(res.body.message, 'string is not a function')
+          assert.equal(res.body.message, '"not a function" is not a function')
           done();
         });
     })

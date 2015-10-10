@@ -65,7 +65,7 @@ describe('Players API', function () {
       done()
     });
   })
-
+  // TODO: There is no point in ever using paths with "games/" in them. Change to only use players/ and add the game in teh data field.
   describe('POST', function () {
     it('creates a new player', function (done) {
       request(api).post('/v1/games/' + gameId + '/players')
@@ -97,7 +97,7 @@ describe('Players API', function () {
   describe('GET', function () {
 
     it('retrieves a player by id', function (done) {
-      request(api).get('/v1/games/' + gameId + '/players/' + playerId)
+      request(api).get('/v1/players/' + playerId)
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
         .expect('Content-Type', 'application/json')
@@ -105,7 +105,7 @@ describe('Players API', function () {
 
     });
     it('returns 404 if player can not be found', function (done) {
-      request(api).get('/v1/games/' + gameId + '/players/' + ObjectId())
+      request(api).get('/v1/players/' + ObjectId())
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
         .expect(404, done);

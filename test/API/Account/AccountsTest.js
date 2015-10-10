@@ -126,6 +126,16 @@ describe('Accounts API', function () {
             done()
           })
       });
+      it('filters based on query parameters', function (done) {
+        request(api).get('/v1/accounts?username=dev')
+          .set('Content-Type', 'application/json')
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
+          .end(function (err, res) {
+            assert.equal(res.body.count, 2);
+            assert.equal(res.body.data.length, 2);
+            done()
+          })
+      });
       describe('as developer', function () {
         it('is forbidden', function (done) {
           request(api).get('/v1/accounts')
