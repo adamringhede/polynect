@@ -108,33 +108,41 @@ describe ('Match API', function () {
 
   describe('POST', function () {
     it('returns 400 if bad input');
-    
+
     it('creates a match if one cannot be found', function (done) {
-      request(api).post('/v1/games/' + gameId + '/matches')
+      request(api).post('/v1/matches')
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
-        .send({ values: {y: 'bar'}, character: fixtures.Character.c1._id })
+        .send({ values: {y: 'bar'}, character: fixtures.Character.c1._id, game: gameId })
         .expect('Content-Type', 'application/json')
         .end(function (err, res) {
           assert.equal(res.statusCode, 200);
-          assert.equal(res.body.players.length, 1);
+          assert.equal(res.body.data.players.length, 1);
           done();
         });
 
     });
     it('adds the request to an existing match if one can be found', function (done) {
-      request(api).post('/v1/games/' + gameId + '/matches')
+      request(api).post('/v1/matches')
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
-        .send({ values: {y: 'bar'}, character: fixtures.Character.c1._id })
+        .send({
+          values: {y: 'bar'},
+          character: fixtures.Character.c1._id,
+          game: gameId
+        })
         .end(function (err, res) {
-          request(api).post('/v1/games/' + gameId + '/matches')
+          request(api).post('/v1/matches')
             .set('Content-Type', 'application/json')
             .set('Authorization', 'Bearer ' + fixtures.AccessToken.t2.token)
-            .send({ values: {y: 'bar'}, character: fixtures.Character.c3._id })
+            .send({
+              values: {y: 'bar'},
+              character: fixtures.Character.c3._id,
+              game: gameId
+            })
             .end(function (err, res2) {
               assert.equal(res2.statusCode, 200);
-              assert.equal(res2.body.players.length, 2);
+              assert.equal(res2.body.data.players.length, 2);
               done();
             });
         });
@@ -143,16 +151,21 @@ describe ('Match API', function () {
 
   describe('GET', function () {
     it('returns the view of an existing match', function (done) {
-      request(api).post('/v1/games/' + gameId + '/matches')
+      request(api).post('/v1/matches')
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
-        .send({ values: {y: 'bar'}, character: fixtures.Character.c1._id})
+        .send({
+          values: {y: 'bar'},
+          character: fixtures.Character.c1._id,
+          game: gameId
+        })
         .end(function (err, res) {
-          request(api).get('/v1/games/' + gameId + '/matches/' + res.body.id)
+          request(api).get('/v1/matches/' + res.body.data.id)
             .set('Content-Type', 'application/json')
             .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
             .expect('Content-Type', 'application/json')
             .end(function (err, res) {
+              console.log(res.body);
               assert.equal(res.body.data.map.z, 10);
               assert.equal(res.statusCode, 200);
               assert.equal(res.body.data.players.length, 1);
@@ -163,9 +176,10 @@ describe ('Match API', function () {
     })
     describe('list', function () {
       it('returns all matches for a game', function (done) {
-        request(api).get('/v1/games/' + gameId + '/matches')
+        request(api).get('/v1/matches')
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
           .end(function (err, res) {
+            console.log(res.body);
             assert.equal(res.body.count, 1);
             done();
           });

@@ -206,7 +206,6 @@ describe('Items API', function () {
             itemSpec: specId1
           })
           .end(function (err, res, data) {
-            console.log(res.body)
             assert.equal(res.statusCode, 200);
             assert.equal(res.body.data.product_id, 'test_spec_one');
             done()
@@ -307,7 +306,6 @@ describe('Items API', function () {
               itemSpec: specId2
             })
             .end(function (err, res) {
-              console.log(res.body)
               assert.equal(res.statusCode, 200);
               assert.equal(res.body.data.stackable, true);
               assert.equal(res.body.data.count, 6);

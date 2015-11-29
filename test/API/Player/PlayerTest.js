@@ -65,28 +65,28 @@ describe('Players API', function () {
       done()
     });
   })
-  // TODO: There is no point in ever using paths with "games/" in them. Change to only use players/ and add the game in teh data field.
+
   describe('POST', function () {
     it('creates a new player', function (done) {
-      request(api).post('/v1/games/' + gameId + '/players')
+      request(api).post('/v1/players')
         .set('Content-Type', 'application/json')
-        .send({username: 'adamringhede2@live.com', password: 'password'})
+        .send({username: 'adamringhede2@live.com', password: 'password', game: gameId})
         .expect('Content-Type', 'application/json')
         .expect(200, /adamringhede2/i, done);
     });
 
     it('fails if combination of game and username exists', function (done) {
-      request(api).post('/v1/games/' + gameId + '/players')
+      request(api).post('/v1/players')
         .set('Content-Type', 'application/json')
-        .send({username: 'adamringhede@live.com', password: 'password'})
+        .send({username: 'adamringhede@live.com', password: 'password', game: gameId})
         .expect('Content-Type', 'application/json')
         .expect(400, /Not unique/i, done);
     });
 
     it('does not fail if the same username is used multiple time on different games', function (done) {
-      request(api).post('/v1/games/' + gameId2 + '/players')
+      request(api).post('/v1/players')
         .set('Content-Type', 'application/json')
-        .send({username: 'adamringhede@live.com', password: 'password'})
+        .send({username: 'adamringhede@live.com', password: 'password', game: gameId2})
         .expect('Content-Type', 'application/json')
         .expect(200, /adamringhede/i, done);
     });
@@ -112,7 +112,20 @@ describe('Players API', function () {
     })
   });
 
-  describe('Players PUT', function () {
+  describe('PUT', function () {
+
+    it('changes custom data', function (done) {
+      request(api).put('/v1/players/' + playerId)
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+        .send({data: {
+          foo: 'bar'
+        }})
+        .end(function (err, res) {
+          assert.equal(res.body.data.data.foo, 'bar');
+          done();
+        });
+    });
 
 
     describe('data', function () {
