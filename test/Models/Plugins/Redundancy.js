@@ -9,34 +9,43 @@ var Schemas = Models.Schemas;
 Models.init();
 
 var gameId = ObjectId();
-var specId = ObjectId();
+var devId = ObjectId();
 var fixtures = {
-  Account: {},
+  Account: {
+    d0: {
+      _id: devId,
+      firstname: 'Polynect'
+    }
+  },
   Game: {
     g0: {
       _id: gameId,
-      name: 'Test game'
+      name: 'Test game',
+      developer: devId
     }
   }
 };
 
+var f = {};
+beforeEach(function (done) {
+  Models.load(fixtures, function (fixtures) {
+    f = fixtures;
+    done();
+  })
+});
+
 describe('Redundancy', function () {
-  var f = {};
+  var p = null;
   beforeEach(function (done) {
-    Models.load(fixtures, function (fixtures) {
-      f = fixtures;
-      done();
-    })
+    p = new Account({
+      role: 'player'
+    });
+    p.update('firstname', 'Adam');
+    p.update('game', f.Game.g0._id);
+    p.save(done);
   });
 
-
   describe('update', function () {
-    var p = null;
-    beforeEach(function () {
-      p = new Account();
-      p.update('firstname', 'Adam');
-      p.update('game', f.Game.g0._id);
-    })
 
     it ('has the same functionality as set', function () {
       assert.equal(p.firstname, 'Adam')
@@ -51,5 +60,11 @@ describe('Redundancy', function () {
     });
   });
 
+  describe('setting redundant fields on reference update', function () {
+    it ('sets specified redundant fields', function () {
+      assert.equal(p.game.developer.id.toString(), devId.toString())
+      assert.equal(p.game.developer.firstname, 'Polynect')
+    });
+  })
 
 });

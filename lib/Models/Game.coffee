@@ -1,7 +1,8 @@
 mongoose = require 'mongoose'
 Schema = mongoose.Schema
+Plugins = require './Plugins'
 
-game = new Schema
+schema = new Schema
   name: String
   alias: String
   created: type: Date, default: Date.now()
@@ -21,6 +22,10 @@ game = new Schema
       starting_items:
       starting_currencies:
 ###
+schema.plugin Plugins.LastMod
+schema.plugin Plugins.Redundancy,
+  developer:
+    model: 'Account'
+    fields: ['firstname']
 
-
-module.exports = mongoose.model 'Game', game
+module.exports = mongoose.model 'Game', schema

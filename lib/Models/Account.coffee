@@ -97,19 +97,14 @@ schema.statics =
 
 schema.plugin Plugins.DataStore
 schema.plugin Plugins.ItemHolder
-# redundancy overrides the set method which uses redundancy config to create set references given a valid mongoid or model
-# it creates id fields to store the id of the redundant attribute
-# and "id" attribute will be added to the redundant fields
 schema.plugin Plugins.Redundancy,
   game:
     model: 'Game'
-    fields: ['name', 'developer']
-    developer:
-      model: 'Account'
-      fields: ['name', 'username']
+    fields: ['name', 'developer.firstname', 'developer.id']
 
-schema.pre 'save', ->
+schema.pre 'save', (next) ->
   if @password
     @password_hash = mongoose.model('Account').hashPassword(@password)
+  next()
 
 module.exports = mongoose.model 'Account', schema

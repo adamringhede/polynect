@@ -1,5 +1,6 @@
 mongoose = require 'mongoose'
 OPath = require 'object-path'
+async = require 'async'
 
 module.exports = (schema, options) ->
   schema.add({ modified_on: Date })
@@ -8,11 +9,11 @@ module.exports = (schema, options) ->
   for field, config of options
     schema.add({ "#{field}": Object })
 
-  schema.methods.update = (path, value) ->
-    if @get(path) isnt value
+  schema.methods.update = (path, value, force = false) ->
+    if @get(path) isnt value or force
 
       if options.hasOwnProperty(path)
-        # Keep track of changed references
+        # TODO Check that the value is a valid identifier
         unless @updatedReferences? then @updatedReferences = {}
         @updatedReferences[path] = value
         path = "#{path}.id"
@@ -22,15 +23,26 @@ module.exports = (schema, options) ->
         @updatedFields[path] = value
       @set path, value
 
-  ###
-  schema.pre 'save', (next) =>
-    for field, config of options
-      # get model
-      # try to parallelise this
-      # do this only for references that have changed
-      # need to use a recursive function to capture all sub models and save them by key
-      # which is used to apply the redundant fields to self
-      mongoose.model(config.model).findOne _id: @["#{field}_id"], (err, model) =>
-        key = field
-        redundantModels[key] = model
-  ###
+
+
+  schema.pre 'save', (next) ->
+    # If a model is created with references set on instantiation, then
+    # this part takes care of initiating the updatedReferences object
+    if @isNew
+      for field, config of options
+        if @[field]?
+          if not @updatedReferences?[field]?
+            @update field, @[field], true
+    # No need to load references if there are no changes
+    unless @updatedReferences? then return next()
+    # Load references in parallel.
+    async.forEachOf options, (config, field, callback) =>
+      if not @updatedReferences[field]? then return callback()
+      mongoose.model(config.model).findOne _id: @[field].id, (err, model) =>
+        if model?
+          for redundant_field in config?.fields
+            @set("#{field}.#{redundant_field}", model.get(redundant_field))
+        else
+          @[field] = null
+        callback()
+    , next
