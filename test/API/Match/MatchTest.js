@@ -124,7 +124,6 @@ describe ('Match API', function () {
     });
     it('adds the request to an existing match if one can be found', function (done) {
       request(api).post('/v1/matches')
-        .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
         .send({
           values: {y: 'bar'},
@@ -133,7 +132,6 @@ describe ('Match API', function () {
         })
         .end(function (err, res) {
           request(api).post('/v1/matches')
-            .set('Content-Type', 'application/json')
             .set('Authorization', 'Bearer ' + fixtures.AccessToken.t2.token)
             .send({
               values: {y: 'bar'},
@@ -152,7 +150,6 @@ describe ('Match API', function () {
   describe('GET', function () {
     it('returns the view of an existing match', function (done) {
       request(api).post('/v1/matches')
-        .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
         .send({
           values: {y: 'bar'},
@@ -161,11 +158,8 @@ describe ('Match API', function () {
         })
         .end(function (err, res) {
           request(api).get('/v1/matches/' + res.body.data.id)
-            .set('Content-Type', 'application/json')
             .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
-            .expect('Content-Type', 'application/json')
             .end(function (err, res) {
-              console.log(res.body);
               assert.equal(res.body.data.map.z, 10);
               assert.equal(res.statusCode, 200);
               assert.equal(res.body.data.players.length, 1);
@@ -179,7 +173,6 @@ describe ('Match API', function () {
         request(api).get('/v1/matches')
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
           .end(function (err, res) {
-            console.log(res.body);
             assert.equal(res.body.count, 1);
             done();
           });

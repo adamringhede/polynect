@@ -35,7 +35,7 @@ var fixtures = {
     d1: {
       _id: playerId,
       role: 'player',
-      username: 'adamringhede@live.com', // No need to provide password really
+      username: 'adamringhede@live.com',
       game: gameId
     }
   },
@@ -69,7 +69,6 @@ describe('Players API', function () {
   describe('POST', function () {
     it('creates a new player', function (done) {
       request(api).post('/v1/players')
-        .set('Content-Type', 'application/json')
         .send({username: 'adamringhede2@live.com', password: 'password', game: gameId})
         .expect('Content-Type', 'application/json')
         .expect(200, /adamringhede2/i, done);
@@ -77,7 +76,6 @@ describe('Players API', function () {
 
     it('fails if combination of game and username exists', function (done) {
       request(api).post('/v1/players')
-        .set('Content-Type', 'application/json')
         .send({username: 'adamringhede@live.com', password: 'password', game: gameId})
         .expect('Content-Type', 'application/json')
         .expect(400, /Not unique/i, done);
@@ -85,7 +83,6 @@ describe('Players API', function () {
 
     it('does not fail if the same username is used multiple time on different games', function (done) {
       request(api).post('/v1/players')
-        .set('Content-Type', 'application/json')
         .send({username: 'adamringhede@live.com', password: 'password', game: gameId2})
         .expect('Content-Type', 'application/json')
         .expect(200, /adamringhede/i, done);

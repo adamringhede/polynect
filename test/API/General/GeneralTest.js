@@ -59,7 +59,6 @@ describe('General API', function () {
   describe('with access token as query param', function () {
     it('works', function (done) {
       request(api).get('/v1/accounts/' + devId + '?access_token=' + fixtures.AccessToken.t1.token)
-        .set('Content-Type', 'application/json')
         .expect(200, /dev/i, done);
     });
   });
@@ -67,7 +66,6 @@ describe('General API', function () {
   describe('without version', function () {
     it('falls back to v1', function (done) {
       request(api).get('/accounts/' + devId)
-        .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
         .expect(200, /dev/i, done);
     });
@@ -77,7 +75,6 @@ describe('General API', function () {
 
     it('sets status code to 200 when resource is not found', function (done) {
       request(api).get('/v1/games/' + ObjectId() + '?suppress_response_codes=true')
-        .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
         .expect(200, /could not find Game/i)
         .end(function (err, res) {
@@ -91,7 +88,6 @@ describe('General API', function () {
   describe('Error', function () {
     it ('includes a message and code', function (done) {
       request(api).get('/errors/internal')
-        .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
         .expect(500)
         .end(function (err, res) {
@@ -104,9 +100,9 @@ describe('General API', function () {
   })
 
   describe('Body parameter', function () {
+
     it('is trimmed from whitepsace', function (done) {
       request(api).put('/v1/accounts/' + devId)
-        .set('ContentType', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
         .send({
           firstname: '    hello    '

@@ -143,7 +143,7 @@ describe('Characters API', function () {
 
     describe('list', function () {
       it('fetches a list of characters', function (done) {
-        request(api).get('/v1/games/' + gameId2 + '/players/' + playerId1 + '/characters')
+        request(api).get('/v1/characters')
           .set('Content-Type', 'application/json')
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
           .expect(200, done);
@@ -154,8 +154,7 @@ describe('Characters API', function () {
   describe('PUT', function () {
     describe('as a developer', function () {
       it('can change the player the character belongs to', function (done) {
-        request(api).put('/v1/games/' + gameId1 + '/players/' + playerId1 + '/characters/' + characterId1)
-          .set('Content-Type', 'application/json')
+        request(api).put('/v1/characters/' + characterId1)
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.dev1.token)
           .send({player: playerId2})
           .expect(200)
@@ -166,8 +165,7 @@ describe('Characters API', function () {
       }),
       it('can not change the game', function (done) {
         // TODO: this should return a BadRequestError instead of not just changing the attribute silently
-        request(api).put('/v1/games/' + gameId1 + '/players/' + playerId1 + '/characters/' + characterId1)
-          .set('Content-Type', 'application/json')
+        request(api).put('/v1/characters/' + characterId1)
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.dev1.token)
           .send({game: gameId2})
           .expect(200)
@@ -179,7 +177,7 @@ describe('Characters API', function () {
     });
     describe('as a player', function () {
       it('can change the character name and data', function (done) {
-        request(api).put('/v1/games/' + gameId1 + '/players/' + playerId1 + '/characters/' + characterId1)
+        request(api).put('/v1/characters/' + characterId1)
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.player1.token)
           .send({
             data: {x: 123},
@@ -194,14 +192,14 @@ describe('Characters API', function () {
       })
       describe('of another game', function () {
         it('is forbidden', function (done) {
-          request(api).put('/v1/games/' + gameId1 + '/players/' + playerId1 + '/characters/' + characterId1)
+          request(api).put('/v1/characters/' + characterId1)
             .set('Authorization', 'Bearer ' + fixtures.AccessToken.player3.token)
             .expect(403, done)
         })
       });
       describe('of same game but not owner of character', function () {
         it('is forbidden', function (done) {
-          request(api).put('/v1/games/' + gameId1 + '/players/' + playerId1 + '/characters/' + characterId1)
+          request(api).put('/v1/characters/' + characterId1)
             .set('Authorization', 'Bearer ' + fixtures.AccessToken.player2.token)
             .expect(403, done)
         })
@@ -212,7 +210,6 @@ describe('Characters API', function () {
     describe('using a shallow path', function () {
       it('creates a new character', function (done) {
         request(api).post('/v1/characters')
-          .set('Content-Type', 'application/json')
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.player1.token)
           .send({name: 'My character', data: {x: '234'}})
           .expect(200, /my character/i, done)
@@ -220,10 +217,9 @@ describe('Characters API', function () {
     })
     describe('as a player', function () {
       it('creates a new character', function (done) {
-        request(api).post('/v1/games/' + gameId1 + '/players/' + playerId1 + '/characters')
-          .set('Content-Type', 'application/json')
+        request(api).post('/v1/characters')
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.player1.token)
-          .send({name: 'My character', data: {x: '234'}})
+          .send({name: 'My character', data: {x: '234'}, game: gameId1, player: playerId1})
           .end(function (err, res) {
             assert.equal(res.statusCode, 200);
             assert.equal(res.body.data.name, 'My character');
@@ -233,29 +229,32 @@ describe('Characters API', function () {
           })
       });
       describe('with another player\'s token', function () {
-        it('is forbidden', function (done) {
-          request(api).post('/v1/games/' + gameId1 + '/players/' + playerId1 + '/characters')
-            .set('Content-Type', 'application/json')
+        it('sets the player to the signed in user', function (done) {
+          request(api).post('/v1/characters')
             .set('Authorization', 'Bearer ' + fixtures.AccessToken.player2.token)
-            .send({name: 'My character', data: {x: '234'}})
-            .expect(403, done);
+            .send({name: 'My character', data: {x: '234'}, game: gameId1, player: playerId1})
+            .expect(200)
+            .end(function (err, res, body) {
+              assert.equal(res.body.data.player, playerId2);
+              done();
+            });
         });
       });
     });
     describe('as a developer', function () {
       it('creates a new character', function (done) {
-        request(api).post('/v1/games/' + gameId1 + '/players/' + playerId1 + '/characters')
+        request(api).post('/v1/characters')
           .set('Content-Type', 'application/json')
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.dev1.token)
-          .send({name: 'My character', data: {x: '234'}})
+          .send({name: 'My character', data: {x: '234'}, game: gameId1, player: playerId1})
           .expect(200, /my character/i, done)
       });
       describe('not of the game the player belongs to', function () {
         it('is forbidden', function (done) {
-          request(api).post('/v1/games/' + gameId1 + '/players/' + playerId1 + '/characters')
+          request(api).post('/v1/characters')
             .set('Content-Type', 'application/json')
             .set('Authorization', 'Bearer ' + fixtures.AccessToken.dev2.token)
-            .send({name: 'My character', data: {x: '234'}})
+            .send({name: 'My character', data: {x: '234'}, game: gameId1, player: playerId1})
             .expect(403, done)
         });
       })

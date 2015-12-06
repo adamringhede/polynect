@@ -39,7 +39,7 @@ schema = new Schema
   role: type: String, enum: ['developer', 'player', 'admin'], default: 'developer'
 
   # Credentials
-  username: type: String, validate: [validateUniqueCredentials, 'Not unique']
+  username: type: String
   password_hash: String
 
   provider:
@@ -56,9 +56,23 @@ schema = new Schema
 
   game: ref: 'Game', type: Schema.Types.ObjectId
 
+schema.path('username').validate (username, callback) ->
+  return true unless username?
+  query = username: username, _id: $ne: @_id
+  if @role is 'player'
+    query.game = @game
+  else
+    query.role = @role
+  mongoose.model('Account').findOne(query, '_id', (err, model) ->
+    if err then throw err
+    callback(model is null)
+  );
+, 'Not unique'
+
 schema.methods =
   hasAccessToGame: (gameId, callback) ->
     if @role is 'developer'
+      #return game.developer._id is @_id or @organisations.indexOf(game.developer._id)
       mongoose.model('Game').findOne _id: gameId, (err, game) =>
         callback? game.holder.toString() is @_id.toString()
 
