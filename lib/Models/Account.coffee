@@ -98,9 +98,8 @@ schema.statics =
 schema.plugin Plugins.DataStore
 schema.plugin Plugins.ItemHolder
 
-schema.pre 'save', (next) ->
+schema.pre 'save', ->
   if @password
     @password_hash = mongoose.model('Account').hashPassword(@password)
-  next()
 
 module.exports = mongoose.model 'Account', schema
