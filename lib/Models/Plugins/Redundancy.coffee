@@ -38,6 +38,29 @@ module.exports = (schema, options) ->
 
       @set path, value
 
+  loadData = (self, baseModel, path, references, done) ->
+    unless references? then return done()
+    async.forEachOf references, (config, field, callback) =>
+      # Construct projection by fields and references
+      select = config.fields.slice()
+      for ref_name, ref of config.references
+        select.push ref_name
+
+      if path?
+        basePath = "#{path}."
+      else
+        basePath = ""
+      mongoose.model(config.model).where({_id: baseModel[field].id}).select(select.join(' ')).findOne (err, model) =>
+        if model?
+          for redundant_field in config?.fields
+            self.set("#{basePath}#{field}.#{redundant_field}", model.get(redundant_field))
+          self.set("#{basePath}#{field}.id", model._id)
+          loadData self, model, "#{basePath}#{field}", config.references, callback
+        else
+          baseModel[field] = null
+          callback()
+    , done
+
   # Loads references models and sets redundant data
   schema.pre 'save', (next) ->
     # If a model is created with references set on instantiation, then
@@ -49,32 +72,12 @@ module.exports = (schema, options) ->
             @update field, @[field], true
     # No need to load references if there are no changes
     unless @updatedReferences? then return next()
+    references = {}
+    for name, reference of options.references
+      if @updatedReferences[name]?
+        references[name] = reference
     # Load references in parallel.
-    async.forEachOf options.references, (config, field, callback) =>
-      if not @updatedReferences[field]? then return callback()
-      # Construct projection by fields and references
-      select = config.fields.slice()
-      for ref_name, ref of config.references
-        select.push ref_name
-      # TODO Create a recursive function that does this. It should be simple enough
-      mongoose.model(config.model).where({_id: @[field].id}).select(select.join(' ')).findOne (err, model) =>
-        if model?
-          for redundant_field in config?.fields
-            @set("#{field}.#{redundant_field}", model.get(redundant_field))
-          async.forEachOf config.references, (reference, ref_field, callback2) =>
-            mongoose.model(reference.model).where({_id: model[ref_field].id}).findOne (err, reference_model) =>
-              if reference_model?
-                for ref_redundant_field in reference.fields
-                  @set("#{field}.#{ref_field}.#{ref_redundant_field}", reference_model.get(ref_redundant_field))
-                @set("#{field}.#{ref_field}.id", reference_model._id)
-              else
-                @[field][ref_field] = null
-              callback2()
-          , callback
-        else
-          @[field] = null
-          callback()
-    , next
+    loadData this, this, null, references, next
 
   # Updates the redundant data of other models referencing this one
   schema.pre 'save', (next) ->
