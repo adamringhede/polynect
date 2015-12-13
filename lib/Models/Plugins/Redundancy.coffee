@@ -2,26 +2,26 @@ mongoose = require 'mongoose'
 OPath = require 'object-path'
 async = require 'async'
 
+setSubscribers = (modelName, references, path = null) ->
+  basePath = if path? then "#{path}." else ""
+  for field, config of references
+    unless mongoose.redundancyConfig[config.model]? then mongoose.redundancyConfig[config.model] = []
+    mongoose.redundancyConfig[config.model].push
+      path: "#{basePath}#{field}"
+      model: modelName
+      fields: config.fields
+    setSubscribers modelName, config.references, "#{basePath}#{field}"
+
 module.exports = (schema, options) ->
   schema.add({ modified_on: Date })
-  # Create a field to store the redundant data
-  unless mongoose.redundancyConfig? then  mongoose.redundancyConfig = {}
+  # Create fields to store the redundant data
+
   for field, config of options.references
     schema.add({ "#{field}": Object })
-    unless mongoose.redundancyConfig[config.model]? then mongoose.redundancyConfig[config.model] = []
-    mongoose.redundancyConfig[config.model].push({
-      path: field,
-      model: options.model,
-      fields: config.fields
-    })
-    for ref_field, ref_config of config.references
-      unless mongoose.redundancyConfig[ref_config.model]? then mongoose.redundancyConfig[ref_config.model] = []
-      mongoose.redundancyConfig[ref_config.model].push({
-        path: "#{field}.#{ref_field}",
-        model: options.model,
-        fields: ref_config.fields
-      })
 
+  # Compose a redundancy config of reference subscribers
+  unless mongoose.redundancyConfig? then  mongoose.redundancyConfig = {}
+  setSubscribers options.model, options.references
 
   schema.methods.update = (path, value, force = false) ->
     if @get(path) isnt value or force
@@ -46,10 +46,7 @@ module.exports = (schema, options) ->
       for ref_name, ref of config.references
         select.push ref_name
 
-      if path?
-        basePath = "#{path}."
-      else
-        basePath = ""
+      basePath = if path? then "#{path}." else ""
       mongoose.model(config.model).where({_id: baseModel[field].id}).select(select.join(' ')).findOne (err, model) =>
         if model?
           for redundant_field in config?.fields
