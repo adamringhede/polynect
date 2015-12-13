@@ -29,9 +29,11 @@
   },
   "devDependencies": {
     "mongoose-fixtures": "0.0.1",
+    "source-map-support": "^0.4.0",
     "supertest": "^1.0.1"
   },
   "scripts": {
+    "watch": "coffee -cwm lib/**/**/*.coffee lib/**/*.coffee",
     "test": "npm run build && grunt test",
     "build": "./node_modules/coffee-script/bin/coffee -cm lib/ && ./node_modules/grunt-cli/bin/grunt component_tree",
     "deploy": "npm run test && git push heroku master",
