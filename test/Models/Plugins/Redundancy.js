@@ -45,7 +45,7 @@ describe('Redundancy', function () {
     p.save(done);
   });
 
-  describe('update', function () {
+  describe('update (method)', function () {
     it ('has the same functionality as set', function () {
       assert.equal(p.firstname, 'Adam')
     });
@@ -60,7 +60,7 @@ describe('Redundancy', function () {
     });
   });
 
-  describe('global redundancy configuration', function () {
+  describe('global configuration', function () {
     it ('includes deep references', function () {
       var ok = false
       for (var i = 0, l = mongoose.redundancyConfig.Account.length; i < l; i++) {
@@ -74,7 +74,7 @@ describe('Redundancy', function () {
   });
 
   describe('updates', function () {
-    it ('changes the value on subscribing models', function (done) {
+    it ('changes the values on subscribing models', function (done) {
       var dev = f.Account.d0;
       dev.update('firstname', 'New name');
       dev.save(function () {
