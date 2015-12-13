@@ -13,9 +13,7 @@ setSubscribers = (modelName, references, path = null) ->
     setSubscribers modelName, config.references, "#{basePath}#{field}"
 
 module.exports = (schema, options) ->
-  schema.add({ modified_on: Date })
   # Create fields to store the redundant data
-
   for field, config of options.references
     schema.add({ "#{field}": Object })
 
