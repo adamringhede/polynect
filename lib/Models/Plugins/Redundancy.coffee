@@ -37,7 +37,7 @@ module.exports = (schema, options) ->
 
       @set path, value
 
-
+  # Loads references models and sets redundant data
   schema.pre 'save', (next) ->
     # If a model is created with references set on instantiation, then
     # this part takes care of initiating the updatedReferences object
@@ -73,4 +73,25 @@ module.exports = (schema, options) ->
         else
           @[field] = null
           callback()
+    , next
+
+  # Updates the redundant data of other models referencing this one
+  schema.pre 'save', (next) ->
+    # There should be no model subscribing to this one if this one is new,
+    # so there is no need to execute an update
+    return next() if @isNew
+    # NOTE In a production environment there should be no need to wait for
+    # the update to finish. Instead it should use no write concern and call
+    # next/callback without waiting for the update to finish
+    async.each mongoose.redundancyConfig[options.model], (subscriber, callback) =>
+      $set = {}
+      update = false
+      for field in subscriber.fields
+        if @updatedFields?[field]?
+          update = true
+          $set["#{subscriber.path}.#{field}"] = @[field]
+      if update
+        mongoose.model(subscriber.model).update "#{subscriber.path}.id": @_id, {$set: $set}, () => callback()
+      else
+        callback()
     , next

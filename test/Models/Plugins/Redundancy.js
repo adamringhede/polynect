@@ -73,12 +73,30 @@ describe('Redundancy', function () {
     });
   });
 
-  describe('reference update', function () {
+  describe('updates', function () {
+    it ('changes the value on subscribing models', function (done) {
+      var dev = f.Account.d0;
+      dev.update('firstname', 'New name');
+      dev.save(function () {
+        Models.Account.findOne({_id: p._id}, function (err, player) {
+          assert.equal(player.game.developer.firstname, 'New name');
+          done();
+        });
+      })
+    })
+  })
+
+  describe('reference change', function () {
     it ('sets specified redundant fields', function () {
       assert.equal(p.game.name, 'Test game');
       assert.equal(p.game.developer.id.toString(), devId.toString())
       assert.equal(p.game.developer.firstname, 'Polynect')
     });
   })
+
+  /*
+  TODO Test that changing the reference changes the redundant data for
+  other models with multi level references
+   */
 
 });
