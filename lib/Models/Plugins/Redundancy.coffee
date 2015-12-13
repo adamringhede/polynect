@@ -25,10 +25,11 @@ module.exports = (schema, options) ->
 
   schema.methods.update = (path, value, force = false) ->
     if @get(path) isnt value or force
-      # Keep track of other changed fields
+      # Keep track of changed fields and values
       unless @updatedFields? then @updatedFields = {}
       @updatedFields[path] = value
 
+      # Keep track of changed references
       if options.references.hasOwnProperty(path)
         # TODO Check that the value is a valid identifier
         unless @updatedReferences? then @updatedReferences = {}
@@ -82,7 +83,7 @@ module.exports = (schema, options) ->
     return next() if @isNew
     # NOTE In a production environment there should be no need to wait for
     # the update to finish. Instead it should use no write concern and call
-    # next/callback without waiting for the update to finish
+    # next/callback without waiting for the update to finish TODO
     async.each mongoose.redundancyConfig[options.model], (subscriber, callback) =>
       $set = {}
       update = false
