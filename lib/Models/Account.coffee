@@ -54,7 +54,7 @@ schema = new Schema
 
   #### Player ####
 
-  game: ref: 'Game', type: Schema.Types.ObjectId
+  #game: ref: 'Game', type: Schema.Types.ObjectId
 
 schema.path('username').validate (username, callback) ->
   return true unless username?
@@ -98,9 +98,16 @@ schema.statics =
 schema.plugin Plugins.DataStore
 schema.plugin Plugins.ItemHolder
 schema.plugin Plugins.Redundancy,
-  game:
-    model: 'Game'
-    fields: ['name', 'developer.firstname', 'developer.id']
+  model: 'Account'
+  references:
+    game:
+      model: 'Game'
+      fields: ['name']
+      references:
+        developer:
+          model: 'Account'
+          fields: ['firstname']
+
 
 schema.pre 'save', (next) ->
   if @password

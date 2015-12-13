@@ -46,7 +46,6 @@ describe('Redundancy', function () {
   });
 
   describe('update', function () {
-
     it ('has the same functionality as set', function () {
       assert.equal(p.firstname, 'Adam')
     });
@@ -57,11 +56,26 @@ describe('Redundancy', function () {
 
     it ('keeps track of updated references', function () {
       assert.equal(p.updatedReferences.game, f.Game.g0._id);
+      assert.equal(p.updatedFields.game, f.Game.g0._id);
     });
   });
 
-  describe('setting redundant fields on reference update', function () {
+  describe('global redundancy configuration', function () {
+    it ('includes deep references', function () {
+      var ok = false
+      for (var i = 0, l = mongoose.redundancyConfig.Account.length; i < l; i++) {
+        var config = mongoose.redundancyConfig.Account[i];
+        if (config.path === 'game.developer') {
+          ok = true;
+        }
+      }
+      assert.ok(ok);
+    });
+  });
+
+  describe('reference update', function () {
     it ('sets specified redundant fields', function () {
+      assert.equal(p.game.name, 'Test game');
       assert.equal(p.game.developer.id.toString(), devId.toString())
       assert.equal(p.game.developer.firstname, 'Polynect')
     });

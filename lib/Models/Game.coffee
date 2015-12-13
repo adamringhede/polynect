@@ -24,8 +24,10 @@ schema = new Schema
 ###
 schema.plugin Plugins.LastMod
 schema.plugin Plugins.Redundancy,
-  developer:
-    model: 'Account'
-    fields: ['firstname']
+  model: 'Game'
+  references:
+    developer:
+      model: 'Account'
+      fields: ['firstname']
 
 module.exports = mongoose.model 'Game', schema
