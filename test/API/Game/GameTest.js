@@ -75,17 +75,17 @@ var fixtures = {
     g1: {
       _id: ObjectId(),
       name: 'Game',
-      holder: devId
+      developer: devId
     },
     g2: {
       _id: ObjectId(),
       name: 'Game',
-      holder: ObjectId()
+      developer: ObjectId()
     },
     g3: {
       _id: ObjectId(),
       name: 'Game',
-      holder: devId2
+      developer: devId2
     }
   }
 }

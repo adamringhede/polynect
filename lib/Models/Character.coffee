@@ -3,24 +3,36 @@ Schema = mongoose.Schema
 Plugins = require './Plugins'
 
 
-Character = new Schema
+schema = new Schema
 
   name: String
 
-  player: type: Schema.Types.ObjectId, ref: 'Account'
+  #player: type: Schema.Types.ObjectId, ref: 'Account'
 
-  game: type: Schema.Types.ObjectId, ref: 'Game'
+  #game: type: Schema.Types.ObjectId, ref: 'Game'
 
 
 #Character.statics =
 
-Character.methods =
+schema.methods =
   addItem: (itemSpec, count, callback) ->
     if callback?
-    then @_addItem itemSpec, this.player, this._id, count, callback
-    else @_addItem itemSpec, this.player, this._id, null, count
+    then @_addItem itemSpec, this.player.id, this._id, count, callback
+    else @_addItem itemSpec, this.player.id, this._id, null, count
 
-Character.plugin Plugins.DataStore
-Character.plugin Plugins.ItemHolder
+schema.plugin Plugins.DataStore
+schema.plugin Plugins.ItemHolder
 
-module.exports = mongoose.model 'Character', Character
+schema.plugin Plugins.Redundancy,
+  model: 'Character'
+  references:
+    player:
+      model: 'Account'
+      references:
+        game:
+          model: 'Game'
+          references:
+            developer:
+              model: 'Account'
+
+module.exports = mongoose.model 'Character', schema

@@ -1,10 +1,15 @@
 mongoose = require 'mongoose'
 Schema = mongoose.Schema
+Plugins = require './Plugins'
 
-Currency = new Schema
+schema = new Schema
   name: String
   product_id: String
-  game: ref: 'Game', type: Schema.Types.ObjectId
 
+schema.plugin Plugins.Redundancy,
+  model: 'Currency'
+  references:
+    game:
+      model: 'Game'
 
-module.exports = mongoose.model 'Currency', Currency
+module.exports = mongoose.model 'Currency', schema

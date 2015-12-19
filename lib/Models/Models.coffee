@@ -28,12 +28,15 @@ exports.load = `function (fixtures, callback) {
         if (fixtures[modelName][i]['_id']) {
           count += 1;
           mongoose.model(modelName).findOne({_id: fixtures[modelName][i]['_id']}, function (err, model) {
-            if (err) throw err;
-            f[modelName][i] = model;
-            count -= 1;
-            if (count == 0) {
-              if (typeof callback === 'function') callback(f);
-            }
+            model.__forceUpdate = true
+            model.save(function () {
+              if (err) throw err;
+              f[modelName][i] = model;
+              count -= 1;
+              if (count == 0) {
+                if (typeof callback === 'function') callback(f);
+              }
+            })
           });
         }
       });

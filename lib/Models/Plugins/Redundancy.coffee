@@ -6,6 +6,7 @@ setSubscribers = (modelName, references, path = null) ->
   basePath = if path? then "#{path}." else ""
   for field, config of references
     unless mongoose.redundancyConfig[config.model]? then mongoose.redundancyConfig[config.model] = []
+    unless config.fields? then config.fields = []
     mongoose.redundancyConfig[config.model].push
       path: "#{basePath}#{field}"
       model: modelName
@@ -16,6 +17,7 @@ module.exports = (schema, options) ->
   # Create fields to store the redundant data
   for field, config of options.references
     schema.add({ "#{field}": Object })
+    schema.add({ "#{field}_id": mongoose.Schema.Types.ObjectId })
 
   # Compose a redundancy config of reference subscribers
   unless mongoose.redundancyConfig? then  mongoose.redundancyConfig = {}
@@ -32,19 +34,27 @@ module.exports = (schema, options) ->
         # TODO Check that the value is a valid identifier
         unless @updatedReferences? then @updatedReferences = {}
         @updatedReferences[path] = value
-        path = "#{path}.id"
+        @set "#{path}_id", value
+        @set "#{path}.id", value
+      else
+        @set path, value
+      true
 
-      @set path, value
 
   loadData = (self, baseModel, path, references, done) ->
     unless references? then return done()
     async.forEachOf references, (config, field, callback) =>
+      unless config.fields then config.fields = []
+
       # Construct projection by fields and references
       select = config.fields.slice()
       for ref_name, ref of config.references
         select.push ref_name
 
       basePath = if path? then "#{path}." else ""
+      unless baseModel[field]?
+        baseModel[field] = null
+        return callback()
       mongoose.model(config.model).where({_id: baseModel[field].id}).select(select.join(' ')).findOne (err, model) =>
         if model?
           for redundant_field in config?.fields
@@ -52,25 +62,37 @@ module.exports = (schema, options) ->
           self.set("#{basePath}#{field}.id", model._id)
           loadData self, model, "#{basePath}#{field}", config.references, callback
         else
-          baseModel[field] = null
+          allowNullReferences = true
+          unless allowNullReferences then baseModel[field] = null
           callback()
     , done
 
+  schema.pre 'validate', (next) ->
+    if @__forceUpdate
+      unless @updatedReferences? then @updatedReferences = {}
+      for field, config of options.references
+        if @[field]?.id?
+          @updatedReferences[field] = @[field].id
+    next()
+
   # Loads references models and sets redundant data
-  schema.pre 'save', (next) ->
+  schema.pre 'validate', (next) ->
     # If a model is created with references set on instantiation, then
     # this part takes care of initiating the updatedReferences object
     if @isNew
       for field, config of options.references
+        unless config.fields? then config.fields = []
         if @[field]?
           if not @updatedReferences?[field]?
             @update field, @[field], true
+
     # No need to load references if there are no changes
     unless @updatedReferences? then return next()
     references = {}
     for name, reference of options.references
       if @updatedReferences[name]?
         references[name] = reference
+        @["#{field}_id"] = @updatedReferences[name]
     # Load references in parallel.
     loadData this, this, null, references, next
 
@@ -90,7 +112,8 @@ module.exports = (schema, options) ->
           update = true
           $set["#{subscriber.path}.#{field}"] = @[field]
       if update
-        mongoose.model(subscriber.model).update "#{subscriber.path}.id": @_id, {$set: $set}, () => callback()
+        mongoose.model(subscriber.model).update "#{subscriber.path}.id": @_id,
+          {$set: $set}, {multi: true, writeConcern: false}, () => callback()
       else
         callback()
     , next

@@ -1,15 +1,18 @@
 Plugins = require './Plugins'
 mongoose = require 'mongoose'
+Plugins = require './Plugins'
 Schema = mongoose.Schema
 Item = require './Item'
 
 # This should be renambed to Product if it produces an item.
 # A new model should be created called Model that produces objects
 # for more complex data stores.
-ItemSpec = new Schema
+schema = new Schema
   name: String
   product_id: type: String # TODO validate unique combined with game
-  game: type: Schema.Types.ObjectId, ref: 'Game'
+  #game: type: Schema.Types.ObjectId, ref: 'Game'
+  #
+  # TODO add more default attributes such as item class, description, etc.
 
   # Access level
   # 0: Only player can change
@@ -33,13 +36,12 @@ ItemSpec = new Schema
     name: String
   }]
 
-ItemSpec.methods =
+schema.methods =
   getCopy: () ->
     item = new Item({
       name: @name,
       product_id: @product_id,
-      game: @game,
-      itemSpec: @_id,
+      item_spec: @_id,
       access_level: @access_level,
       attributes: @attributes,
       stackable: @stackable
@@ -50,19 +52,15 @@ ItemSpec.methods =
       item.data = @data
     return item
 
-ItemSpec.plugin Plugins.LastMod
+schema.plugin Plugins.Redundancy,
+  model: 'ItemSpec'
+  references:
+    game:
+      model: 'Game'
+      references:
+        developer:
+          model: 'Account'
 
-ItemSpec.post 'save', () ->
-  # Only do this if it has been changed
-  mongoose.model('Item').collection.update({ itemSpec: @_id }, { $set: {
-    name: @name,
-    product_id: @product_id,
-    attributes: @attriubtes,
-    access_level: @access_level
-  } }, {
-    multi: true,
-    writeConcern: false
-  })
+schema.plugin Plugins.LastMod
 
-
-module.exports = mongoose.model 'ItemSpec', ItemSpec
+module.exports = mongoose.model 'ItemSpec', schema

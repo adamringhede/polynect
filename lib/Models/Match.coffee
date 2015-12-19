@@ -1,5 +1,6 @@
 mongoose = require 'mongoose'
 Builder = require '../Components/MatchQueryBuilder/MatchQueryBuilder'
+Plugins = require './Plugins'
 Schema = mongoose.Schema
 
 
@@ -19,7 +20,7 @@ schema = new Schema
       min: Number,
       max: Number
   }]
-  game: type: Schema.Types.ObjectId, ref: 'Game'
+  #game: type: Schema.Types.ObjectId, ref: 'Game'
   open: type: Boolean, default: true
   status: type: String, default: WAITING
   requirements: {}
@@ -29,7 +30,6 @@ schema = new Schema
   roles:
     need: {}
     delegations: {}
-
 
 schema.statics =
   initWithGame: (game) ->
@@ -137,6 +137,13 @@ schema.methods =
                 return true
     return false
 
-
+schema.plugin Plugins.Redundancy,
+  model: 'Match',
+  references:
+    game:
+      model: 'Game'
+      references:
+        developer:
+          model: 'Account'
 
 module.exports = mongoose.model 'Match', schema

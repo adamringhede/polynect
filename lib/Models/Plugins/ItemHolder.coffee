@@ -39,13 +39,18 @@ module.exports = (schema, options) ->
 
   schema.methods._addItem = `function (spec, player, character, count, callback) {
     if (spec.stackable) {
-      Models.Item.findOne({itemSpec: spec._id, player: player, character: character || null}, function (err, item) {
+      var query = {'item_spec.id': spec._id, 'player.id': player};
+      if (character != null) {
+        query['character.id'] = character;
+      }
+      Models.Item.findOne(query, function (err, item) {
         if (err) return callback(err);
         if (!item) {
           item = spec.getCopy();
-          item.player = player;
+          item.update('item_spec', spec, true);
+          item.update('player', player, true);
           if (character) {
-            item.character = character;
+            item.update('character', character._id, true);
           }
         }
         item.count += count || 1;
@@ -55,9 +60,10 @@ module.exports = (schema, options) ->
       });
     } else {
       var item = spec.getCopy();
-      item.player = player;
+      item.update('player', player, true);
+      item.update('item_spec', spec, true);
       if (character) {
-        item.character = character;
+        item.update('character', character, true);
       }
       item.save(function (err, item) {
         if (err) callback(err);

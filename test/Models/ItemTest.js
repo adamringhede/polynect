@@ -31,9 +31,7 @@ var fixtures = {
   },
   Item: {
     i1: {
-      product_id: 'test_spec',
-      game: gameId,
-      itemSpec: specId
+      item_spec: specId
     }
   }
 };
@@ -50,16 +48,18 @@ describe('Item', function () {
   it ('is changed if its spec is changed and saved', function (done) {
     var spec = f.ItemSpec.is0;
     var item = spec.getCopy();
-    assert.equal(item.product_id, 'test_spec');
-    item.save(function () {
-      spec.product_id = 'new_test_spec';
-      spec.save(function () {
-        Item.find({product_id: 'new_test_spec'}, function (err, items) {
-          assert.equal(items.length, 2);
-          done()
+    item.save(function (err, item) {
+      assert.equal(item.item_spec.product_id, 'test_spec');
+      item.save(function () {
+        spec.update('product_id', 'new_test_spec')
+        spec.save(function () {
+          Item.find({'item_spec.product_id': 'new_test_spec'}, function (err, items) {
+            assert.equal(items.length, 2);
+            done()
+          });
         });
       });
-    });
+    })
   });
 
 

@@ -170,7 +170,7 @@ describe ('Match API', function () {
     })
     describe('list', function () {
       it('returns all matches for a game', function (done) {
-        request(api).get('/v1/matches')
+        request(api).get('/v1/matches?game.id=' + gameId)
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
           .end(function (err, res) {
             assert.equal(res.body.count, 1);

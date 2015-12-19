@@ -11,7 +11,7 @@ validateUniqueCredentials = (username, next) ->
   return true unless username?
   query = username: username, _id: $ne: @_id
   if @role is 'player'
-    query.game = @game
+    query.game.id = @game.id
   else
     query.role = @role
   mongoose.model('Account').findOne(query, '_id', (err, model) ->
@@ -60,7 +60,7 @@ schema.path('username').validate (username, callback) ->
   return true unless username?
   query = username: username, _id: $ne: @_id
   if @role is 'player'
-    query.game = @game
+    query.game_id = @game_id
   else
     query.role = @role
   mongoose.model('Account').findOne(query, '_id', (err, model) ->

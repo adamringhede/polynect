@@ -80,17 +80,17 @@ var fixtures = {
     g1: {
       _id: gameId1,
       name: 'Game',
-      holder: devId1
+      developer: devId1
     },
     g2: {
       _id: ObjectId(),
       name: 'Game',
-      holder: ObjectId()
+      developer: ObjectId()
     },
     g3: {
       _id: gameId2,
       name: 'Game',
-      holder: devId2
+      developer: devId2
     }
   },
   ItemSpec: {
@@ -128,7 +128,7 @@ var fixtures = {
     }
   }
 }
-describe('Games API', function () {
+describe('ItemSpecs API', function () {
 
 
   var f;
@@ -141,25 +141,26 @@ describe('Games API', function () {
 
   describe('POST', function () {
     it('creates a new itemspec for a game', function (done) {
-      request(api).post('/v1/games/' + gameId1 + '/itemSpecs')
+      request(api).post('/v1/itemSpecs')
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
         .send({
-          name: 'new item'
+          name: 'new item',
+          game: gameId1
         })
-        .expect(200, /new item/i, done);
+        .expect(/new item/i, done);
     })
   });
 
   describe('GET', function () {
     it('lists item specs for a game', function (done) {
-      request(api).get('/v1/games/' + gameId1 + '/itemSpecs')
+      request(api).get('/v1/itemSpecs')
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
         .expect(200, /"count":2/i, done);
     })
     it('fetches by id', function (done) {
-      request(api).get('/v1/games/' + gameId1 + '/itemSpecs/' + specId1)
+      request(api).get('/v1/itemSpecs/' + specId1)
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
         .expect(200, /test_spec_one/i, done);
@@ -168,16 +169,16 @@ describe('Games API', function () {
 
   describe('PUT', function () {
     it('changes existing specs', function (done) {
-      request(api).put('/v1/games/' + gameId1 + '/itemSpecs/' + specId1)
+      request(api).put('/v1/itemSpecs/' + specId1)
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
         .send({
           product_id: 'new_prod_id'
         })
-        .expect(200, /new_prod_id/i, done);
+        .expect(/new_prod_id/i, done);
     })
     it('can not change a spec that the developer does not have access to', function (done) {
-      request(api).put('/v1/games/' + gameId1 + '/itemSpecs/' + specId3)
+      request(api).put('/v1/itemSpecs/' + specId3)
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
         .send({
@@ -189,7 +190,7 @@ describe('Games API', function () {
 
   describe('DELETE', function () {
     it('removes the spec', function (done) {
-      request(api).delete('/v1/games/' + gameId1 + '/itemSpecs/' + specId1)
+      request(api).delete('/v1/itemSpecs/' + specId1)
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
         .expect(200, /deleted/i, done);

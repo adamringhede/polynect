@@ -74,7 +74,7 @@ describe('Buying an item', function () {
 
             // Test that the player received the item
             Models.Item.find({
-              player: player._id
+              'player.id': player._id
             }, function (err, items) {
               assert.equal(items.length, 1);
               done();
@@ -95,7 +95,7 @@ describe('Buying an item', function () {
 
             // Test that the character received the item
             Models.Item.find({
-              character: character._id
+              'character.id': character._id
             }, function (err, items) {
               assert.equal(items.length, 1);
               done();
