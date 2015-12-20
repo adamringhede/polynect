@@ -23,6 +23,6 @@ schema.plugin Plugins.Redundancy,
               model: 'Account'
     item_spec:
       model: 'ItemSpec'
-      fields: ['name', 'stackable', 'default_count', 'product_id', 'access_level']
+      fields: ['name', 'stackable', 'default_count', 'product_id', 'access_level', 'description', 'class']
 
 module.exports = mongoose.model 'Item', schema
