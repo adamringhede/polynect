@@ -10,19 +10,18 @@ Item = require './Item'
 schema = new Schema
   name: String
   product_id: type: String # TODO validate unique combined with game
-  #game: type: Schema.Types.ObjectId, ref: 'Game'
-  #
-  # TODO add more default attributes such as item class, description, etc.
+  class: String
+  description: String
 
   # Access level
   # 0: Only player can change
   # 1: Requires secret token
   access_level: type: Number, default: 0
 
-  # Data
   # Attributes are not writable by clients can act as base values
   attributes: {}
   # Data can contain anything and might be writable by games
+  # The item spec can include default data to be copied to new items
   data: {}
 
   # Type
@@ -40,9 +39,7 @@ schema.methods =
   getCopy: () ->
     item = new Item({
       name: @name,
-      product_id: @product_id,
       item_spec: @_id,
-      access_level: @access_level,
       attributes: @attributes,
       stackable: @stackable
     })
