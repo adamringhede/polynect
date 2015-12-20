@@ -110,7 +110,7 @@ describe('Games API', function () {
         .send({
           name: 'New game'
         })
-        .expect(200, /new game/i, done);
+        .expect(/new game/i, done);
     });
 
     describe('with another holder as developer', function () {

@@ -7,6 +7,8 @@ schema = new Schema
   alias: String
   created: type: Date, default: Date.now()
   matchmaking_config: {}
+  rate_limit: type: Number, default: 20
+
   #holder: type: Schema.Types.ObjectId, ref: 'Account' # now called developer
 ###
   config:
