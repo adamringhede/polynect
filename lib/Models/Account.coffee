@@ -86,8 +86,8 @@ schema.statics =
   findWithCredentials: (input, callback) ->
     hash = this.hashPassword(input.password)
     query = username: input.username, password_hash: hash
-    if input.game?
-      query.game = input.game
+    if input.game_id?
+      query.game_id = input.game_id
       query.role = 'player'
     else
       query.role = $ne: 'player'
