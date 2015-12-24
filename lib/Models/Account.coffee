@@ -61,8 +61,7 @@ schema.path('username').validate (username, callback) ->
   query = username: username, _id: $ne: @_id
   if @role is 'player'
     query.game_id = @game_id
-  else
-    query.role = @role
+  query.role = @role
   mongoose.model('Account').findOne(query, '_id', (err, model) ->
     if err then throw err
     callback(model is null)
