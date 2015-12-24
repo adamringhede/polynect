@@ -37,7 +37,8 @@ module.exports = (schema, options) ->
         @set "#{path}_id", value
         @set "#{path}.id", value
       else
-        @set path, value
+        #@set path, value # @set ignores attributes which are not in the model which makes it possible to set the password
+        @[path] = value
       true
 
 

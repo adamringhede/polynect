@@ -108,7 +108,7 @@ schema.plugin Plugins.Redundancy,
           fields: ['firstname']
 
 
-schema.pre 'save', (next) ->
+schema.pre 'validate', (next) ->
   if @password
     @password_hash = mongoose.model('Account').hashPassword(@password)
   next()
