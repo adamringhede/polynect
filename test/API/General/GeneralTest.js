@@ -56,6 +56,13 @@ describe('General API', function () {
     });
   })
 
+  describe('status', function () {
+    it('says if the account it logged in', function (done) {
+      request(api).get('/v1/status?access_token=' + fixtures.AccessToken.t1.token)
+        .expect(200, /"authenticated":true/, done);
+    });
+  })
+
   describe('with access token as query param', function () {
     it('works', function (done) {
       request(api).get('/v1/accounts/' + devId + '?access_token=' + fixtures.AccessToken.t1.token)
