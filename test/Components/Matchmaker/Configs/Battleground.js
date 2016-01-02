@@ -20,7 +20,7 @@
     }
   },
   "roles": {
-    "selected": "input.selected_roles", // The roles are provided in the matching values as an array or string if it is a single role
+    "value": "input.selected_roles", // The roles are provided in the matching values as an array or string if it is a single role
     "limits": {
       "tank": [1,3], // Minimum 1, maximum 3
       "healer": [2,6], // Minimum 2, maximum 6

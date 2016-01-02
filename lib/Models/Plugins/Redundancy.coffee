@@ -102,9 +102,9 @@ module.exports = (schema, options) ->
     # There should be no model subscribing to this one if this one is new,
     # so there is no need to execute an update
     return next() if @isNew
-    # NOTE In a production environment there should be no need to wait for
+    # TODO In a production environment there should be no need to wait for
     # the update to finish. Instead it should use no write concern and call
-    # next/callback without waiting for the update to finish TODO
+    # next/callback without waiting for the update to finish
     async.each mongoose.redundancyConfig[options.model], (subscriber, callback) =>
       $set = {}
       update = false

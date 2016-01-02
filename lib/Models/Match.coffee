@@ -14,6 +14,9 @@ schema = new Schema
   requests: [{
       player: {
         id: String
+      },
+      character: {
+        id: String
       }
       attributes: {},
       roles: [String],
