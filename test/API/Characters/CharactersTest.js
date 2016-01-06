@@ -141,10 +141,10 @@ describe('Characters API', function () {
 
     describe('list', function () {
       it('fetches a list of characters', function (done) {
-        request(api).get('/v1/characters')
+        request(api).get('/v1/characters?player_id=' + playerId1)
           .set('Content-Type', 'application/json')
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
-          .expect(200, done);
+          .expect(200, done)
       });
     })
   });
