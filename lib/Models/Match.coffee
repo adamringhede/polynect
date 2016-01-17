@@ -50,7 +50,7 @@ schema.statics =
           if limit.length is 2 and limit[0] <= limit[1]
             match.roles.need[role] = limit
           else if limit.length is 1
-            match.roles.need[role] = [limit[0], limit[1]]
+            match.roles.need[role] = [limit[0], limit[0]]
           else
             throw "Invalid role limit " + limit
         else if typeof limit is 'number'

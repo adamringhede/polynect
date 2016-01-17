@@ -88,6 +88,7 @@ describe('Matchmaker', function () {
         game: f.Game.g1,
         values: { y: 'test' }
       }, function (err, match2) {
+        assert.notEqual(match2.requests[0].player.id, match2.requests[1].player.id);
         assert.equal(match2.size, 2);
         assert.equal(match2.requests.length, 2);
         assert.equal(match._id.toString(), match2._id.toString());

@@ -56,6 +56,8 @@ describe('Matchmaking (roles)', function () {
     it ('selects the first role in the array', function (done) {
       match('p1', ['b', 'a'], function (err, match) {
         assert.equal(err, null);
+        assert.equal(match.roles.delegations['b'].length, 1);
+        assert.equal(match.roles.delegations['a'].length, 0);
         done();
       })
     });
@@ -68,6 +70,7 @@ describe('Matchmaking (roles)', function () {
         },
         function (callback) {
           match('p2', ['a'], function (err, match) {
+            // If the size of the match is 1, then it must have had created a new match
             assert.equal(match.size, 1);
             callback();
           })
