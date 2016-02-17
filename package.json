@@ -12,7 +12,7 @@
     "grunt-mocha-test": "*",
     "mocha": "*",
     "moment": "^2.10.3",
-    "mongoose": "^4.0.2",
+    "mongoose": "^4.3.7",
     "mongoose-paginate": "^4.0.0",
     "mongoose-unique-validator": "^0.4.1",
     "oauth2-server-restify": "git+https://github.com/adamringhede/node-oauth2-server-restify.git",
@@ -25,6 +25,7 @@
     "restify": "^3.0.2",
     "socket.io": "^1.3.5",
     "tokenthrottle-redis": "^1.1.0",
+    "uglify-js": "^2.6.1",
     "underscore": "^1.8.3",
     "validator": "^3.41.2"
   },

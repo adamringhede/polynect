@@ -122,6 +122,12 @@ describe ('Match API', function () {
         });
 
     });
+
+    describe('as an independent client', function () {
+      // In this case, the client has the role of a developer and needs to include
+      // the player's data and character data in the request and not just the id of
+      // a player as that player will not exist on our system.
+    });
     it('adds the request to an existing match if one can be found', function (done) {
       request(api).post('/v1/matches')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
@@ -160,7 +166,7 @@ describe ('Match API', function () {
           request(api).get('/v1/matches/' + res.body.data.id)
             .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
             .end(function (err, res) {
-              assert.equal(res.body.data.map.z, 10);
+              assert.equal(res.body.data.attributes.z, 10);
               assert.equal(res.statusCode, 200);
               assert.equal(res.body.data.players.length, 1);
               done();

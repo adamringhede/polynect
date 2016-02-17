@@ -27,6 +27,10 @@ schema = new Schema
   open: type: Boolean, default: true
   status: type: String, default: WAITING
   requirements: {}
+  # Matchmaking may use reservation
+  reserved: type: Boolean, default: false
+  reserved_at: type: Number, default: -1
+
   size: type: Number, default: 0
   attributes: {}
   rolesEnabled: type: Boolean, default: false
@@ -59,6 +63,9 @@ schema.statics =
 
 
 schema.methods =
+  clearReservation: () ->
+    @reserved = false
+    @reserved_at = -1
   calculateAttributes: `function() {
     if (this.requests.length === 0) return;
     this.attributes = {};
@@ -84,13 +91,22 @@ schema.methods =
       }
     }
   }`
-  addRequest: (request) ->
-    if @rolesEnabled
-      if @delegateRequest(request, true)
+  addRequest: (request, config) ->
+    if config.roles
+      if @delegateRequest(request, config.roles.allowSwitching)
         this.markModified('roles.delegations')
       else return false
-    this.size += 1;
-    this.requests.push(request);
+
+    # Makes sure we don't already have the request
+    haveRequest = false
+    for other in this.requests
+      if other.player.id.toString() is request.player.id.toString()
+        haveRequest = true
+        break
+
+    this.requests.push(request) unless haveRequest
+    this.size = this.requests.length
+
     this.calculateAttributes();
     return true;
 
@@ -112,7 +128,7 @@ schema.methods =
     for (var i = 0, l = request.roles.length; i < l; i++) {
       var role = request.roles[i];
       if (this.roles.need[role] && this.roles.need[role][limit] > this.roles.delegations[role].length) {
-        this.roles.delegations[role].push({
+        this.addPlayerToRole(role, {
           id: request.player.id,
           roles: request.roles
         });
@@ -132,13 +148,41 @@ schema.methods =
               continue if otherRole is role # we have already determined that there are no spots for this role
               if @roles.need[otherRole]? and @roles.need[otherRole][1] > @roles.delegations[otherRole].length
                 @roles.delegations[otherRole].push other
+                @addPlayerToRole otherRole, other
+                # Remove other player from the role
                 @roles.delegations[role].splice i, 1
-                @roles.delegations[role].push {
+                # Add the new player to this role
+                @addPlayerToRole role, {
                   id: request.player.id,
                   roles: request.roles
                 }
                 return true
     return false
+  addPlayerToRole: (role, player) ->
+    alreadyAdded = false
+    if !@roles.delegations[role]
+      @roles.delegations[role] = []
+    else
+      for otherPlayer in @roles.delegations[role]
+        if otherPlayer.id.toString() == player.id.toString()
+          alreadyAdded = true
+          break
+    unless alreadyAdded
+      @roles.delegations[role].push {
+        id: player.id,
+        roles: player.roles
+      }
+
+###
+There i no way to try to chagne the collection per request.
+If we want to split matches into different collections we need to use the mongo driver directly.   
+schema.pre 'findOneAndUpdate', () ->
+  this.mongooseCollection.collection.s.namespace = 'polynect-test.test_matches'
+schema.pre 'save', (next) ->
+  this.mongooseCollection.collection.s.namespace = 'polynect-test.test_matches'
+  next()
+###
+
 
 schema.plugin Plugins.Redundancy,
   model: 'Match',

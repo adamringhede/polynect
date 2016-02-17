@@ -152,6 +152,24 @@ describe('Matchmaker', function () {
       });
     });
   });
+  it('creates millions of documents', function (done) {
+    return done();
+    this.timeout(10 * 60 * 1000);
+    require('async').timesSeries(20000, function (n, next) {
+      var player = new Models.Account({role:'player', data: {}});
+      Matchmaker.findMatch({
+        player: player,
+        game: f.Game.g1,
+        values: {
+          y: 'bar' + Math.floor(Math.random() * 5)
+        }
+      }, function (err, match) {
+        next()
+      });
+    }, function (result) {
+      done();
+    })
+  });
 
 
 
