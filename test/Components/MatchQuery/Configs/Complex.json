@@ -13,8 +13,7 @@
     },
     "y": {
       "type": "same",
-      "default": "foo",
-      "value": "input.y"
+      "value": "options.y"
     },
     "z": {
       "type": "close",

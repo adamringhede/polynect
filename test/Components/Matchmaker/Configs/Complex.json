@@ -13,7 +13,6 @@
     },
     "y": {
       "type": "same",
-      "default": "foo",
       "value": "input.y"
     },
     "z": {

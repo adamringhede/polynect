@@ -174,8 +174,8 @@ schema.methods =
       }
 
 ###
-There i no way to try to chagne the collection per request.
-If we want to split matches into different collections we need to use the mongo driver directly.   
+There is no way to try to chagne the collection per request.
+If we want to split matches into different collections we need to use the mongo driver directly and build our own ODM.
 schema.pre 'findOneAndUpdate', () ->
   this.mongooseCollection.collection.s.namespace = 'polynect-test.test_matches'
 schema.pre 'save', (next) ->

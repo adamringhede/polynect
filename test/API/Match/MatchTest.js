@@ -107,7 +107,17 @@ describe ('Match API', function () {
   })
 
   describe('POST', function () {
-    it('returns 400 if bad input');
+    it('returns 400 if bad input', function (done) {
+      request(api).post('/v1/matches')
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+        .send({ values: {}, character: fixtures.Character.c1._id, game: gameId })
+        .end(function (err, res) {
+          assert.equal(res.statusCode, 400);
+          done();
+        });
+
+    });
 
     it('creates a match if one cannot be found', function (done) {
       request(api).post('/v1/matches')
@@ -132,7 +142,7 @@ describe ('Match API', function () {
       request(api).post('/v1/matches')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
         .send({
-          values: {y: 'bar'},
+          options: {y: 'bar'},
           character: fixtures.Character.c1._id,
           game: gameId
         })
