@@ -20,6 +20,7 @@ var api = 'http://localhost:8090';
 var gameId = ObjectId();
 var playerId = ObjectId();
 var playerId2 = ObjectId();
+var devId = ObjectId();
 var clientId = ObjectId();
 var fixtures = {
   Match: {
@@ -32,7 +33,8 @@ var fixtures = {
     g1: {
       _id: gameId,
       name: 'TestGame',
-      matchmaking_config: require('../../Components/MatchQuery/Configs/Complex')
+      matchmaking_config: require('../../Components/MatchQuery/Configs/Complex'),
+      developer: devId
     }
   },
   Account: {
@@ -47,6 +49,11 @@ var fixtures = {
       role: 'player',
       username: 'adamringhede2@live.com', // No need to provide password really
       game: gameId
+    },
+    d1: {
+      _id: devId,
+      role: 'developer',
+      username: 'adamringhede3@live.com',
     }
   },
   Character: {
@@ -92,6 +99,12 @@ var fixtures = {
       expires: moment().add(1, 'hours'),
       client_id: clientId,
       holder: playerId2
+    },
+    t3: {
+      token: 'testtoken3',
+      expires: moment().add(1, 'hours'),
+      client_id: clientId,
+      holder: devId
     }
   }
 };
@@ -107,6 +120,31 @@ describe ('Match API', function () {
   })
 
   describe('POST', function () {
+    describe('as developer', function () {
+      it ('works by passing in character data', function (done) {
+        request(api).post('/v1/matchmaker')
+          .set('Content-Type', 'application/json')
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.t3.token)
+          .send({ values: {y: 'bar'}, player: {id: "123"}, character: {b: 10}, game: gameId })
+          .expect('Content-Type', 'application/json')
+          .end(function (err, res) {
+            request(api).post('/v1/matchmaker')
+              .set('Content-Type', 'application/json')
+              .set('Authorization', 'Bearer ' + fixtures.AccessToken.t3.token)
+              .send({ values: {y: 'bar'}, player: {id: "124"}, character: {id: "123", b: 10}, game: gameId })
+              .expect('Content-Type', 'application/json')
+              .end(function (err, res) {
+                // It is possible to provide custom player ids 
+                assert.equal(res.body.data.players[0].id, "123");
+                assert.equal(res.body.data.players[1].id, "124");
+                assert.equal(res.statusCode, 200);
+                assert.equal(res.body.data.players.length, 2);
+                done();
+              });
+          });
+      })
+    });
+
     it('returns 400 if bad input', function (done) {
       request(api).post('/v1/matches')
         .set('Content-Type', 'application/json')
@@ -116,7 +154,6 @@ describe ('Match API', function () {
           assert.equal(res.statusCode, 400);
           done();
         });
-
     });
 
     it('creates a match if one cannot be found', function (done) {

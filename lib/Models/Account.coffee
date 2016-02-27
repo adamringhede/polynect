@@ -53,6 +53,7 @@ schema = new Schema
   email: type: String, validate: [validator.isEmail, 'Invalid email']
 
   #### Player ####
+  player_id: String # And ID used for matchmaking
 
   #game: ref: 'Game', type: Schema.Types.ObjectId
 
@@ -69,6 +70,8 @@ schema.path('username').validate (username, callback) ->
 , 'Not unique'
 
 schema.methods =
+  setId: (id) ->
+    @_id = id
   hasAccessToGame: (gameId, callback) ->
     if @role is 'developer'
       #return game.developer._id is @_id or @organisations.indexOf(game.developer._id)
