@@ -25,6 +25,8 @@ var fixtures = {
     d1: {
       _id: devId,
       role: 'developer',
+      firstname: 'Adam',
+      lastname: 'Ringhede',
       username: 'dev',
       password: 'pass',
       email: 'adamringhede@live.com'
@@ -55,6 +57,13 @@ var fixtures = {
       expires: moment().add(1, 'hours'),
       client_id: 'client',
       holder: adminId
+    }
+  },
+  PasswordResetToken: {
+    prt1: {
+      token: 'resettoken',
+      account: devId,
+      email: 'adamringhede@live.com'
     }
   }
 }
@@ -215,5 +224,39 @@ describe('Accounts API', function () {
         .expect(200, /deleted account/i, done);
     });
   })
+
+    describe('Forgot password', function () {
+      it('sends a reset password link', function (done) {
+        request(api).post('/v1/accounts/forgot_password')
+          .set('Content-Type', 'application/json')
+          .send({ email: 'adamringhede@live.com' })
+          .expect(200, /Reset password link sent/i, done);
+      });
+      it('validates that email exists', function (done) {
+        request(api).post('/v1/accounts/forgot_password')
+          .set('Content-Type', 'application/json')
+          .send({ email: 'not_found@live.com' })
+          .expect(400, /Could not be found/i, done);
+      });
+    });
+
+    describe('Reset password', function () {
+      it('sends accounts details via GET', function (done) {
+        request(api).get('/v1/accounts/reset_password/resettoken')
+          .set('Content-Type', 'application/json')
+          .expect(200, /account/i, done);
+      });
+      it('sends 404 if unable to find GET', function (done) {
+        request(api).get('/v1/accounts/reset_password/asflas')
+          .set('Content-Type', 'application/json')
+          .expect(404, done);
+      });
+      it('changes the password via POST', function (done) {
+        request(api).post('/v1/accounts/reset_password/resettoken')
+          .set('Content-Type', 'application/json')
+          .send({password: 'new_pass'})
+          .expect(200, /Password is reset/i, done);
+      });
+    });
 
 });

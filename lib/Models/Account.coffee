@@ -51,11 +51,19 @@ schema = new Schema
   firstname: String
   lastname: String
   email: type: String, validate: [validator.isEmail, 'Invalid email']
+  activated: type: Boolean, default: false # Activated through email
+  verified: type: Boolean, default: false # A credit card has been verified
 
   #### Player ####
   player_id: String # And ID used for matchmaking
 
   #game: ref: 'Game', type: Schema.Types.ObjectId
+  #
+
+schema.pre 'validate', (next) ->
+  if validator.isEmail @username
+    @email = @username
+  next()
 
 schema.path('username').validate (username, callback) ->
   return true unless username?
