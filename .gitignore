@@ -1,10 +1,14 @@
 node_modules
 lib/**/*.map
 lib/Components/**/index.js
+lib/Templates/**/index.js
 
 
 # Compoments that uses coffeescript
 lib/Models/**/*.js
 lib/Matchmaker/*.js
+
+# Templates
+lib/Templates/*.html
 
 dump.rdb

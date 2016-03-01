@@ -10,13 +10,16 @@ schema = new Schema
   email: type: String, validate: [validator.isEmail, 'Invalid email']
   token: type: String, index: true, unique: true
 
-schema.path('email').validate (email, callback) ->
-  mongoose.model('Account').findOne({email: email}, '_id', (err, model) =>
+schema.pre 'validate', (next) ->
+  mongoose.model('Account').findOne({email: @email}, '_id', (err, model) =>
     if err then throw err
     if model? and not @account?
       @account = model._id
-    callback(model?)
+    next()
   );
+
+schema.path('email').validate (email) ->
+  return @account? and @account.id?
 , 'Could not be found'
 
 
@@ -31,6 +34,9 @@ schema.pre 'save', (next) ->
       .digest('hex');
 
     next()
+
+schema.methods =
+  getLink: () -> "https://developer.polynect.io/#/reset-password/#{@token}"
 
 schema.plugin Plugins.Redundancy,
   model: 'PasswordResetToken'
