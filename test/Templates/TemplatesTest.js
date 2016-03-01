@@ -23,6 +23,13 @@ describe('Templates', function () {
       assert.ok(secondDuration < firstDuration);
       assert.ok(/Hi Jack/.test(template));
     });
+
+    it('renders activate_account', function () {
+      var template = Templates.email('activate_account', {
+        activation_link: 'http://example.com/'
+      });
+      assert.ok(/activate/i, template);
+    });
   })
 
 });

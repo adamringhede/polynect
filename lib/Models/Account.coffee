@@ -2,6 +2,7 @@ crypto = require 'crypto'
 Plugins = require './Plugins'
 validator = require 'validator'
 mongoose = require 'mongoose'
+crypto = require 'crypto'
 _ = require 'underscore'
 Schema = mongoose.Schema
 
@@ -51,6 +52,7 @@ schema = new Schema
   firstname: String
   lastname: String
   email: type: String, validate: [validator.isEmail, 'Invalid email']
+  activation_token: type: String
   activated: type: Boolean, default: false # Activated through email
   verified: type: Boolean, default: false # A credit card has been verified
 
@@ -78,6 +80,10 @@ schema.path('username').validate (username, callback) ->
 , 'Not unique'
 
 schema.methods =
+  getActivationLink: ->
+    unless @activation_token?
+      @activation_token = crypto.createHash('sha1').update(@_id + Math.random()*10000).digest('hex');
+    "https://developer.polynect.io/#/activate/#{@activation_token}"
   setId: (id) ->
     @_id = id
   hasAccessToGame: (gameId, callback) ->
@@ -105,6 +111,7 @@ schema.statics =
     this.findOne query, (err, model) ->
       callback? err, model
 
+schema.plugin Plugins.LastMod
 schema.plugin Plugins.DataStore
 schema.plugin Plugins.ItemHolder
 schema.plugin Plugins.Redundancy,

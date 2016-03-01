@@ -49,6 +49,7 @@ schema.methods =
       item.data = @data
     return item
 
+schema.plugin Plugins.LastMod
 schema.plugin Plugins.Redundancy,
   model: 'ItemSpec'
   references:

@@ -29,7 +29,9 @@ var fixtures = {
       lastname: 'Ringhede',
       username: 'dev',
       password: 'pass',
-      email: 'adamringhede@live.com'
+      email: 'adamringhede@live.com',
+      activated: false,
+      activation_token: 'test_activation_token'
     },
     admin: {
       _id: adminId,
@@ -257,6 +259,31 @@ describe('Accounts API', function () {
           .send({password: 'new_pass'})
           .expect(200, /Password is reset/i, done);
       });
+    });
+
+    describe('Developer registration', function () {
+      it('creates an activation token', function (done) {
+        request(api).post('/v1/accounts/register')
+          .set('Content-Type', 'application/json')
+          .send({email: 'developer@polynect.io'})
+          .expect(/access_token/)
+          .expect(200, /developer@/i, done)
+      })
+      describe('activation', function () {
+        it('returns an access token on GET', function (done) {
+          request(api).get('/v1/accounts/activate/test_activation_token')
+            .set('Content-Type', 'application/json')
+            .expect(200, /token/i, done)
+        })
+
+        it('sets some user information', function (done) {
+          request(api).post('/v1/accounts/activate/test_activation_token')
+            .set('Content-Type', 'application/json')
+            .send({firstname: 'john', lastname: 'doe', password: 'secret'})
+            .expect(200, /john/i, done)
+        })
+      })
+
     });
 
 });
