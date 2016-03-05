@@ -52,6 +52,7 @@ schema = new Schema
   firstname: String
   lastname: String
   email: type: String, validate: [validator.isEmail, 'Invalid email']
+  accepted_terms: type: String, default: false,
   activation_token: type: String
   activated: type: Boolean, default: false # Activated through email
   verified: type: Boolean, default: false # A credit card has been verified
