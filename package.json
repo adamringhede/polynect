@@ -45,6 +45,7 @@
     "test": "npm run build && grunt test",
     "build": "./node_modules/coffee-script/bin/coffee -cm lib/ && ./node_modules/grunt-cli/bin/grunt component_tree",
     "deploy": "npm run test && git push heroku master",
+    "deployf": "git push heroku master",
     "postinstall": "npm run build"
   },
   "author": "Adam Ringhede",
