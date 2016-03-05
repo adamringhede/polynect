@@ -273,7 +273,7 @@ describe('Accounts API', function () {
         it('returns an access token on GET', function (done) {
           request(api).get('/v1/accounts/activate/test_activation_token')
             .set('Content-Type', 'application/json')
-            .expect(200, /token/i, done)
+            .expect(200, /name/i, done)
         })
 
         it('sets some user information', function (done) {
