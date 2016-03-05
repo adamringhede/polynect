@@ -257,7 +257,7 @@ describe('Accounts API', function () {
         request(api).post('/v1/accounts/reset_password/resettoken')
           .set('Content-Type', 'application/json')
           .send({password: 'new_pass'})
-          .expect(200, /Password is reset/i, done);
+          .expect(200, /token/i, done);
       });
     });
 
