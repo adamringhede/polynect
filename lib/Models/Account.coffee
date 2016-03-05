@@ -52,7 +52,7 @@ schema = new Schema
   firstname: String
   lastname: String
   email: type: String, validate: [validator.isEmail, 'Invalid email']
-  accepted_terms: type: String, default: false,
+  accepted_terms: type: String, default: false
   activation_token: type: String
   activated: type: Boolean, default: false # Activated through email
   verified: type: Boolean, default: false # A credit card has been verified
@@ -85,6 +85,9 @@ schema.methods =
     unless @activation_token?
       @activation_token = crypto.createHash('sha1').update(@_id + Math.random()*10000).digest('hex');
   getActivationLink: ->
+    unless @activation_token?
+      @createActivationToken()
+      @save()
     "https://developer.polynect.io/#/activate/#{@activation_token}"
   setId: (id) ->
     @_id = id
