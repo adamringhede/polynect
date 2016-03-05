@@ -80,9 +80,10 @@ schema.path('username').validate (username, callback) ->
 , 'Not unique'
 
 schema.methods =
-  getActivationLink: ->
+  createActivationToken: ->
     unless @activation_token?
       @activation_token = crypto.createHash('sha1').update(@_id + Math.random()*10000).digest('hex');
+  getActivationLink: ->
     "https://developer.polynect.io/#/activate/#{@activation_token}"
   setId: (id) ->
     @_id = id
