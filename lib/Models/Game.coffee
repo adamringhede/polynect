@@ -3,7 +3,7 @@ Schema = mongoose.Schema
 Plugins = require './Plugins'
 
 schema = new Schema
-  name: String
+  name: type: String, required: true
   alias: String
   created: type: Date, default: Date.now()
   matchmaking_config: {}
