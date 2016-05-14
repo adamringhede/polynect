@@ -81,14 +81,15 @@ describe('Accounts API', function () {
 
   describe('POST', function () {
     it('creates a new Account', function (done) {
+      console.log("HERE");
       request(api).post('/v1/accounts')
         .set('Content-Type', 'application/json')
         .send({
           username: 'adam',
           password: 'secret'
         })
-        .expect(200)
         .end(function (err, res) {
+          assert.equal(200, res.statusCode);
           assert.equal(res.body.data.username, 'adam');
           done()
         })
