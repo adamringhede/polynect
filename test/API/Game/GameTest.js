@@ -121,7 +121,7 @@ describe('Games API', function () {
           .expect('Content-Type', 'application/json')
           .send({
             name: 'New game',
-            holder: adminId
+            developer: adminId
           })
           .expect(403, done);
       })

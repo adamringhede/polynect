@@ -7,7 +7,7 @@ ObjectId = require 'objectid'
 
 
 schema = new Schema
-  email: type: String, validate: [validator.isEmail, 'Invalid email']
+  email: type: String, match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,10})+$/, 'Invalid email'] #validate: [validator.isEmail, 'Invalid email']
   token: type: String, index: true, unique: true
 
 schema.pre 'validate', (next) ->

@@ -134,7 +134,7 @@ describe ('Match API', function () {
               .send({ values: {y: 'bar'}, player: {id: "124"}, character: {id: "123", b: 10}, game: gameId })
               .expect('Content-Type', 'application/json')
               .end(function (err, res) {
-                // It is possible to provide custom player ids 
+                // It is possible to provide custom player ids
                 assert.equal(res.body.data.players[0].id, "123");
                 assert.equal(res.body.data.players[1].id, "124");
                 assert.equal(res.statusCode, 200);

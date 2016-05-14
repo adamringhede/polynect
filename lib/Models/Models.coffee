@@ -13,9 +13,12 @@ exports.init = (dbURL = process.env.POLYNECT_MONGO_URI || 'mongodb://localhost/
   exports.connection = mongoose.connection
   exports.connected = true
 
+
+exports.loadFixtures = Fixtures.load
 exports.load = `function (fixtures, callback) {
   var f = {};
   Fixtures.load(fixtures, mongoose.connection, function (err) {
+    if (err) throw err;
     var count = 0;
     var non_empty_count = 0;
     if (Object.keys(fixtures).length === 0 && typeof callback === 'function') callback(f);
@@ -28,7 +31,7 @@ exports.load = `function (fixtures, callback) {
         if (fixtures[modelName][i]['_id']) {
           count += 1;
           mongoose.model(modelName).findOne({_id: fixtures[modelName][i]['_id']}, function (err, model) {
-            model.__forceUpdate = true
+            model.__forceUpdate = true;
             model.save(function () {
               if (err) throw err;
               f[modelName][i] = model;

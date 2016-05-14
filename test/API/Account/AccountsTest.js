@@ -20,6 +20,7 @@ require('../../../lib/API')
 var devId = ObjectId();
 var clientId = ObjectId();
 var adminId = ObjectId();
+var playerId = ObjectId();
 var fixtures = {
   Account: {
     d1: {
@@ -40,7 +41,7 @@ var fixtures = {
       password: 'pass'
     },
     p1: {
-      _id: ObjectId(),
+      _id: playerId,
       role: 'player',
       username: 'playername',
       password: 'secret'
@@ -81,7 +82,6 @@ describe('Accounts API', function () {
 
   describe('POST', function () {
     it('creates a new Account', function (done) {
-      console.log("HERE");
       request(api).post('/v1/accounts')
         .set('Content-Type', 'application/json')
         .send({

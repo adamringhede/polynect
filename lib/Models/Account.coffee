@@ -51,7 +51,7 @@ schema = new Schema
 
   firstname: String
   lastname: String
-  email: type: String, validate: [validator.isEmail, 'Invalid email']
+  email: type: String, match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,10})+$/, 'Invalid email']
   accepted_terms: type: String, default: false
   activation_token: type: String
   activated: type: Boolean, default: false # Activated through email
@@ -62,11 +62,6 @@ schema = new Schema
 
   #game: ref: 'Game', type: Schema.Types.ObjectId
   #
-
-schema.pre 'validate', (next) ->
-  if validator.isEmail @username
-    @email = @username
-  next()
 
 schema.path('username').validate (username, callback) ->
   return true unless username?
