@@ -11,4 +11,5 @@ lib/Matchmaker/*.js
 # Templates
 lib/Templates/*.html
 
+.vscode/
 dump.rdb
