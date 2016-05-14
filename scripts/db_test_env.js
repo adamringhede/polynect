@@ -4,6 +4,7 @@ var ObjectId = require('objectid');
 Models.init()
 
 var adminId = ObjectId('55aaabb5acbb5c03003d0bf0');
+var devId = ObjectId('55aaabb5acbb5c03003d0ba0');
 var clientId = ObjectId('55aaabb5acbb5c03003d0bf1');
 var gameId = ObjectId('55aaabb5acbb5c03003d0bf2');
 var playerId1 = ObjectId('55aaabb5acbb5c03003d0bf3');
@@ -15,6 +16,12 @@ Models.load({
       username: 'admin',
       password_hash: Models.Account.hashPassword('secret'),
       role: 'admin'
+    },
+    dev: {
+      _id: devId,
+      username: 'adamringhede@live.com',
+      password_hash: Models.Account.hashPassword('secret'),
+      role: 'developer'
     },
     p1: {
       _id: playerId1,
