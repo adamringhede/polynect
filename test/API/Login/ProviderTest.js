@@ -5,13 +5,13 @@ var ObjectId = require('objectid');
 
 Models.init()
 
-process.env.POLYNECT_API_PORT = 8090;
+process.env.POLYNECT_API_PORT = 9999;
 process.env.MOCK_SERVICES = true;
 
 // Start API
 require('../../../lib/API')
 
-var api = 'http://localhost:8090';
+var api = 'http://localhost:9999';
 
 var gameId = ObjectId();
 var playerId = ObjectId()

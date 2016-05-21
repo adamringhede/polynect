@@ -5,7 +5,7 @@ var ObjectId = require('objectid');
 
 Models.init()
 
-process.env.POLYNECT_API_PORT = 8090;
+process.env.POLYNECT_API_PORT = 9999;
 process.env.MOCK_SERVICES = true;
 
 // Start API
@@ -61,14 +61,14 @@ describe('Login API', function () {
   describe('Login as player', function () {
 
     it('returns 401 if player does not exist with sent credentials', function (done) {
-      request({ method: 'POST', json: true, url: 'http://localhost:8090/v1/games/'+gameId+'/login',
+      request({ method: 'POST', json: true, url: 'http://localhost:9999/v1/games/'+gameId+'/login',
         body: {username: player.username, password: 'wrong password'} }, function (err, res, body) {
           assert.equal(res.statusCode, 401);
           done();
         });
     });
     it('returns 200 if valid credentials are used', function (done) {
-      request({ method: 'POST', json: true, url: 'http://localhost:8090/v1/games/'+gameId+'/login',
+      request({ method: 'POST', json: true, url: 'http://localhost:9999/v1/games/'+gameId+'/login',
         body: {username: player.username, password: player.password} }, function (err, res, body) {
           assert.equal(res.statusCode, 200);
           assert.equal(typeof body.data.token.access_token, 'string');
@@ -80,7 +80,7 @@ describe('Login API', function () {
   describe('Login as developer', function () {
 
     it('works', function (done) {
-      request({ method: 'POST', json: true, url: 'http://localhost:8090/v1/login',
+      request({ method: 'POST', json: true, url: 'http://localhost:9999/v1/login',
         body: {username: 'dev', password: 'secret'} }, function (err, res, body) {
           assert.equal(res.statusCode, 200);
           Models.AccessToken.findOne({token: body.data.token.access_token}, function (err, model) {
@@ -91,7 +91,7 @@ describe('Login API', function () {
     });
 
     it('works when a player has the same username', function (done) {
-      request({ method: 'POST', json: true, url: 'http://localhost:8090/v1/login',
+      request({ method: 'POST', json: true, url: 'http://localhost:9999/v1/login',
         body: {username: player.username, password: player.password} }, function (err, res, body) {
           assert.equal(body.data.role, 'developer')
           assert.equal(res.statusCode, 200);
