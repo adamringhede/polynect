@@ -9,22 +9,24 @@ var moment = require('moment');
 
 Models.init()
 
-process.env.POLYNECT_API_PORT = 8090;
+process.env.POLYNECT_API_PORT = 9999;
 process.env.MOCK_SERVICES = true;
 
 // Start API
 require('../../../lib/API')
 
-var api = 'http://localhost:8090';
+var api = 'http://localhost:9999';
 
 var gameId = ObjectId();
 var playerId = ObjectId();
 var playerId2 = ObjectId();
 var devId = ObjectId();
 var clientId = ObjectId();
+var matchId = ObjectId();
 var fixtures = {
   Match: {
     m1: {
+      _id: matchId,
       game: gameId,
       status: 'waiting'
     }
@@ -231,6 +233,59 @@ describe ('Match API', function () {
           });
       })
     })
+  });
+
+  describe('Realtime', function () {
+    it('sends updates in match', function (done) {
+
+      /*var url = "wss://username:password@sub.polynect.io/matches/matchID";*/
+      require('../../../lib/API/Sub');
+
+      var WebSocketClient = require('websocket').client;
+
+      request(api).post('/v1/matches')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+        .send({
+          values: {y: 'bar'},
+          character: fixtures.Character.c1._id,
+          game: gameId
+        })
+        .end(function (err, res) {
+          var client = new WebSocketClient();
+           
+          client.on('connectFailed', function(error) {
+              console.log('Connect Error: ' + error.toString());
+          });
+           
+          client.on('connect', function(connection) {
+              console.log('WebSocket Client Connected');
+              connection.on('error', function(error) {
+                  console.log("Connection Error: " + error.toString());
+              });
+              connection.on('close', function() {
+                  console.log('echo-protocol Connection Closed');
+              });
+              connection.on('message', function(message) {
+                  var match = JSON.parse(message.utf8Data); 
+                  assert.equal(match.players.length, 2);
+                  done();
+              });
+          });
+           
+          client.connect('ws://localhost:8080/matches/' + res.body.data.id, 'event-protocol');
+
+          request(api).post('/v1/matches')
+            .set('Authorization', 'Bearer ' + fixtures.AccessToken.t2.token)
+            .send({
+              values: {y: 'bar'},
+              character: fixtures.Character.c3._id,
+              game: gameId
+            })
+            .end(function (err, res) {
+              
+            })
+        });
+    });
   });
 
 })

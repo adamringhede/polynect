@@ -4,6 +4,7 @@
   "description": "Polynect API",
   "main": "lib/API/index.js",
   "dependencies": {
+    "amqplib": "^0.4.1",
     "async": "^2.0.0-rc.4",
     "coffee-script": "^1.9.3",
     "flat": "^2.0.0",
@@ -31,7 +32,8 @@
     "tokenthrottle-redis": "^1.1.0",
     "uglify-js": "^2.6.1",
     "underscore": "^1.8.3",
-    "validator": "^5.2.0"
+    "validator": "^5.2.0",
+    "websocket": "^1.0.23"
   },
   "devDependencies": {
     "grunt-contrib-jade": "^1.0.0",
