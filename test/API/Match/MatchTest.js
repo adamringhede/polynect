@@ -238,7 +238,6 @@ describe ('Match API', function () {
   describe('Realtime', function () {
     it('sends updates in match', function (done) {
 
-      /*var url = "wss://username:password@sub.polynect.io/matches/matchID";*/
       require('../../../lib/API/Sub');
 
       var WebSocketClient = require('websocket').client;
@@ -252,13 +251,19 @@ describe ('Match API', function () {
         })
         .end(function (err, res) {
           var client = new WebSocketClient();
+
+          /*
+          SubStub('ws://localhost:9999/matches/' + res.body.data.id, 'event-protocol').message(function (message) {
+
+          });
+          */
+
            
           client.on('connectFailed', function(error) {
               console.log('Connect Error: ' + error.toString());
           });
            
           client.on('connect', function(connection) {
-              console.log('WebSocket Client Connected');
               connection.on('error', function(error) {
                   console.log("Connection Error: " + error.toString());
               });
@@ -272,7 +277,7 @@ describe ('Match API', function () {
               });
           });
            
-          client.connect('ws://localhost:8080/matches/' + res.body.data.id, 'event-protocol');
+          client.connect('ws://localhost:9999/matches/' + res.body.data.id, 'event-protocol');
 
           request(api).post('/v1/matches')
             .set('Authorization', 'Bearer ' + fixtures.AccessToken.t2.token)
@@ -281,9 +286,7 @@ describe ('Match API', function () {
               character: fixtures.Character.c3._id,
               game: gameId
             })
-            .end(function (err, res) {
-              
-            })
+            .end(function() {})
         });
     });
   });
