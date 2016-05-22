@@ -148,6 +148,7 @@ describe ('Match API', function () {
                   .end(function (err, res) {
                     assert.equal(res.body.data.players.length, 1);
                     assert.equal(res.body.data.size, 1);
+                    assert.equal(res.body.data.players[0].id, "124");
                     done();
                   })              
               });
