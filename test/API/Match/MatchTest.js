@@ -141,7 +141,15 @@ describe ('Match API', function () {
                 assert.equal(res.body.data.players[1].id, "124");
                 assert.equal(res.statusCode, 200);
                 assert.equal(res.body.data.players.length, 2);
-                done();
+
+                request(api).delete('/v1/matches/' + res.body.data.id + '/players/123')
+                  .set('Content-Type', 'application/json')
+                  .set('Authorization', 'Bearer ' + fixtures.AccessToken.t3.token)
+                  .end(function (err, res) {
+                    assert.equal(res.body.data.players.length, 1);
+                    assert.equal(res.body.data.size, 1);
+                    done();
+                  })              
               });
           });
       })

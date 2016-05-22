@@ -115,7 +115,24 @@ schema.methods =
     this.calculateStatus()
     return true;
 
-  removeRequest: (request) ->
+  removePlayer: (playerId) ->
+    removed = false
+    for request, i in @requests
+      if request.player.id == playerId
+        @requests.splice(i, 1)
+        removed = true
+        break
+
+    if @roles?.delegations?
+      for role, delegations of @roles.delegations
+        for delegate, k in delegations
+          if delegate.id == playerId
+            delegate.splice(k, 1)
+    if removed then @onRemoveRequest()
+    removed
+
+
+  onRemoveRequest: ->
     this.size -= 1;
     this.calculateAttributes();
     this.calculateStatus()
