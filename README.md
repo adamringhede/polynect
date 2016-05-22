@@ -1,0 +1,9 @@
+
+
+#### Test 
+
+Run this in the terminal for an easy to use script
+ 
+```
+echo "curl -XPOST -H \"Content-Type: application/json\" -H \"Authorization: Bearer 74a673672c943dab2e0cffd1083adfcc6bb6f20a7c4df0b2f47b9285e8a94228\" -d \$1 localhost:1235/v1/matchmaker" > polynect
+```
