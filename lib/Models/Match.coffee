@@ -23,7 +23,7 @@ schema = new Schema
       min: Number,
       max: Number
   }]
-  
+
   open: type: Boolean, default: true
   status: type: String, default: WAITING
   requirements: {}
@@ -96,7 +96,7 @@ schema.methods =
     }
   }`
   addRequest: (request, config) ->
-    if config.roles
+    if Object.keys(config.roles).length > 0
       if @delegateRequest(request, config.roles.allowSwitching)
         this.markModified('roles.delegations')
       else return false
