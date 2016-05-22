@@ -48,7 +48,7 @@ schema.statics =
     match.min = game.matchmaking_config.general.min or match.min
     match.max = game.matchmaking_config.general.max or match.max
     match.requirements = game.matchmaking_config.attributes;
-    if game.matchmaking_config.roles? and game.matchmaking_config.roles.limits?
+    if game.matchmaking_config.roles?.limits?
       match.rolesEnabled = true;
       match.roles.need = {}
       match.roles.delegations = {}
@@ -96,7 +96,7 @@ schema.methods =
     }
   }`
   addRequest: (request, config) ->
-    if Object.keys(config.roles).length > 0
+    if config.roles?.limits? and Object.keys(config.roles).length > 0
       if @delegateRequest(request, config.roles.allowSwitching)
         this.markModified('roles.delegations')
       else return false
