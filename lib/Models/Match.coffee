@@ -23,7 +23,7 @@ schema = new Schema
       min: Number,
       max: Number
   }]
-  #game: type: Schema.Types.ObjectId, ref: 'Game'
+  
   open: type: Boolean, default: true
   status: type: String, default: WAITING
   requirements: {}

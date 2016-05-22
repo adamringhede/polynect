@@ -51,6 +51,8 @@ schema = new Schema
 
   firstname: String
   lastname: String
+  developer_token: type: String
+  developer_token_expires: type: Date
   email: type: String, match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,10})+$/, 'Invalid email']
   accepted_terms: type: String, default: false
   activation_token: type: String
