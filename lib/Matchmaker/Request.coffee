@@ -2,7 +2,7 @@ puid = require('puid')
 p = new puid()
 _ = require('underscore');
 
-class Request extends require('events').EventEmitter
+class Request extends require('events')
   constructor: (@requirements = {}) ->
     @id = p.generate()
     @min = 2

@@ -36,6 +36,7 @@
     "websocket": "^1.0.23"
   },
   "devDependencies": {
+    "grunt": "^1.0.1",
     "grunt-contrib-jade": "^1.0.0",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-jade": "^0.5.1",

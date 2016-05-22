@@ -194,6 +194,7 @@ describe ('Match API', function () {
               game: gameId
             })
             .end(function (err, res2) {
+              assert.equal(res2.body.data.status, 'ready');
               assert.equal(res2.statusCode, 200);
               assert.equal(res2.body.data.players.length, 2);
               done();

@@ -31,6 +31,8 @@ schema = new Schema
   reserved: type: Boolean, default: false
   reserved_at: type: Number, default: -1
 
+  min: type: Number, default: 2
+  max: type: Number, default: 64
   size: type: Number, default: 0
   attributes: {}
   rolesEnabled: type: Boolean, default: false
@@ -43,6 +45,8 @@ schema.statics =
     Match = mongoose.model('Match')
     match = new Match();
     match.game = game._id;
+    match.min = game.matchmaking_config.general.min or match.min
+    match.max = game.matchmaking_config.general.max or match.max
     match.requirements = game.matchmaking_config.attributes;
     if game.matchmaking_config.roles? and game.matchmaking_config.roles.limits?
       match.rolesEnabled = true;
@@ -108,11 +112,22 @@ schema.methods =
     this.size = this.requests.length
 
     this.calculateAttributes();
+    this.calculateStatus()
     return true;
 
   removeRequest: (request) ->
     this.size -= 1;
     this.calculateAttributes();
+    this.calculateStatus()
+
+  calculateStatus: ->
+    enoughPlayers = this.size >= this.min
+    fulfilledRoles = true
+    if this.rolesEnabled
+      for role, need of this.roles.need
+        if need[0] > this.roles.delegations[role]?.length
+          fulfilledRoles = false
+    this.status = if enoughPlayers and fulfilledRoles then READY else WAITING
 
   delegateRequest: (request, allowSwitching = false) ->
     `

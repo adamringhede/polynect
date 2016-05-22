@@ -24,7 +24,7 @@
     "limits": {
       "tank": [1,3], // Minimum 1, maximum 3
       "healer": [2,6], // Minimum 2, maximum 6
-      "damage_dealer": 6 // Minimum of 6 damage dealers before starting
+      "damage_dealer": [6] // Minimum of 6 damage dealers before starting
     }
   }
 }

@@ -1,4 +1,4 @@
-class Delegator extends require('events').EventEmitter 
+class Delegator extends require('events')
   constructor: (@need = {}) -> 
     @reset();
 

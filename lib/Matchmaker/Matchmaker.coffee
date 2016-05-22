@@ -1,7 +1,7 @@
 Request = require('../Models').Request
 Delegator = require './Delegator'
 PartyMatch = require './PartyMatch'
-Emitter = require('events').EventEmitter
+Emitter = require('events')
 
 
 ALLOWED_TIMEOUTS = 20
