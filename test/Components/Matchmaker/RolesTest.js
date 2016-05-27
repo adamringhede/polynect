@@ -27,6 +27,11 @@ var fixtures = {
       name: 'Test game',
       matchmaking_config: require('./Configs/Roles')
     },
+    g2: {
+      _id: ObjectId(),
+      name: 'Test game 2 ',
+      matchmaking_config: require('./Configs/Roles2')
+    },
   },
   Match: {}
 };
@@ -36,10 +41,10 @@ var fixtures = {
 describe('Matchmaking (roles)', function () {
   var f = {};
 
-  function match(player, roles, callback) {
+  function match(player, roles, callback, game) {
     Matchmaker.findMatch({
       player: f.Account[player],
-      game: f.Game.g1,
+      game: game || f.Game.g1,
       values: {
         roles: roles
       }
@@ -106,6 +111,31 @@ describe('Matchmaking (roles)', function () {
           })
         }
       ], done);
+    });
+    it('delegates until all minimum requirements can stil be fulfilled', function (done) {
+      f.Game.g2.markModified('matchmaking_config');
+      f.Game.g2.save(function () {
+        async.series([
+          function (callback) {
+            match('p1', ['b'], callback, f.Game.g2)
+          },
+          function (callback) {
+            match('p2', ['a'], function (err, match) {
+              // This request should be added to the previous match as 
+              // it has 2 spots but the sum of min is less than max
+              assert.equal(match.size, 2);
+              callback();
+            }, f.Game.g2)
+          },
+          function (callback) {
+            match('p3', ['a'], function (err, match) {
+              // A new match should be created
+              assert.equal(match.size, 1);
+              callback();
+            }, f.Game.g2)
+          }
+        ], done);
+      })
     });
     it ('does not switch roles if switching is disabled', function (done) {
       f.Game.g1.matchmaking_config.roles.allowSwitching = false;
