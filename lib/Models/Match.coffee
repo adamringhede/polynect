@@ -130,19 +130,24 @@ schema.methods =
     this.status = if enoughPlayers and fulfilledRoles then READY else WAITING
 
   delegateRequest: (request, allowSwitching = false) ->
+    # The minSum is the number of spots left that has to be filled 
+    # It is used to determine if we can delegate a request to a lower priority
+    # role. 
     `
     var limit = 1;
+    var minSum = 0;
     for (role in this.roles.need) {
       var need = this.roles.need[role];
       if (need[0] > this.roles.delegations[role].length) {
         limit = 0;
-        break;
       }
+      minSum += need[0] - this.roles.delegations[role].length;
     }
 
     for (var i = 0, l = request.roles.length; i < l; i++) {
       var role = request.roles[i];
-      if (this.roles.need[role] && this.roles.need[role][limit] > this.roles.delegations[role].length) {
+      if (this.roles.need[role] && (this.roles.need[role][limit] > this.roles.delegations[role].length 
+         || this.max - this.size > minSum)) {
         this.addPlayerToRole(role, {
           id: request.player.id,
           roles: request.roles
