@@ -210,6 +210,10 @@ schema.methods =
         roles: player.roles
       }
 
+schema.pre 'save', (next) ->
+  # If changin from state waiting to ready for the first time,
+  next()
+
 ###
 There is no way to try to chagne the collection per request.
 If we want to split matches into different collections we need to use the mongo driver directly and build our own ODM.

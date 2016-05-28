@@ -9,7 +9,7 @@
     "value": "input.roles",
     "allowSwitching": true,
     "limits": {
-      "a": 0,
+      "a": [0,2],
       "b": 2
     }
   }
