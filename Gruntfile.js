@@ -6,6 +6,7 @@ module.exports = function(grunt) {
       source: {
         includeDir: true,
         cwd: [
+          'lib/Matchmaker',
           'lib/Templates',
           'lib/Models',
           'lib/Models/Plugins',
