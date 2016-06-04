@@ -1,13 +1,30 @@
 version: '2'
 services: 
+  web:
+    image: node
+    ports: 
+      - "9999:9999"
+    volumes: 
+      - ./:/app
+    environment:
+      REDIS_URL: 'redis://redis:6379'
+      POLYNECT_MONGO_URI: 'mongodb://mongodb:27017/polynect-test'
+      AMQP_URL: 'amqp://rabbitmq'
+    depends_on:
+      - redis
+      - mongodb
+      #- influxdb
+      - rabbitmq
   redis:
     image: redis
+    hostname: redis
     ports: 
       - "6379:6379" 
   mongodb:
     image: mongo:3.2
     volumes: 
       - /data/db
+    hostname: mongodb
     ports:
       - "27017:27017"
   influxdb:
