@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Polynect API",
   "main": "lib/API/index.js",
+  "engines": {
+    "npm": "3.8.x",
+    "node": "6.2.x"
+  },
   "dependencies": {
     "amqplib": "^0.4.1",
     "async": "^2.0.0-rc.4",
@@ -46,8 +50,7 @@
   },
   "scripts": {
     "watch": "coffee -cwm lib/**/**/*.coffee lib/**/*.coffee && grunt watch:jade",
-    "test": "npm run build && grunt test",
-    "testd": "docker-compose run -w /app --entrypoint 'node_modules/.bin/grunt test' web",
+    "test": "docker-compose run -w /app --entrypoint 'node_modules/.bin/grunt test' web",
     "build": "./node_modules/coffee-script/bin/coffee -cm lib/ && ./node_modules/grunt-cli/bin/grunt component_tree",
     "deploy": "npm run test && git push heroku master",
     "deployf": "git push heroku master",
