@@ -6,7 +6,27 @@ schema = new Schema
   name: type: String, required: true
   alias: String
   created: type: Date, default: Date.now()
-  matchmaking_config: {}
+  matchmaking_config: 
+    general: 
+      min: type: Number default: 2
+      max: type: Number default: 2
+    attributes: {}
+    ###
+    This would require moving to an array which could be good
+    [{
+      value: type: String, required: true
+      default: required: false
+
+      intervals: type: Array, 
+    }]
+    ###
+    roles: 
+      # Enabled should be set to false automatically when roles is empty, or it should be a method. 
+      #enabled: type: Boolean, default: false
+      allowSwitching: type: Boolean, default: false
+      value: type: String, required: true
+      limits: {}
+
   rate_limit: type: Number, default: 20
 
   #holder: type: Schema.Types.ObjectId, ref: 'Account' # now called developer
