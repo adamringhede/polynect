@@ -96,7 +96,7 @@ schema.methods =
     }
   }`
   addRequest: (request, config) ->
-    if config.roles?.limits? and Object.keys(config.roles).length > 0
+    if config.roles?.limits? and Object.keys(config.roles.limits).length > 0
       if @delegateRequest(request, config.roles.allowSwitching)
         this.markModified('roles.delegations')
       else return false
