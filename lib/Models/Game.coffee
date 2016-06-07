@@ -8,8 +8,8 @@ schema = new Schema
   created: type: Date, default: Date.now()
   matchmaking_config: 
     general: 
-      min: type: Number default: 2
-      max: type: Number default: 2
+      min: type: Number, default: 2
+      max: type: Number, default: 2
     attributes: {}
     ###
     This would require moving to an array which could be good
