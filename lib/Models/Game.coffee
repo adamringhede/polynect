@@ -24,7 +24,7 @@ schema = new Schema
       # Enabled should be set to false automatically when roles is empty, or it should be a method. 
       #enabled: type: Boolean, default: false
       allowSwitching: type: Boolean, default: false
-      value: type: String, required: true
+      value: type: String
       limits: {}
 
   rate_limit: type: Number, default: 20
