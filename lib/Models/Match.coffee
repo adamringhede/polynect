@@ -97,7 +97,7 @@ schema.methods =
   }`
   addRequest: (request, config) ->
     if config.roles?.limits? and Object.keys(config.roles.limits).length > 0
-      if @delegateRequest(request, config.roles.allowSwitching)
+      if @delegateRequest(request, config.roles.allow_switching)
         this.markModified('roles.delegations')
       else return false
 
@@ -146,7 +146,7 @@ schema.methods =
           fulfilledRoles = false
     this.status = if enoughPlayers and fulfilledRoles then READY else WAITING
 
-  delegateRequest: (request, allowSwitching = false) ->
+  delegateRequest: (request, allow_switching = false) ->
     # The minSum is the number of spots left that has to be filled 
     # It is used to determine if we can delegate a request to a lower priority
     # role. 
@@ -173,7 +173,7 @@ schema.methods =
       }
     }`
 
-    return false unless allowSwitching
+    return false unless allow_switching
 
     # This is less restrictive
     for role in request.roles

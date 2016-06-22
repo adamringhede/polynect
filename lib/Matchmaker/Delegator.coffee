@@ -26,7 +26,7 @@ class Delegator extends require('events')
         return false
     return true
 
-  put: (request, allowSwitching = true) -> 
+  put: (request, allow_switching = true) -> 
     if @meetsNeed()
       x = "maximum"
     else 
@@ -36,7 +36,7 @@ class Delegator extends require('events')
         @delegations[role].push request
         return true
 
-    return false if not allowSwitching
+    return false if not allow_switching
 
     for role in request.roles
       if @need[role].minimum > 0 # there is a need for this role to begin with but it is occupied

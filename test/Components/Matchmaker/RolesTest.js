@@ -138,7 +138,7 @@ describe('Matchmaking (roles)', function () {
       })
     });
     it ('does not switch roles if switching is disabled', function (done) {
-      f.Game.g1.matchmaking_config.roles.allowSwitching = false;
+      f.Game.g1.matchmaking_config.roles.allow_switching = false;
       f.Game.g1.markModified('matchmaking_config');
       f.Game.g1.save(function () {
         async.series([
