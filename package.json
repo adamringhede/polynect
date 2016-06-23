@@ -19,7 +19,7 @@
     "jade": "^1.11.0",
     "mocha": "^2.4.5",
     "moment": "^2.10.3",
-    "mongoose": "^4.3.7",
+    "mongoose": "4.*.*",
     "mongoose-paginate": "^5.0.0",
     "mongoose-unique-validator": "^1.0.2",
     "nock": "^8.0.0",
@@ -50,6 +50,7 @@
   },
   "scripts": {
     "watch": "coffee -cwm lib/**/**/*.coffee lib/**/*.coffee && grunt watch:jade",
+    "bash": "docker-compose run -w /app --entrypoint 'bash' web",
     "test": "docker-compose run -w /app --entrypoint 'node_modules/.bin/grunt test' web",
     "build": "./node_modules/coffee-script/bin/coffee -cm lib/ && ./node_modules/grunt-cli/bin/grunt component_tree",
     "deploy": "npm run test && git push heroku master",

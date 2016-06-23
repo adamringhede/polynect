@@ -7,6 +7,7 @@ schema = new Schema
   alias: String
   created: type: Date, default: Date.now()
   matchmaking_config: 
+    attempts: type: Number, default: 1
     general: 
       min: type: Number, default: 2
       max: type: Number, default: 2
