@@ -287,7 +287,7 @@ describe ('Match API', function () {
               });
           });
            
-          client.connect('ws://localhost:9999/matches/' + res.body.data.id, 'event-protocol');
+          client.connect('ws://localhost:9999/matches/' + res.body.data.id, 'match.polynect.io');
 
           request(api).post('/v1/matches')
             .set('Authorization', 'Bearer ' + fixtures.AccessToken.t2.token)
