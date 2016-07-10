@@ -248,7 +248,7 @@ describe ('Match API', function () {
   describe('Realtime', function () {
     it('sends updates in match', function (done) {
 
-      require('../../../lib/API/Sub');
+      //require('../../../lib/API/Sub');
 
       var WebSocketClient = require('websocket').client;
 
