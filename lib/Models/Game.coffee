@@ -11,14 +11,19 @@ schema = new Schema
     general: 
       min: type: Number, default: 2
       max: type: Number, default: 2
+    teams:
+      count: type: Number, default: 1
+      match: 
+        type: type: String, enum: ['same', 'different'], default: 'different'
+        value: type: String
     attributes: {}
     ###
-    This would require moving to an array which could be good
+    This would require moving to an array, which could be good anyway.
     [{
+      type: type: String, required: true, enum: ['same', 'interval', 'close']
       value: type: String, required: true
       default: required: false
-
-      intervals: type: Array, 
+      intervals: type: Array
     }]
     ###
     roles: 
@@ -29,8 +34,7 @@ schema = new Schema
       limits: {}
 
   rate_limit: type: Number, default: 20
-
-  #holder: type: Schema.Types.ObjectId, ref: 'Account' # now called developer
+  
 ###
   config:
     player:
