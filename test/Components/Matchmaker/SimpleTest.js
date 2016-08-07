@@ -5,6 +5,7 @@ var ObjectId = require('objectid');
 
 Models.init();
 
+var gameId2 =  ObjectId();
 var fixtures = {
   Account: {
     p1: {
@@ -27,9 +28,9 @@ var fixtures = {
       matchmaking_config: require('./Configs/Simple')
     },
     g2: {
-      _id: ObjectId(),
+      _id: gameId2,
       name: 'Another game',
-      matchmaking_config: require('./Configs/Simple')
+      matchmaking_config: require('./Configs/TeamsSimple')
     }
   },
   Match: {}
@@ -152,6 +153,22 @@ describe('Matchmaker', function () {
       });
     });
   });
+
+  it('trigger matching with teams', function (done) {
+    Matchmaker.findMatch({
+      player: f.Account.p1,
+      game: f.Game.g2
+    }, function (err, match) {
+      Matchmaker.findMatch({
+        player: f.Account.p2,
+        game: f.Game.g2
+      }, function (err, match2) {
+        console.log(match2);
+        done();
+      });
+    });
+  });
+
   it('creates millions of documents', function (done) {
     return done();
     this.timeout(10 * 60 * 1000);

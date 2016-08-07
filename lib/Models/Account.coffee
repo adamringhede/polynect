@@ -45,7 +45,8 @@ schema = new Schema
 
   provider:
     alias: String # Alias of provider, eg. facebook, twitter
-    uid: type: String#, validate: [validateUniqueProviderId, 'Not unique'] # The user id retrieved from the provider
+    uid: type: String
+  #, validate: [validateUniqueProviderId, 'Not unique'] # The user id retrieved from the provider
 
   #### Developer ####
 

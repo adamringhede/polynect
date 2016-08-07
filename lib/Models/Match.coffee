@@ -1,6 +1,8 @@
 mongoose = require 'mongoose'
 Builder = require '../Components/MatchQueryBuilder/MatchQueryBuilder'
 Plugins = require './Plugins'
+ObjectId = require('objectid');
+Models = require './'
 Schema = mongoose.Schema
 
 
@@ -31,6 +33,9 @@ schema = new Schema
   reserved: type: Boolean, default: false
   reserved_at: type: Number, default: -1
 
+  teams_match: type: String
+  max_teams: type: Number, default: 1
+
   min: type: Number, default: 2
   max: type: Number, default: 64
   size: type: Number, default: 0
@@ -47,7 +52,10 @@ schema.statics =
     match.game = game._id;
     match.min = game.matchmaking_config.general.min or match.min
     match.max = game.matchmaking_config.general.max or match.max
-    match.requirements = game.matchmaking_config.attributes;
+    match.requirements = game.matchmaking_config.attributes
+    if game.matchmaking_config.teams?
+      match.max_teams = game.matchmaking_config.teams.count
+
     if game.matchmaking_config.roles?.limits?
       match.rolesEnabled = true;
       match.roles.need = {}
@@ -96,7 +104,7 @@ schema.methods =
     }
   }`
   addRequest: (request, config) ->
-    if config.roles?.limits? and Object.keys(config.roles.limits).length > 0
+    if @rolesEnabled
       if @delegateRequest(request, config.roles.allow_switching)
         this.markModified('roles.delegations')
       else return false
@@ -111,9 +119,12 @@ schema.methods =
     this.requests.push(request) unless haveRequest
     this.size = this.requests.length
 
-    this.calculateAttributes();
+    this.calculateAttributes()
     this.calculateStatus()
-    return true;
+
+    # This may work for now, but in the future, we will want a worker to be dedicated to this match.
+    if @size is 1 then @matchWithTeams()
+    return !haveRequest
 
   removePlayer: (playerId) ->
     removed = false
@@ -131,6 +142,40 @@ schema.methods =
     if removed then @onRemoveRequest()
     removed
 
+  reserve: ->
+    update = {'$set':{}}
+    update['$set']['reserved'] = true;
+    update['$set']['reserved_at'] = Date.now();
+    mongoose.model 'Match'
+      .findByIdAndUpdate(@_id, update)
+    true
+
+  release: ->
+    update = {'$set':{}}
+    update['$set']['reserved'] = false;
+    update['$set']['reserved_at'] = -1;
+    mongoose.model 'Match'
+      .findByIdAndUpdate(@_id, update)
+    true
+
+  matchWithTeams: ->
+    # Find a team to join
+    # If that does not work, create a new team, append the match to it and we are done
+    # After that, assign the team to a worker that looks for matches to att to it.
+    # The reason for assigning it to a worker is incase this process crashes and the teams match is left alone.
+    TeamsMatch = require('./TeamsMatch')
+    if @size is 1 and not @teams_match?
+      if true or @reserve() # reservation may not be needed as it should only be possible to be of size 1 once.
+        TeamsMatch.findForMatch this, (err, teamsMatch) =>
+          if err then throw err
+          unless teamsMatch?
+            teamsMatch = new TeamsMatch()
+            teamsMatch.game = @game_id
+            teamsMatch.max_teams = @max_teams
+            teamsMatch.push(this)
+            teamsMatch.save()
+            teamsMatch.matchWithOthers()
+          @teams_match = teamsMatch._id
 
   onRemoveRequest: ->
     this.size -= 1;
@@ -153,7 +198,7 @@ schema.methods =
     `
     var limit = 1;
     var minSum = 0;
-    for (role in this.roles.need) {
+    for (var role in this.roles.need) {
       var need = this.roles.need[role];
       if (need[0] > this.roles.delegations[role].length) {
         limit = 0;
@@ -230,6 +275,7 @@ schema.plugin Plugins.Redundancy,
   references:
     game:
       model: 'Game'
+      fields: ['matchmaking_config']
       references:
         developer:
           model: 'Account'

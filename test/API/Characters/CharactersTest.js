@@ -39,7 +39,7 @@ var fixtures = {
       _id: gameId2,
       name: 'Another Game',
       developer: devId2
-    },
+    }
   },
   Account: {
     admin: {
@@ -86,7 +86,7 @@ var fixtures = {
       _id: characterId2,
       name: 'char2',
       player: playerId2
-    },
+    }
   },
   Client: {
     c1: {
@@ -126,7 +126,7 @@ var fixtures = {
       holder: playerId3
     }
   }
-}
+};
 describe('Characters API', function () {
 
   var f;
@@ -135,7 +135,7 @@ describe('Characters API', function () {
       f = fixtures;
       done();
     });
-  })
+  });
 
   describe('GET', function () {
 
@@ -191,7 +191,7 @@ describe('Characters API', function () {
             assert.deepEqual(res.body.data.data, {x: 123});
             done();
           });
-      })
+      });
       describe('of another game', function () {
         it('is forbidden', function (done) {
           request(api).put('/v1/characters/' + characterId1)
@@ -216,7 +216,7 @@ describe('Characters API', function () {
           .send({name: 'My character', data: {x: '234'}})
           .expect(/my character/i, done)
       });
-    })
+    });
     describe('as a player', function () {
       it('creates a new character', function (done) {
         request(api).post('/v1/characters')

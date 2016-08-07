@@ -5,13 +5,6 @@
     "max": 2
   },
   "teams": {
-    "count": 2,
-    "opposed": "faction"
-  },
-  "attributes": {
-    "faction": {
-      "type": "same",
-      "value": "input.faction"
-    }
+    "count": 2
   }
 }
