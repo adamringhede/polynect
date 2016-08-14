@@ -212,8 +212,9 @@ schema.methods =
             .then =>
               @release().then(=> teamsMatch.release().then(resolve))
             .catch (err) =>
-              console.log "Could not find enough teams. Delegating task to worker."
-              Worker.run 'matchTeams', teamsMatchId: teamsMatch._id
+              # It may not be necessary to let a worker find teams, as a newly created match will find this team atomically.
+              #console.log "Could not find enough teams. Delegating task to worker."
+              #Worker.run 'matchTeams', teamsMatchId: teamsMatch._id
               # We release it as it may take more time for the worker to start, than for another match to start
               # looking for this teams match.
               @release().then(=> teamsMatch.release().then(resolve))
