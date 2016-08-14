@@ -1,8 +1,11 @@
+"use strict";
+
 var assert = require('assert');
 var Models = require('../../../lib/Models');
 var Matchmaker = require('../../../lib/Components/Matchmaker');
 var ObjectId = require('objectid');
 var async = require('async');
+var Worker = require('../../../lib/Worker');
 
 Models.init();
 
@@ -19,6 +22,10 @@ var fixtures = {
     p3: {
       _id: ObjectId(),
       username: 'hacker@polynect.io'
+    },
+    p4: {
+      _id: ObjectId(),
+      username: 'hacker2@polynect.io'
     }
   },
   Game: {
@@ -44,21 +51,29 @@ describe('Matchmaking (teams)', function () {
   }
 
   beforeEach(function (done) {
+
     Models.load(fixtures, function (fixtures) {
       f = fixtures;
       done();
     })
   });
 
+  after(Worker.purge);
+
   it('finds another team if one exists', function (done) {
     async.series([
       function (callback) {
-        match('p1', callback)
+        match('p1', (err, match) => {
+          callback();
+        })
       },
       function (callback) {
         match('p2', function (err, match) {
           // The first two players will create a match.
           assert.equal(match.size, 2);
+          assert.equal(match.status, Models.Match.STATUS_WAITING)
+          // There is no need to match with teams as it should end up in the same match as the previous one where size
+          // is now 2.
           callback();
         })
       },
@@ -68,15 +83,28 @@ describe('Matchmaking (teams)', function () {
           match('p3', function (err, match) {
             // A new match should be created and it will find the first team
             assert.equal(match.size, 1);
-            Models.TeamsMatch.findOne({_id: match.teams_match}, (err, teams_match) => {
-              assert.equal(teams_match.game_id.toString(), f.Game.g1._id.toString());
-              assert.equal(teams_match.size, 2);
-              assert.equal(teams_match.teams.length, 2);
-              callback()
+            setTimeout(() => {
+              Models.TeamsMatch.findOne({_id: match.teams_match}, (err, teams_match) => {
+                match.calculateStatus();
+                assert.equal(teams_match.game_id.toString(), f.Game.g1._id.toString());
+                assert.equal(match.teams.length, 2);
+                assert.equal(teams_match.size, 2);
+                assert.equal(teams_match.teams.length, 2);
+                callback()
+              }, 50);
             });
           });
         }, 20);
-      }
+      },
+      function (callback) {
+        match('p4', function (err, match) {
+          match.calculateStatus();
+          assert.equal(match.size, 2);
+          assert.equal(match.status, Models.Match.STATUS_READY);
+          assert.ok(match.teams_match != null);
+          callback();
+        })
+      },
     ], done);
   });
 

@@ -2,6 +2,7 @@ node_modules
 lib/**/*.map
 lib/Components/**/index.js
 lib/Templates/**/index.js
+lib/Worker/**/index.js
 
 
 # Compoments that uses coffeescript

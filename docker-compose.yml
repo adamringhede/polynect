@@ -37,6 +37,7 @@ services:
     environment:
       PRE_CREATE_DB: 'polynect_stats'
   rabbitmq:
+    # guest:guest
     image: rabbitmq:3.6.0-management
     ports:
       - "15672:15672"

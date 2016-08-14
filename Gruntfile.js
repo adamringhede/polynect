@@ -14,7 +14,8 @@ module.exports = function(grunt) {
           'lib/API/Views',
           'lib/Components',
           'lib/Components/MatchQueryBuilder',
-          'lib/API/Controllers'
+          'lib/API/Controllers',
+          'lib/Worker'
         ]
       }
     },

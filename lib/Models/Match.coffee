@@ -1,7 +1,8 @@
 mongoose = require 'mongoose'
 Builder = require '../Components/MatchQueryBuilder/MatchQueryBuilder'
 Plugins = require './Plugins'
-ObjectId = require('objectid');
+ObjectId = require('objectid')
+Worker = require('../Worker')
 Models = require './'
 Schema = mongoose.Schema
 
@@ -27,12 +28,13 @@ schema = new Schema
   }]
 
   open: type: Boolean, default: true
-  status: type: String, default: WAITING
+  status: type: String, default: WAITING, enum: [WAITING, READY]
   requirements: {}
   # Matchmaking may use reservation
   reserved: type: Boolean, default: false
   reserved_at: type: Number, default: -1
 
+  teams: type: [String]
   teams_match: type: String
   max_teams: type: Number, default: 1
 
@@ -46,6 +48,8 @@ schema = new Schema
     delegations: {}
 
 schema.statics =
+  STATUS_READY: READY
+  STATUS_WAITING: WAITING
   initWithGame: (game) ->
     Match = mongoose.model('Match')
     match = new Match();
@@ -122,8 +126,6 @@ schema.methods =
     this.calculateAttributes()
     this.calculateStatus()
 
-    # This may work for now, but in the future, we will want a worker to be dedicated to this match.
-    if @size is 1 then @matchWithTeams()
     return !haveRequest
 
   removePlayer: (playerId) ->
@@ -142,7 +144,7 @@ schema.methods =
     if removed then @onRemoveRequest()
     removed
 
-  reserve: ->
+  oldreserve: () ->
     update = {'$set':{}}
     update['$set']['reserved'] = true;
     update['$set']['reserved_at'] = Date.now();
@@ -150,32 +152,73 @@ schema.methods =
       .findByIdAndUpdate(@_id, update)
     true
 
-  release: ->
-    update = {'$set':{}}
-    update['$set']['reserved'] = false;
-    update['$set']['reserved_at'] = -1;
-    mongoose.model 'Match'
-      .findByIdAndUpdate(@_id, update)
-    true
+  reserve: (duration) -> new Promise (resolve, reject) =>
+    if duration > 0
+      update = {'$set':{}}
+      update['$set']['reserved'] = true
+      update['$set']['reserved_at'] = Date.now()
+      mongoose.model('Match').findOneAndUpdate({
+        _id: @_id,
+        reserved_at: {'$lt': Date.now() - duration}
+      }, update, (err, match) =>
+        if err then reject(err)
+        @reserved = match?
+        resolve(match?)
+      )
+    else resolve(true)
 
-  matchWithTeams: ->
+  release: -> new Promise (resolve, reject) =>
+    update = '$set':
+      reserved: false
+      reserved_at: -1
+    mongoose.model 'Match'
+      .findByIdAndUpdate(@_id, update, resolve)
+
+  matchWithTeams: -> new Promise (resolve, reject) =>
     # Find a team to join
     # If that does not work, create a new team, append the match to it and we are done
     # After that, assign the team to a worker that looks for matches to att to it.
     # The reason for assigning it to a worker is incase this process crashes and the teams match is left alone.
     TeamsMatch = require('./TeamsMatch')
     if @size is 1 and not @teams_match?
-      if true or @reserve() # reservation may not be needed as it should only be possible to be of size 1 once.
-        TeamsMatch.findForMatch this, (err, teamsMatch) =>
-          if err then throw err
+      # We can only do this if we have reserved the match, or else we may create multiple teams matches.
+      # On a second note, if we can prove that the match will never have multiple threads thinking that the size is 1
+      # at the same time, then there is no need to reserve it.
+      @reserve(50).then (reserved) =>
+        unless reserved then return resolve()
+        TeamsMatch.findForMatch(this).then (teamsMatch) =>
+          reserveTime = 50
           unless teamsMatch?
             teamsMatch = new TeamsMatch()
             teamsMatch.game = @game_id
             teamsMatch.max_teams = @max_teams
+            teamsMatch.reserved = true
+            teamsMatch.reserved_at = Date.now()
             teamsMatch.push(this)
             teamsMatch.save()
-            teamsMatch.matchWithOthers()
+            reserveTime = 0
+          else
+          # Todo need to prevent matches that already are in a teams match to be included in another match's teams match
           @teams_match = teamsMatch._id
+          for id in teamsMatch.teams
+            if @teams.indexOf(id.toString()) < 0
+              @teams.push id.toString()
+
+          @save()
+          if teamsMatch.isFull() then return @release().then(resolve)
+          teamsMatch.reserve(reserveTime).then (reserved) =>
+            return unless reserved
+            teamsMatch.matchWithOthers()
+            .then =>
+              @release().then(=> teamsMatch.release().then(resolve))
+            .catch (err) =>
+              console.log "Could not find enough teams. Delegating task to worker."
+              Worker.run 'matchTeams', teamsMatchId: teamsMatch._id
+              # We release it as it may take more time for the worker to start, than for another match to start
+              # looking for this teams match.
+              @release().then(=> teamsMatch.release().then(resolve))
+    else resolve()
+
 
   onRemoveRequest: ->
     this.size -= 1;
@@ -189,7 +232,8 @@ schema.methods =
       for role, need of this.roles.need
         if need[0] > this.roles.delegations[role]?.length
           fulfilledRoles = false
-    this.status = if enoughPlayers and fulfilledRoles then READY else WAITING
+    allTeams = @max_teams is 1 or @max_teams is @teams?.length
+    this.status = if enoughPlayers and fulfilledRoles and allTeams then READY else WAITING
 
   delegateRequest: (request, allow_switching = false) ->
     # The minSum is the number of spots left that has to be filled 
@@ -259,6 +303,8 @@ schema.pre 'save', (next) ->
   # If changin from state waiting to ready for the first time,
   next()
 
+schema.post 'save', ->
+  #@matchWithTeams()
 ###
 There is no way to try to chagne the collection per request.
 If we want to split matches into different collections we need to use the mongo driver directly and build our own ODM.
