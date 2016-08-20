@@ -1,3 +1,5 @@
+"use strict";
+
 var assert = require('assert');
 var Models = require('../../../lib/Models');
 var Matchmaker = require('../../../lib/Components/Matchmaker')
@@ -154,19 +156,21 @@ describe('Matchmaker', function () {
     });
   });
 
-  it('trigger matching with teams', function (done) {
-    Matchmaker.findMatch({
-      player: f.Account.p1,
-      game: f.Game.g2
-    }, function (err, match) {
-      Matchmaker.findMatch({
-        player: f.Account.p2,
-        game: f.Game.g2
-      }, function (err, match2) {
-        console.log(match2);
-        done();
-      });
-    });
+  // TODO Test that there is an error thrown if the requests don't match with each other.
+  // We could create a closed and hidden match to begin with, add one of the requests, then the other.
+  // Or we can define a method to test locally if they match.
+  // We can define a merge function on builder for joining other matches.
+  it('allows multiple requests to be grouped', function (done) {
+    Matchmaker.findMatchForGroup([{
+      player: f.Account.p1
+    }, {
+      player: f.Account.p2
+    }], f.Game.g1).then((match) => {
+      assert.equal(match.size, 2);
+      assert.equal(match.requests.length, 2);
+      assert.equal(match.status, Models.Match.STATUS_READY);
+      done();
+    }).catch((err) => {throw err});
   });
 
   it('creates millions of documents', function (done) {
