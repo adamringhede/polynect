@@ -119,7 +119,7 @@ describe ('Match API', function () {
       f = fixtures;
       done()
     });
-  })
+  });
 
   describe('POST', function () {
     describe('as developer', function () {
@@ -153,7 +153,26 @@ describe ('Match API', function () {
                   })              
               });
           });
-      })
+      });
+      describe('with multiple players', () => {
+        it('works by passing in multiple requests in a group', (done) => {
+          request(api).post('/v1/matches/match')
+            .set('Content-Type', 'application/json')
+            .set('Authorization', 'Bearer ' + fixtures.AccessToken.t3.token)
+            .send({ group: [
+              {values: {y: 'bar'}, player: {id: "123"}, character: {b: 10}},
+              {values: {y: 'bar'}, player: {id: "124"}, character: {b: 10}}
+            ], game: gameId })
+            .end((err, res) => {
+              assert.equal(res.body.data.players[0].id, "123");
+              assert.equal(res.body.data.players[1].id, "124");
+              assert.equal(res.statusCode, 200);
+              assert.equal(res.body.data.players.length, 2);
+              done();
+            });
+        });
+
+      });
     });
 
     it('returns 400 if bad input', function (done) {
