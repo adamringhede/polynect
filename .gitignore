@@ -3,6 +3,8 @@ lib/**/*.map
 lib/Components/**/index.js
 lib/Templates/**/index.js
 lib/Worker/**/index.js
+lib/API/Controllers/index.js
+lib/API/Views/index.js
 
 
 # Compoments that uses coffeescript
