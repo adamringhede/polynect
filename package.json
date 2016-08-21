@@ -14,7 +14,7 @@
     "flat": "^2.0.0",
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
-    "grunt-component-tree": "^0.1.3",
+    "grunt-component-tree": "^0.1.4",
     "grunt-mocha-test": "*",
     "jade": "^1.11.0",
     "mocha": "^2.4.5",
