@@ -180,7 +180,7 @@ schema.methods =
     # After that, assign the team to a worker that looks for matches to att to it.
     # The reason for assigning it to a worker is incase this process crashes and the teams match is left alone.
     TeamsMatch = require('./TeamsMatch')
-    if @size is 1 and not @teams_match?
+    if @size is 1 and @max_teams > 1 and not @teams_match?
       # We can only do this if we have reserved the match, or else we may create multiple teams matches.
       # On a second note, if we can prove that the match will never have multiple threads thinking that the size is 1
       # at the same time, then there is no need to reserve it.
