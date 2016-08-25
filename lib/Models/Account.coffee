@@ -86,7 +86,7 @@ schema.methods =
     unless @activation_token?
       @createActivationToken()
       @save()
-    "https://developer.polynect.io/#/activate/#{@activation_token}"
+    "https://www.polynect.io/app/#/activate/#{@activation_token}"
   setId: (id) ->
     @_id = id
   hasAccessToGame: (gameId, callback) ->

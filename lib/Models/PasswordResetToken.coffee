@@ -36,7 +36,7 @@ schema.pre 'save', (next) ->
     next()
 
 schema.methods =
-  getLink: () -> "https://developer.polynect.io/#/reset-password/#{@token}"
+  getLink: () -> "https://www.polynect.io/app/#/reset-password/#{@token}"
 
 schema.plugin Plugins.Redundancy,
   model: 'PasswordResetToken'
