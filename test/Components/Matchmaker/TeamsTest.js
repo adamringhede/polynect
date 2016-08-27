@@ -71,7 +71,7 @@ describe('Matchmaking (teams)', function () {
         match('p2', function (err, match) {
           // The first two players will create a match.
           assert.equal(match.size, 2);
-          assert.equal(match.status, Models.Match.STATUS_WAITING)
+          assert.equal(match.status, Models.Match.STATUS_WAITING);
           // There is no need to match with teams as it should end up in the same match as the previous one where size
           // is now 2.
           callback();
@@ -98,11 +98,14 @@ describe('Matchmaking (teams)', function () {
       },
       function (callback) {
         match('p4', function (err, match) {
-          match.calculateStatus();
-          assert.equal(match.size, 2);
-          assert.equal(match.status, Models.Match.STATUS_READY);
-          assert.ok(match.teams_match != null);
-          callback();
+          match.save(() => {
+            match.calculateStatus();
+            assert.equal(match.size, 2);
+            assert.equal(match.teams.length, 2);
+            assert.equal(match.status, Models.Match.STATUS_READY);
+            assert.ok(match.teams_match != null);
+            callback()
+          })
         })
       },
     ], done);

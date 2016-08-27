@@ -5,7 +5,7 @@ async = require 'async'
 Schema = mongoose.Schema
 
 schema = new Schema
-  teams: type: [String] # set of all matches
+  teams: [type: Schema.Types.ObjectId, ref: 'Match']
   max_teams: type: Number, default: 1
   size: 0
   attributes: {} # derived from matches
@@ -19,15 +19,16 @@ schema.statics =
     query =
       "game_id": match.game.id
       "size": {"$lt": match.max_teams}
-      "teams": {"$ne": match._id.toString()} # not sure about strings or objectId
+      "teams": {"$ne": match._id}
     for name, value of match.attributes
       unless query.attributes then query.attributes = {}
       # need to use match query for handle "close" attributes
       query.attributes[name] = value
     mongoose.model('TeamsMatch').findOneAndUpdate query,
       "$inc": {"size": 1},
-      "$addToSet": {"teams": match._id.toString()}
+      "$addToSet": {"teams": match._id}
     , {'new': true}, (err, teamsMatch) =>
+      if teamsMatch? then teamsMatch.updateMatchTeamRefs()
       unless err?
         resolve(teamsMatch)
       else
@@ -39,6 +40,16 @@ schema.methods =
   push: (match) ->
     @teams.push match._id
     @size = @teams.length
+    @updateMatchTeamRefs()
+
+  updateMatchTeamRefs: () -> new Promise (resolve, reject) =>
+    mongoose.model('Match').update({teams_match: this._id.toString()}, {
+      "$set": {teams: this.teams}
+    }, (a, b) ->
+      console.log a
+      console.log b
+      resolve()
+    );
 
   release: -> new Promise (resolve, reject) =>
     update = {'$set':{}}

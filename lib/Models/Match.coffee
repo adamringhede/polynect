@@ -34,7 +34,7 @@ schema = new Schema
   reserved: type: Boolean, default: false
   reserved_at: type: Number, default: -1
 
-  teams: type: [String]
+  teams: [type: Schema.Types.ObjectId, ref: 'Match']
   teams_match: type: String
   max_teams: type: Number, default: 1
 
@@ -195,19 +195,19 @@ schema.methods =
             teamsMatch.reserved = true
             teamsMatch.reserved_at = Date.now()
             teamsMatch.push(this)
+            console.log "creat2ed"
             teamsMatch.save()
             reserveTime = 0
-          else
           # Todo need to prevent matches that already are in a teams match to be included in another match's teams match
           @teams_match = teamsMatch._id
           for id in teamsMatch.teams
             if @teams.indexOf(id.toString()) < 0
-              @teams.push id.toString()
+              @teams.push id
 
-          @save()
-          if teamsMatch.isFull() then return @release().then(resolve)
+          if teamsMatch.isFull() then return @release().then(() => @save(() => resolve()))
+          else @save()
           teamsMatch.reserve(reserveTime).then (reserved) =>
-            return unless reserved
+            unless reserved then return resolved()
             teamsMatch.matchWithOthers()
             .then =>
               @release().then(=> teamsMatch.release().then(resolve))
