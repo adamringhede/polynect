@@ -15,6 +15,7 @@ services:
       - mongodb
       #- influxdb
       - rabbitmq
+    entrypoint: 'node app'
   redis:
     image: redis
     hostname: redis
