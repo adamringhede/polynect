@@ -15,7 +15,8 @@ module.exports = function(grunt) {
           'lib/Components',
           'lib/Components/MatchQueryBuilder',
           'lib/API/Controllers',
-          'lib/Worker'
+          'lib/Worker',
+          'lib/Worker/Tasks'
         ]
       }
     },
