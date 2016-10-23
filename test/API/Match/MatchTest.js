@@ -1,3 +1,5 @@
+"use strict";
+
 var assert = require('assert');
 //var request = require('request');
 var Models = require('../../../lib/Models');
@@ -6,6 +8,7 @@ var mongoose = require('mongoose');
 var ObjectId = require('objectid');
 var request = require('supertest');
 var moment = require('moment');
+const async = require('async');
 
 Models.init()
 
@@ -18,6 +21,7 @@ require('../../../lib/API')
 var api = 'http://localhost:9999';
 
 var gameId = ObjectId();
+var gameId2 = ObjectId();
 var playerId = ObjectId();
 var playerId2 = ObjectId();
 var devId = ObjectId();
@@ -31,11 +35,18 @@ var fixtures = {
       status: 'waiting'
     }
   },
+  TeamsMatch: {},
   Game: {
     g1: {
       _id: gameId,
       name: 'TestGame',
       matchmaking_config: require('../../Components/MatchQuery/Configs/Complex'),
+      developer: devId
+    },
+    g2: {
+      _id: gameId2,
+      name: 'TestGameTeams',
+      matchmaking_config: require('../../Components/Matchmaker/Configs/TeamsSimple'),
       developer: devId
     }
   },
@@ -153,6 +164,27 @@ describe ('Match API', function () {
                   })              
               });
           });
+      });
+      describe('with teams', () => {
+        it('works with multiple request', (done) => {
+          async.eachLimit(["1", "2", "3" ,"4"], 1, (pid, callback) => {
+            request(api).post('/v1/matches/match')
+              .set('Content-Type', 'application/json')
+              .set('Authorization', 'Bearer ' + fixtures.AccessToken.t3.token)
+              .send({values: {y: 'bar'}, player: {id: pid}, character: {b: 10}, game: gameId2 })
+              .end((err, res) => {
+                assert.equal(res.statusCode, 200);
+                callback(err);
+              });
+          }, () => {
+            request(api).get('/v1/matches?game.id=' + gameId2)
+              .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+              .end(function (err, res) {
+                assert.equal(res.body.count, 2);
+                done();
+              });
+          })
+        });
       });
       describe('with multiple players', () => {
         it('works by passing in multiple requests in a group', (done) => {

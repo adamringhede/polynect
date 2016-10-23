@@ -4,9 +4,11 @@ Fixtures = require 'pow-mongoose-fixtures'
 exports.connected = false
 
 exports.connection = null
+mongoose.Promise = global.Promise
 
 exports.init = (dbURL = process.env.POLYNECT_MONGO_URI || 'mongodb://localhost/polynect-test') ->
   return if exports.connected
+  mongoose.Promise = global.Promise
   mongoose.connect dbURL
   #mongoose.set('debug', true)
 
