@@ -170,7 +170,7 @@ describe ('Match API', function () {
       });
       describe('with teams', () => {
         it('works with multiple request', (done) => {
-          async.eachLimit(["1", "2", "3" ,"4"], 1, (pid, callback) => {
+          async.eachSeries(["1", "2", "3" ,"4"], (pid, callback) => {
             request(api).post('/v1/matches/match')
               .set('Content-Type', 'application/json')
               .set('Authorization', 'Bearer ' + fixtures.AccessToken.t3.token)

@@ -5,13 +5,14 @@
   "main": "lib/API/index.js",
   "engines": {
     "npm": "3.8.x",
-    "node": "6.3.x"
+    "node": "6.7.x"
   },
   "dependencies": {
     "amqplib": "^0.5.1",
     "async": "^2.0.0-rc.4",
     "coffee-script": "^1.9.3",
     "concat-stream": "^1.5.2",
+    "dtrace-provider": "^0.8.0",
     "flat": "^2.0.0",
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
@@ -34,7 +35,7 @@
     "randomstring": "^1.0.5",
     "request": "^2.55.0",
     "restify": "4.3.0",
-    "sendgrid": "^4.7.1",
+    "sendgrid": "^2.0.0",
     "socket.io": "^1.4.6",
     "tokenthrottle-redis": "^1.1.0",
     "uglify-js": "^2.6.1",

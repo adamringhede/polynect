@@ -4,17 +4,8 @@ Plugins = require './Plugins'
 
 
 schema = new Schema
-
   name: String
-
-  character_id: String # For matchmaking to override the default one
-
-  #player: type: Schema.Types.ObjectId, ref: 'Account'
-
-  #game: type: Schema.Types.ObjectId, ref: 'Game'
-
-
-#Character.statics =
+  character_id: String
 
 schema.methods =
   addItem: (itemSpec, count, callback) ->
