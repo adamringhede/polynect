@@ -29,6 +29,7 @@ schema = new Schema
 
   open: type: Boolean, default: true
   status: type: String, default: WAITING, enum: [WAITING, READY]
+  initiated: type: Boolean, default: false
   requirements: {}
   # Matchmaking may use reservation
   reserved: type: Boolean, default: false
