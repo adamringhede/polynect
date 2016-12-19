@@ -45,3 +45,8 @@ services:
       - "15672:15672"
       - "5672:5672"
     hostname: rabbitmq
+  watch:
+      image: node:6.9.2-alpine
+      volumes:
+      - .:/app
+      entrypoint: 'npm --prefix app run watch'
