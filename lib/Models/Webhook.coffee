@@ -1,13 +1,36 @@
 mongoose = require 'mongoose'
 Plugins = require './Plugins'
+rp = require 'request-promise'
+sha1 = require 'sha1'
 Schema = mongoose.Schema
 
-Hook = type: Boolean, required: true, default: true
+Hook = type: Boolean, required: true, default: false
 
 schema = new Schema
   url: type: String, required: true
   enable:
     match_init: Hook
+
+schema.methods.send = (event, payload, attempts = 3) ->
+  attempts -= 1
+  if (attempts <= 0)
+    return Promise.resolve(false)
+  data = JSON.stringify(Object.assign({event: event}, payload))
+  signature = sha1(data)
+  return rp({
+    method: 'POST',
+    uri: this.url,
+    body: data,
+    resolveWithFullResponse: true,
+    headers: {
+      'X-Hub-Signature': signature
+    }
+  })
+  .then((response) => true)
+  .catch((response) =>
+    return this.send(event, payload, attempts)
+  )
+
 
 ### Example delivery
 
