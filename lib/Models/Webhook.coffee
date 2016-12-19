@@ -1,13 +1,14 @@
 mongoose = require 'mongoose'
 Plugins = require './Plugins'
 rp = require 'request-promise'
-sha1 = require 'sha1'
+crypto = require 'crypto'
 Schema = mongoose.Schema
 
 Hook = type: Boolean, required: true, default: false
 
 schema = new Schema
   url: type: String, required: true
+  secret: type: String
   enable:
     match_init: Hook
 
@@ -16,7 +17,7 @@ schema.methods.send = (event, payload, attempts = 3) ->
   if (attempts <= 0)
     return Promise.resolve(false)
   data = JSON.stringify(Object.assign({event: event}, payload))
-  signature = sha1(data)
+  signature = crypto.createHmac('sha256', this.secret || 'secret').update(data).digest('hex')
   return rp({
     method: 'POST',
     uri: this.url,
