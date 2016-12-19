@@ -55,9 +55,10 @@
     "supertest": "^2.0.1"
   },
   "scripts": {
+    "compile": "coffee -cm lib/**/**/*.coffee lib/**/*.coffee",
     "watch": "coffee -cwm lib/**/**/*.coffee lib/**/*.coffee && grunt watch:jade",
     "bash": "docker-compose run --rm -w /app --entrypoint 'bash' web",
-    "test": "docker-compose run --rm -w /app --entrypoint 'node_modules/.bin/grunt test' web",
+    "test": "npm run compile && docker-compose run --rm -w /app --entrypoint 'node_modules/.bin/grunt test' web",
     "build": "./node_modules/coffee-script/bin/coffee -cm lib/ && ./node_modules/grunt-cli/bin/grunt component_tree",
     "deploy": "npm run test && git push heroku master",
     "deployf": "git push heroku master",

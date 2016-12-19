@@ -9,12 +9,14 @@ Hook = type: Boolean, required: true, default: false
 schema = new Schema
   url: type: String, required: true
   secret: type: String
-  enable:
+  enabled:
     match_init: Hook
 
 schema.methods.send = (event, payload, attempts = 3) ->
+  if this.enabled[event] == null
+    throw new Error("Invalid hook type: " + event)
   attempts -= 1
-  if (attempts <= 0)
+  if (attempts <= 0 || !this.enabled[event])
     return Promise.resolve(false)
   data = JSON.stringify(Object.assign({event: event}, payload))
   signature = crypto.createHmac('sha256', this.secret || 'secret').update(data).digest('hex')
