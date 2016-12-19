@@ -2,11 +2,12 @@ mongoose = require 'mongoose'
 Plugins = require './Plugins'
 Schema = mongoose.Schema
 
+Hook = type: Boolean, required: true, default: true
+
 schema = new Schema
   url: type: String, required: true
-  type: type: String, enum: ['init'], reqired: true
-  secret: type: String
-  use_secret: type: Boolean, default: false
+  enable:
+    match_init: Hook
 
 ### Example delivery
 

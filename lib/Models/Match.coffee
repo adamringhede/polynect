@@ -38,6 +38,8 @@ schema = new Schema
   teams_match: type: String
   max_teams: type: Number, default: 1
 
+  data: {}
+
   min: type: Number, default: 2
   max: type: Number, default: 64
   size: type: Number, default: 0

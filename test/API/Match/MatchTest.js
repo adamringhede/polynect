@@ -32,7 +32,10 @@ var fixtures = {
     m1: {
       _id: matchId,
       game: gameId,
-      status: 'waiting'
+      status: 'waiting',
+      data: {
+        foo: 1
+      }
     }
   },
   TeamsMatch: {},
@@ -262,6 +265,24 @@ describe ('Match API', function () {
         });
     });
   });
+
+  describe('PUT', function () {
+    it('changes data incrementally', function (done) {
+      request(api).put('/v1/matches/' + fixtures.Match.m1._id)
+        .set('Content-Type', 'application/json')
+        .set('Authorization', 'Bearer ' + fixtures.AccessToken.t3.token)
+        .expect('Content-Type', 'application/json')
+        .send({
+          data: {
+            bar: 2
+          }
+        })
+        .end(function (err, res) {
+          assert.equal(res.body.data.data.bar, 2);
+          done()
+        })
+    })
+  })
 
   describe('GET', function () {
     it('returns the view of an existing match', function (done) {
