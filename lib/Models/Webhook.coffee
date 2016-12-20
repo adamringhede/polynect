@@ -89,6 +89,6 @@ schema.plugin Plugins.Redundancy,
       references:
         developer:
           model: 'Account'
-          fields: ['firstname']
+          fields: []
 
 module.exports = mongoose.model 'Webhook', schema
