@@ -7,7 +7,7 @@ Schema = mongoose.Schema
 Hook = type: Boolean, required: true, default: false
 
 schema = new Schema
-  url: type: String, required: true
+  url: type: String
   secret: type: String
   enabled:
     match_init: Hook
