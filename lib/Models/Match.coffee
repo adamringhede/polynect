@@ -198,7 +198,6 @@ schema.methods =
             teamsMatch.reserved = true
             teamsMatch.reserved_at = Date.now()
             teamsMatch.push(this)
-            console.log "creat2ed"
             teamsMatch.save()
             reserveTime = 0
           # Todo need to prevent matches that already are in a teams match to be included in another match's teams match
@@ -325,7 +324,7 @@ schema.plugin Plugins.Redundancy,
   references:
     game:
       model: 'Game'
-      fields: ['matchmaking_config']
+      fields: ['matchmaking_config', 'name']
       references:
         developer:
           model: 'Account'

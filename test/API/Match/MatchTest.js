@@ -137,6 +137,28 @@ describe ('Match API', function () {
 
   describe('POST', function () {
     describe('as developer', function () {
+
+      it('can add player to existing match', function(done) {
+        // TODO Perform more testing with invalid input
+
+        request(api).post('/v1/matches/match')
+          .set('Content-Type', 'application/json')
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.t3.token)
+          .send({ values: {y: 'bar'}, player: {id: "123"}, character: {b: 10}, game: gameId })
+          .expect('Content-Type', 'application/json')
+          .end(function (err, res) {
+            request(api).post('/v1/matches/' + res.body.data.id + '/players')
+              .set('Content-Type', 'application/json')
+              .set('Authorization', 'Bearer ' + fixtures.AccessToken.t3.token)
+              .send({ values: {y: 'bar'}, player: {id: "234"}, character: {b: 10}, game: gameId })
+              .expect('Content-Type', 'application/json')
+              .end(function (err, res) {
+                  assert.equal(res.body.data.size, 2);
+                  done();
+              })
+          })
+      });
+
       it ('works by passing in character data', function (done) {
         request(api).post('/v1/matches/match')
           .set('Content-Type', 'application/json')
