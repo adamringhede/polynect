@@ -34,6 +34,10 @@ schema = new Schema
       limits: {}
 
   rate_limit: type: Number, default: 20
+
+  playfab:
+    title_id: String
+    secret_key: String
   
 ###
   config:

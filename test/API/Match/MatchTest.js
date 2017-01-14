@@ -22,6 +22,7 @@ var api = 'http://localhost:9999';
 
 var gameId = ObjectId();
 var gameId2 = ObjectId();
+var gameId3 = ObjectId();
 var playerId = ObjectId();
 var playerId2 = ObjectId();
 var devId = ObjectId();
@@ -44,7 +45,11 @@ var fixtures = {
       _id: gameId,
       name: 'TestGame',
       matchmaking_config: require('../../Components/MatchQuery/Configs/Complex'),
-      developer: devId
+      developer: devId,
+      playfab: {
+        title_id: '14E9',
+        secret_key: 'FR5MNGNWJCDM34C54XPQDNQ93K75Q47DASUYSJD8SPNWNR945Z'
+      }
     },
     g2: {
       _id: gameId2,
@@ -157,6 +162,31 @@ describe ('Match API', function () {
                   done();
               })
           })
+      });
+
+      describe('with PlayFab', function () {
+        it('works by using player data from PlayFab', function (done) {
+          request(api).post('/v1/matches/match')
+            .set('Content-Type', 'application/json')
+            .set('Authorization', 'PlayFab 4D0B49ABE6175CB2---14E9-8D43C7B1944D9A0-24CD51C40FD4649B.55D25DE0DE830858')
+            .send({ values: {y: 'bar'}, player: "4D0B49ABE6175CB2", game: gameId })
+            .expect('Content-Type', 'application/json')
+            .end(function (err, res) {
+              assert.equal(res.statusCode, 200);
+              done()
+            })
+        });
+        it('fails gracefully if character does not exist', function (done) {
+          request(api).post('/v1/matches/match')
+            .set('Content-Type', 'application/json')
+            .set('Authorization', 'PlayFab 4D0B49ABE6175CB2---14E9-8D43C7B1944D9A0-24CD51C40FD4649B.55D25DE0DE830858')
+            .send({ values: {y: 'bar'}, character: "123", game: gameId })
+            .expect('Content-Type', 'application/json')
+            .end(function (err, res) {
+              assert.equal(res.statusCode, 400);
+              done()
+            })
+        });
       });
 
       it ('works by passing in character data', function (done) {
