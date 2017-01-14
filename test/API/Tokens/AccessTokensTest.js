@@ -6,7 +6,7 @@ var ObjectId = require('objectid');
 var request = require('supertest');
 var moment = require('moment');
 
-Models.init()
+Models.init();
 
 var api = 'http://localhost:9999';
 
@@ -14,7 +14,7 @@ process.env.POLYNECT_API_PORT = 9999;
 process.env.MOCK_SERVICES = true;
 
 // Start API
-require('../../../lib/API')
+require('../../../lib/API');
 
 
 var devId = ObjectId();
