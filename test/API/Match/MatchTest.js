@@ -10,6 +10,8 @@ var request = require('supertest');
 var moment = require('moment');
 const async = require('async');
 
+const playFabToken = 'PlayFab 4D0B49ABE6175CB2---14E9-8D43C7B1944D9A0-24CD51C40FD4649B.55D25DE0DE830858';
+
 Models.init()
 
 process.env.POLYNECT_API_PORT = 9999;
@@ -168,7 +170,7 @@ describe ('Match API', function () {
         it('works by using player data from PlayFab', function (done) {
           request(api).post('/v1/matches/match')
             .set('Content-Type', 'application/json')
-            .set('Authorization', 'PlayFab 4D0B49ABE6175CB2---14E9-8D43C7B1944D9A0-24CD51C40FD4649B.55D25DE0DE830858')
+            .set('Authorization', playFabToken)
             .send({ values: {y: 'bar'}, player: "4D0B49ABE6175CB2", game: gameId })
             .expect('Content-Type', 'application/json')
             .end(function (err, res) {
@@ -179,7 +181,7 @@ describe ('Match API', function () {
         it('fails gracefully if character does not exist', function (done) {
           request(api).post('/v1/matches/match')
             .set('Content-Type', 'application/json')
-            .set('Authorization', 'PlayFab 4D0B49ABE6175CB2---14E9-8D43C7B1944D9A0-24CD51C40FD4649B.55D25DE0DE830858')
+            .set('Authorization', playFabToken)
             .send({ values: {y: 'bar'}, character: "123", game: gameId })
             .expect('Content-Type', 'application/json')
             .end(function (err, res) {
@@ -355,12 +357,28 @@ describe ('Match API', function () {
               done();
             });
         });
-
     })
+    it('works with PlayFab authentication', function (done) {
+      request(api).get('/v1/matches/' + fixtures.Match.m1._id)
+        .set('Authorization', playFabToken)
+        .end(function (err, res) {
+          assert.equal(res.statusCode, 200);
+          done();
+        });
+    });
+
     describe('list', function () {
       it('returns all matches for a game', function (done) {
         request(api).get('/v1/matches?game.id=' + gameId)
           .set('Authorization', 'Bearer ' + fixtures.AccessToken.t1.token)
+          .end(function (err, res) {
+            assert.equal(res.body.count, 1);
+            done();
+          });
+      })
+      it('works with PlayFab authentication', function (done) {
+        request(api).get('/v1/matches?game.id=' + gameId)
+          .set('Authorization', playFabToken)
           .end(function (err, res) {
             assert.equal(res.body.count, 1);
             done();
