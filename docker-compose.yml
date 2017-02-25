@@ -1,7 +1,7 @@
 version: '2'
 services: 
   web:
-    image: node:7.2-alpine
+    image: node:7.6
     ports: 
       - "9999:9999"
     volumes: 
@@ -46,7 +46,7 @@ services:
       - "5672:5672"
     hostname: rabbitmq
   watch:
-      image: node:7.2-alpine
+      image: node:7.6-alpine
       volumes:
       - .:/app
       entrypoint: 'npm --prefix app run watch'

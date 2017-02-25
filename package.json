@@ -4,8 +4,8 @@
   "description": "Polynect API",
   "main": "lib/API/index.js",
   "engines": {
-    "npm": "3.8.x",
-    "node": "7.2.x"
+    "npm": "4.1.x",
+    "node": "7.6.x"
   },
   "dependencies": {
     "amqplib": "^0.5.1",

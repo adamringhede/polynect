@@ -2,7 +2,7 @@
   "general": {
     "max": 20,
     "min": 18,
-    "wait after min": 10, // number of seconds before signaling that matchmaking is finished
+    "wait after min": 10 // number of seconds before signaling that matchmaking is finished
   },
   "attributes": {
     "tier": {
@@ -12,9 +12,9 @@
     },
     "skill": {
       "type": "close",
-      "distance": [0.1, 4]
+      "distance": [0.1, 4],
       "value": {
-        $divide: ["player.pvp_stats.battlegrounds.wins", "player.pvp_stats.battlegrounds.losses"]
+        "$divide": ["player.pvp_stats.battlegrounds.wins", "player.pvp_stats.battlegrounds.losses"]
       },
       "default": 0.5
     }

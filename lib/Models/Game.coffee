@@ -36,6 +36,7 @@ schema = new Schema
   rate_limit: type: Number, default: 20
 
   playfab:
+    enabled: type: Boolean, default: false
     title_id: String
     secret_key: String
   
