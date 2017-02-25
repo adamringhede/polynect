@@ -49,6 +49,7 @@ var fixtures = {
       matchmaking_config: require('../../Components/MatchQuery/Configs/Complex'),
       developer: devId,
       playfab: {
+        enabled: true,
         title_id: '14E9',
         secret_key: 'FR5MNGNWJCDM34C54XPQDNQ93K75Q47DASUYSJD8SPNWNR945Z'
       }
