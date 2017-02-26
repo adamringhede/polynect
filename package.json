@@ -10,9 +10,9 @@
   "dependencies": {
     "amqplib": "^0.5.1",
     "async": "^2.0.0-rc.4",
+    "bunyan": "^1.8.5",
     "coffee-script": "^1.9.3",
     "concat-stream": "^1.5.2",
-    "dtrace-provider": "^0.8.0",
     "flat": "^2.0.0",
     "grunt": "^1.0.1",
     "grunt-cli": "^1.2.0",
@@ -27,6 +27,7 @@
     "mongoose-paginate": "^5.0.0",
     "mongoose-unique-validator": "^1.0.2",
     "nock": "^9.0.2",
+    "node-gyp": "^3.5.0",
     "oauth2-server-restify": "git+https://github.com/adamringhede/node-oauth2-server-restify.git#7f83e928314c8a276bdd3fc201dfda5b5cb5d429",
     "object-path": "^0.11.3",
     "objectid": "^3.2.0",
