@@ -1,0 +1,344 @@
+swagger: "2.0"
+info:
+  version: 1.0.0
+  title: Polynect
+  description: An API for matchmaking in multiplayer games.
+  termsOfService: http://www.polynect.io/terms/
+  contact:
+    name: Polynect
+    email: support@polynect.io
+    url: http://wwww.polynect.io/documentation
+  license:
+    name: MIT
+    url: http://github.com/gruntjs/grunt/blob/master/LICENSE-MIT
+host: api.polynect.io
+basePath: /v1
+schemes:
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /matches/match:
+    post:
+      description: |
+        Start matchmaking for a player. The data needed depends on the game's configuration in Polynect. If matchmaking as a
+        group of players, the data for each individual player can be added as elements in the group parameter.
+      operationId: startMatching
+      parameters:
+        - name: Authorization
+          in: header
+          description: A developer token. Needed to Start with "Bearer "
+          required: yes
+          type: string
+        - name: game
+          in: body
+          description: The ID of the game to match for
+          required: yes
+          type: string
+        - name: options
+          in: body
+          description: Key value pairs if needed by the game's matchmaking configuration.
+          required: no
+          type: object
+        - name: player
+          in: body
+          description: Player specific data used for matching with other players.
+          required: no
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                example: "58b2daf613cad300046e21aa"
+        - name: character
+          in: body
+          description: Character data used for matching in games in which a player may play as one of many characters.
+          required: no
+          type: object
+        - name: group
+          in: body
+          description: |
+            An array containing matchmaking data for each player. This should be used start matchmaking as a group of players.
+          required: no
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                options:
+                  type: object
+                  description: Key value pairs if needed by the game's matchmaking configuration.
+                player:
+                  type: object
+                  description: Player specific data used for matching with other players as key value pairs as well as an `id`.
+                  properties:
+                    id:
+                      type: string
+                      example: "58b2daf613cad300046e21aa"
+
+                character:
+                  type: object
+                  properties:
+                    level:
+                      type: integer
+                      example: 23
+                  description: Character data used for matching in games in which a player may play as one of many characters.
+      responses:
+        "200":
+          $ref: '#/responses/MatchResponse'
+  /matches/{match_id}/players:
+    post:
+      description: |
+        A player can manually be added to an existing match. This may be useful to let the player select a match from a
+        list of matches or to implement invitations, in which case the player is added to the match after accepting the invitation.
+        It requires the same parameters as creating a matchmaking request as that the attributes on the match can be updated.
+      operationId: addPlayerToMatch
+      parameters:
+        - name: Authorization
+          in: header
+          description: A developer token. Needed to Start with "Bearer "
+          required: yes
+          type: string
+        - name: match_id
+          in: path
+          description: The ID of the match to which to add the player
+          required: true
+        - name: game
+          in: body
+          description: The ID of the game to match for
+          required: yes
+          type: string
+        - name: options
+          in: body
+          description: Key value pairs if needed by the game's matchmaking configuration.
+          required: no
+          type: object
+        - name: player
+          in: body
+          description: Player specific data used for matching with other players.
+          required: no
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                example: "58b2daf613cad300046e21aa"
+        - name: character
+          in: body
+          description: Character data used for matching in games in which a player may play as one of many characters.
+          required: no
+          type: object
+      responses:
+        "200":
+          $ref: '#/responses/MatchResponse'
+  /matches/{match_id}/players/{player_id}:
+    delete:
+      description: |
+        If a player chooses to leave or has been disconnected for a certain amount of time, it is often necessary to
+        remove it from the match so that another player can join. This is done with a delete request with the match and player IDs.
+      operationId: removePlayerFromMatch
+      parameters:
+        - name: Authorization
+          in: header
+          description: A developer token. Needed to Start with "Bearer "
+          required: yes
+          type: string
+        - name: match_id
+          in: path
+          description: The ID of the match to which to add the player
+          required: true
+        - name: player_id
+          in: path
+          description: The ID of the player to remove
+          required: true
+      responses:
+        "200":
+          $ref: '#/responses/MatchResponse'
+  /matches/{match_id}:
+    put:
+      description: |
+        Editing a match can be used to set custom data on the match or open/close to allow/deny new players from joining the match.
+      operationId: updateMatch
+      parameters:
+        - name: Authorization
+          in: header
+          description: A developer token. Needed to Start with "Bearer "
+          required: yes
+          type: string
+        - name: match_id
+          in: path
+          description: The ID of the match to update
+          required: true
+        - name: data
+          in: body
+          description: Custom key/value pairs to store on the match.
+          required: no
+          type: object
+        - name: open
+          in: body
+          description: Open means that other players can join the match unless it is full.
+          required: no
+          type: boolean
+      responses:
+        "200":
+          $ref: '#/responses/MatchResponse'
+    delete:
+      description: |
+        After a game has ended and all the players have left, you may want to delete the match, although this is not necessary.
+        This can however be done with a delete request.
+      operationId: removeMatch
+      parameters:
+        - name: Authorization
+          in: header
+          description: A developer token. Needed to Start with "Bearer "
+          required: yes
+          type: string
+        - name: match_id
+          in: path
+          description: The ID of the match to delete
+          required: true
+      responses:
+        "200":
+          schema:
+            type: object
+            properties:
+              data:
+                type: string
+                example: "Deleted Match"
+              status:
+                type: string
+                example: "success"
+responses:
+  MatchResponse:
+    description: A view of the current state of the match including what players are in it.
+    schema:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "58b2daf613cad300016e43bb"
+        size:
+          type: integer
+          example: 3
+        min:
+          type: integer
+          example: 3
+        max:
+          type: integer
+          example: 5
+        game:
+          type: object
+          properties:
+            id:
+              type: string
+              example: "58b2daf613cad300016e21cb"
+        status:
+          type: string
+          example: "ready"
+        attributes:
+          type: object
+          properties:
+            gameMode:
+              type: string
+              example: dungeon
+            level:
+              type: array
+              example: 22.5
+        data:
+          type: object
+        open:
+          type: boolean
+        teams:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                example: "58b2daf613cad300046e78fe"
+              players:
+                type: array
+                schema:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: "58b2daf613cad300046e21aa"
+              characters:
+                type: array
+                schema:
+                  type: object
+                  properties:
+                    player:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          example: "58b2daf613cad300046e21aa"
+        players:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                example: "58b2daf613cad300046e21aa"
+        characters:
+          type: array
+          items:
+            type: object
+            properties:
+              player:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: "58b2daf613cad300046e21aa"
+        roles:
+          type: object
+          properties:
+            "{customRoleKey}":
+              type: object
+              properties:
+                min:
+                  type: integer
+                  example: 2
+                max:
+                  type: integer
+                  example: 2
+                players:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: "58b2daf613cad300046e21aa"
+
+definitions:
+  PlayerMatchRequest:
+    type: object
+    properties:
+      options:
+        type: object
+        description: Key value pairs if needed by the game's matchmaking configuration.
+      player:
+        type: object
+        description: Player specific data used for matching with other players as key value pairs as well as an `id`.
+        properties:
+          id:
+            type: string
+      character:
+        type: object
+  Error:
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
