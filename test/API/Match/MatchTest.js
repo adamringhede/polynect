@@ -20,17 +20,17 @@ process.env.MOCK_SERVICES = true;
 // Start API
 require('../../../lib/API');
 
-var api = 'http://localhost:9999';
+const api = 'http://localhost:9999';
 
-var gameId = ObjectId();
-var gameId2 = ObjectId();
-var gameId3 = ObjectId();
-var playerId = ObjectId();
-var playerId2 = ObjectId();
-var devId = ObjectId();
-var clientId = ObjectId();
-var matchId = ObjectId();
-var fixtures = {
+const gameId = ObjectId();
+const gameId2 = ObjectId();
+const gameId3 = ObjectId();
+const playerId = ObjectId();
+const playerId2 = ObjectId();
+const devId = ObjectId();
+const clientId = ObjectId();
+const matchId = ObjectId();
+const fixtures = {
   Match: {
     m1: {
       _id: matchId,
@@ -53,6 +53,12 @@ var fixtures = {
         title_id: '14E9',
         secret_key: 'FR5MNGNWJCDM34C54XPQDNQ93K75Q47DASUYSJD8SPNWNR945Z'
       }
+    },
+    g3: {
+      _id: gameId3,
+      name: 'TestGame',
+      matchmaking_config: require('../../Components/Matchmaker/Configs/Roles'),
+      developer: devId
     },
     g2: {
       _id: gameId2,
@@ -163,6 +169,27 @@ describe ('Match API', function () {
               .end(function (err, res) {
                   assert.equal(res.body.data.size, 2);
                   done();
+              })
+          })
+      });
+
+      it('works with roles', function(done) {
+        request(api).post('/v1/matches/match')
+          .set('Content-Type', 'application/json')
+          .set('Authorization', 'Bearer ' + fixtures.AccessToken.t3.token)
+          .send({ values: {roles: ['a']}, player: {id: "123"}, character: {b: 10}, game: gameId3 })
+          .expect('Content-Type', 'application/json')
+          .end(function (err, res) {
+            request(api).post('/v1/matches/' + res.body.data.id + '/players')
+              .set('Content-Type', 'application/json')
+              .set('Authorization', 'Bearer ' + fixtures.AccessToken.t3.token)
+              .send({ values: {roles: ['b']}, player: {id: "234"}, character: {b: 10}, game: gameId3 })
+              .expect('Content-Type', 'application/json')
+              .end(function (err, res) {
+                assert.equal(res.body.data.roles.a.players.length, 1);
+                assert.equal(res.body.data.roles.b.players.length, 1);
+                assert.equal(res.body.data.size, 2);
+                done();
               })
           })
       });

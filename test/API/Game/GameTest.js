@@ -203,7 +203,7 @@ describe('Games API', function () {
       request(api).delete('/v1/games/' + fixtures.Game.g1._id)
         .set('Content-Type', 'application/json')
         .set('Authorization', 'Bearer ' + fixtures.AccessToken.admin.token)
-        .expect(200, /deleted/i, done);
+        .expect(200, /deleted/i, (res, res2) => done());
     });
     it('works holder of the game', function (done) {
       request(api).delete('/v1/games/' + fixtures.Game.g3._id)
