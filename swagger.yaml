@@ -69,12 +69,12 @@ paths:
             type: object
             properties:
               message: "Error"
-  /matches/match:
+  /matches:
     get:
       tags:
       - Match
-      description: List all existing matches with the following request. 
-      opertionId: getMatches
+      description: List all existing matches.
+      operationId: listMatches
       parameters:
       - name: size
         in: query
@@ -92,8 +92,8 @@ paths:
         in: query
         type: string
         enum:
-        - ready
-        - waiting
+          - ready
+          - waiting
       - name: open 
         in: query
         type: boolean
@@ -365,6 +365,9 @@ definitions:
         type: string
         value: "success"
 responses:
+  MatchListResponse:
+    schema:
+      $ref: '#/definitions/MatchListResponse'
   MatchResponse:
     description: A view of the current state of the match including what players are in it.
     schema:
