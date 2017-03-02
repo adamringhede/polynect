@@ -1,13 +1,13 @@
 "use strict";
 
-var assert = require('assert');
+const assert = require('assert');
 //var request = require('request');
-var Models = require('../../../lib/Models');
-var Matchmaker = require('../../../lib/Components/Matchmaker');
-var mongoose = require('mongoose');
-var ObjectId = require('objectid');
-var request = require('supertest');
-var moment = require('moment');
+const Models = require('../../../lib/Models');
+const Matchmaker = require('../../../lib/Components/Matchmaker');
+const mongoose = require('mongoose');
+const ObjectId = require('objectid');
+const request = require('supertest');
+const moment = require('moment');
 const async = require('async');
 
 const playFabToken = 'PlayFab 4D0B49ABE6175CB2---14E9-8D43C7B1944D9A0-24CD51C40FD4649B.55D25DE0DE830858';
@@ -168,7 +168,16 @@ describe ('Match API', function () {
               .expect('Content-Type', 'application/json')
               .end(function (err, res) {
                   assert.equal(res.body.data.size, 2);
-                  done();
+                  request(api).post('/v1/matches/' + res.body.data.id + '/players')
+                    .set('Content-Type', 'application/json')
+                    .set('Authorization', 'Bearer ' + fixtures.AccessToken.t3.token)
+                    .send({ values: {y: 'bar'}, player: {id: "345"}, character: {b: 10}, game: gameId })
+                    .expect('Content-Type', 'application/json')
+                    .end(function (err, res) {
+                      assert.equal(res.statusCode, 422);
+                      assert.equal(res.body.message, "Match is full");
+                      done();
+                    })
               })
           })
       });
@@ -180,7 +189,8 @@ describe ('Match API', function () {
           .send({ values: {roles: ['a']}, player: {id: "123"}, character: {b: 10}, game: gameId3 })
           .expect('Content-Type', 'application/json')
           .end(function (err, res) {
-            request(api).post('/v1/matches/' + res.body.data.id + '/players')
+            const testMatchId = res.body.data.id;
+            request(api).post('/v1/matches/' + testMatchId + '/players')
               .set('Content-Type', 'application/json')
               .set('Authorization', 'Bearer ' + fixtures.AccessToken.t3.token)
               .send({ values: {roles: ['b']}, player: {id: "234"}, character: {b: 10}, game: gameId3 })
@@ -189,7 +199,28 @@ describe ('Match API', function () {
                 assert.equal(res.body.data.roles.a.players.length, 1);
                 assert.equal(res.body.data.roles.b.players.length, 1);
                 assert.equal(res.body.data.size, 2);
-                done();
+                request(api).post('/v1/matches/' + testMatchId + '/players')
+                  .set('Content-Type', 'application/json')
+                  .set('Authorization', 'Bearer ' + fixtures.AccessToken.t3.token)
+                  .send({ values: {roles: ['b']}, player: {id: "234"}, character: {b: 10}, game: gameId3 })
+                  .expect('Content-Type', 'application/json')
+                  .end(function (err, res) {
+                    // Adding the same player twice should fail
+                    assert.equal(res.statusCode, 422);
+                    assert.equal(res.body.message, "A player with the same id is already in the match.");
+                    request(api).post('/v1/matches/' + testMatchId + '/players')
+                      .set('Content-Type', 'application/json')
+                      .set('Authorization', 'Bearer ' + fixtures.AccessToken.t3.token)
+                      .send({ values: {roles: ['a']}, player: {id: "345"}, character: {b: 10}, game: gameId3 })
+                      .expect('Content-Type', 'application/json')
+                      .end(function (err, res) {
+                        // it should fail if there are no more spots for that roles
+                        assert.equal(res.statusCode, 422);
+                        done();
+                      })
+                  })
+
+
               })
           })
       });

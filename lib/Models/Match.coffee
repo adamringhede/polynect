@@ -110,6 +110,12 @@ schema.methods =
       }
     }
   }`
+  hasPlayer: (playerId) ->
+    for request in this.requests
+        if request.player.id.toString() is playerId
+            return true
+    return false
+
   addRequest: (request, config) ->
     if @rolesEnabled
       if @delegateRequest(request, config.roles.allow_switching)

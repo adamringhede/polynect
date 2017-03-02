@@ -18,3 +18,4 @@ lib/Templates/*.html
 dump.rdb
 .idea
 .idea/
+tmp

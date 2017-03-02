@@ -2,7 +2,7 @@
   "attempts": 1,
   "general": {
     "min": 2,
-    "max": 2
+    "max": 3
   },
   "attributes": {},
   "roles": {
