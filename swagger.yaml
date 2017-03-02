@@ -17,6 +17,8 @@ produces:
   - application/json
 tags:
   - name: Match
+security:
+  - Token: []
 paths:
   /matches/match:
     post:
@@ -64,11 +66,7 @@ paths:
         "200":
           $ref: '#/responses/MatchResponse'
         default:
-          description: unexpected error
-          schema:
-            type: object
-            properties:
-              message: "Error"
+          $ref: '#/responses/ErrorResponse'
   /matches:
     get:
       tags:
@@ -101,11 +99,7 @@ paths:
         "200":
           $ref: '#/responses/MatchListResponse'
         default:
-          description: unexpected error
-          schema:
-            type: object
-            properties:
-              message: "Error"
+          $ref: '#/responses/ErrorResponse'
   /matches/{match_id}/players:
     post:
       tags:
@@ -152,6 +146,8 @@ paths:
       responses:
         "200":
           $ref: '#/responses/MatchResponse'
+        default:
+          $ref: '#/responses/ErrorResponse'
   /matches/{match_id}/players/{player_id}:
     delete:
       tags:
@@ -178,6 +174,8 @@ paths:
       responses:
         "200":
           $ref: '#/responses/MatchResponse'
+        default:
+          $ref: '#/responses/ErrorResponse'
   /matches/{match_id}:
     put:
       tags:
@@ -208,6 +206,8 @@ paths:
       responses:
         "200":
           $ref: '#/responses/MatchResponse'
+        default:
+          $ref: '#/responses/ErrorResponse'
     delete:
       tags:
       - Match
@@ -223,7 +223,17 @@ paths:
         type: string
       responses:
         "200":
-          $ref: '#/responses/Response'
+          $ref: '#/responses/TextResponse'
+        default:
+          $ref: '#/responses/ErrorResponse'
+securityDefinitions:
+  Token:
+    description: |
+      The token should start with "Bearer " followed by the token found in the Polynect app under "Manage account".
+      For authenticating with PlayFab, the token should start with "PlayFab " followed by a session ticket acquired from PlayFab.
+    in: header
+    type: apiKey
+    name: Authorization
 definitions:
   Player:
     type: object
@@ -356,14 +366,25 @@ definitions:
       status:
         type: string
         value: "success"
-  Response:
+  TextResponse:
     type: object
     properties:
       data:
-        type: object
+        type: string
       status:
         type: string
         value: "success"
+  ErrorResponse:
+    type: object
+    properties:
+      message:
+        type: string
+      code:
+        type: string
+      response_code:
+        type: integer
+      status:
+        type: string
 responses:
   MatchListResponse:
     schema:
@@ -372,8 +393,12 @@ responses:
     description: A view of the current state of the match including what players are in it.
     schema:
       $ref: '#/definitions/MatchResponse'
-  Response:
+  ErrorResponse:
+    description: Error
+    schema:
+      $ref: '#/definitions/ErrorResponse'
+  TextResponse:
     description: test
     schema:
-      $ref: '#/definitions/Response'
+      $ref: '#/definitions/TextResponse'
 
