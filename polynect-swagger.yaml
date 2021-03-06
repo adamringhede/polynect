@@ -1,0 +1,404 @@
+swagger: "2.0"
+info:
+  version: 1.0.0
+  title: Polynect
+  description: An API for matchmaking in multiplayer games.
+  contact:
+    name: Polynect
+    email: support@polynect.io
+    url: http://www.polynect.io/documentation
+host: api.polynect.io
+basePath: /v1
+schemes:
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+tags:
+  - name: Match
+security:
+  - Token: []
+paths:
+  /matches/match:
+    post:
+      tags:
+      - Match
+      description: |
+        Start matchmaking for a player. The data needed depends on the game's configuration in Polynect. If matchmaking as a
+        group of players, the data for each individual player can be added as elements in the group parameter.
+      operationId: startMatching
+      parameters:
+      - name: game
+        in: body
+        description: The ID of the game to match for
+        required: yes
+        schema:
+          type: string
+      - name: options
+        in: body
+        description: Key value pairs if needed by the game's matchmaking configuration.
+        required: no
+        schema:
+          $ref: '#/definitions/Options'
+      - name: player
+        in: body
+        description: Player specific data used for matching with other players.
+        required: no
+        schema:
+          $ref: '#/definitions/Player'
+      - name: character
+        in: body
+        description: Character data used for matching in games in which a player may play as one of many characters.
+        required: no
+        schema:
+          $ref: '#/definitions/Character'
+      - name: group
+        in: body
+        description: |
+          An array containing matchmaking data for each player. This should be used start matchmaking as a group of players.
+        required: no
+        schema:
+          type: array
+          items:
+            $ref: '#/definitions/GroupMember'
+      responses:
+        "200":
+          $ref: '#/responses/MatchResponse'
+        default:
+          $ref: '#/responses/ErrorResponse'
+  /matches:
+    get:
+      tags:
+      - Match
+      description: List all existing matches.
+      operationId: listMatches
+      parameters:
+      - name: size
+        in: query
+        type: integer
+      - name: min
+        in: query
+        type: integer  
+      - name: max
+        in: query
+        type: integer
+      - name: game.id
+        in: query
+        type: string
+      - name: status
+        in: query
+        type: string
+        enum:
+          - ready
+          - waiting
+      - name: open 
+        in: query
+        type: boolean
+      responses:
+        "200":
+          $ref: '#/responses/MatchListResponse'
+        default:
+          $ref: '#/responses/ErrorResponse'
+  /matches/{match_id}/players:
+    post:
+      tags:
+      - Match
+      description: |
+        A player can manually be added to an existing match. This may be useful to let the player select a match from a
+        list of matches or to implement invitations, in which case the player is added to the match after accepting the invitation.
+        It requires the same parameters as creating a matchmaking request as that the attributes on the match can be updated.
+      operationId: addPlayerToMatch
+      parameters:
+      - name: match_id
+        in: path
+        description: The ID of the match to which to add the player
+        required: true
+        type: string
+        schema:
+          type: string
+      - name: game
+        in: body
+        description: The ID of the game to match for
+        required: yes
+        schema:
+          type: string
+      - name: options
+        in: body
+        description: Key value pairs if needed by the game's matchmaking configuration.
+        required: no
+        type: object
+        schema:
+          $ref: '#/definitions/Options'
+      - name: player
+        in: body
+        description: Player specific data used for matching with other players.
+        required: no
+        schema:
+          $ref: '#/definitions/Player'
+      - name: character
+        in: body
+        description: Character data used for matching in games in which a player may play as one of many characters.
+        required: no
+        type: object
+        schema:
+          $ref: '#/definitions/Character'
+      responses:
+        "200":
+          $ref: '#/responses/MatchResponse'
+        default:
+          $ref: '#/responses/ErrorResponse'
+  /matches/{match_id}/players/{player_id}:
+    delete:
+      tags:
+      - Match
+      description: |
+        If a player chooses to leave or has been disconnected for a certain amount of time, it is often necessary to
+        remove it from the match so that another player can join. This is done with a delete request with the match and player IDs.
+      operationId: removePlayerFromMatch
+      parameters:
+      - name: match_id
+        in: path
+        description: The ID of the match to which to add the player
+        required: true
+        type: string
+        schema:
+          type: string
+      - name: player_id
+        in: path
+        description: The ID of the player to remove
+        required: true
+        type: string
+        schema:
+          type: string
+      responses:
+        "200":
+          $ref: '#/responses/MatchResponse'
+        default:
+          $ref: '#/responses/ErrorResponse'
+  /matches/{match_id}:
+    put:
+      tags:
+      - Match
+      description: |
+        Editing a match can be used to set custom data on the match or open/close to allow/deny new players from joining the match.
+      operationId: updateMatch
+      parameters:
+      - name: match_id
+        in: path
+        description: The ID of the match to update
+        required: true
+        type: string
+        schema:
+          type: string
+      - name: data
+        in: body
+        description: Custom key/value pairs to store on the match.
+        required: no
+        schema:
+          type: object
+      - name: open
+        in: body
+        description: Open means that other players can join the match unless it is full.
+        required: no
+        schema:
+          type: boolean
+      responses:
+        "200":
+          $ref: '#/responses/MatchResponse'
+        default:
+          $ref: '#/responses/ErrorResponse'
+    delete:
+      tags:
+      - Match
+      description: |
+        After a game has ended and all the players have left, you may want to delete the match, although this is not necessary.
+        This can however be done with a delete request.
+      operationId: removeMatch
+      parameters:
+      - name: match_id
+        in: path
+        description: The ID of the match to delete
+        required: true
+        type: string
+      responses:
+        "200":
+          $ref: '#/responses/TextResponse'
+        default:
+          $ref: '#/responses/ErrorResponse'
+securityDefinitions:
+  Token:
+    description: |
+      The token should start with "Bearer " followed by the token found in the Polynect app under "Manage account".
+      For authenticating with PlayFab, the token should start with "PlayFab " followed by a session ticket acquired from PlayFab.
+    in: header
+    type: apiKey
+    name: Authorization
+definitions:
+  Player:
+    type: object
+    properties:
+      id:
+        type: string
+        example: "58b2daf613cad300046e21aa"
+    additionalProperties:
+      type: object
+  Game:
+    type: object
+    properties:
+      id:
+        type: string
+        example: "58b2daf613cad300016e21cb"
+  Character:
+    type: object
+    additionalProperties:
+      type: object
+  Options:
+    type: object
+    description: Key value pairs if needed by the game's matchmaking configuration.
+    additionalProperties:
+      type: object
+  GroupMember:
+    type: object
+    properties:
+      options:
+        $ref: '#/definitions/Options'
+      player:
+        $ref: '#/definitions/Player'
+      character:
+        $ref: '#/definitions/Character'
+  Role:
+    properties:
+      min:
+        type: integer
+        example: 2
+      max:
+        type: integer
+        example: 2
+      players:
+        type: array
+        items:
+          $ref: '#/definitions/Player'
+  Team:
+    type: object
+    properties:
+      id:
+        type: string
+        example: "58b2daf613cad300046e78fe"
+      players:
+        type: array
+        items:
+          $ref: '#/definitions/Player'
+      characters:
+        type: array
+        items:
+          $ref: '#/definitions/Character'
+  Match:
+    type: object
+    properties:
+      id:
+        type: string
+        example: "58b2daf613cad300016e43bb"
+      size:
+        type: integer
+        example: 3
+      min:
+        type: integer
+        example: 3
+      max:
+        type: integer
+        example: 5
+      game:
+        $ref: '#/definitions/Game'
+      status:
+        type: string
+        example: "ready"
+      attributes:
+        type: object
+        additionalProperties:
+          type: object
+      data:
+        type: object
+        additionalProperties:
+          type: object
+      open:
+        type: boolean
+      teams:
+        type: array
+        items:
+          $ref: '#/definitions/Team'
+      players:
+        type: array
+        items:
+          $ref: '#/definitions/Player'
+      characters:
+        type: array
+        items:
+          $ref: '#/definitions/Character'
+      roles:
+        type: object
+        additionalProperties:
+          $ref: '#/definitions/Role'
+  MatchResponse:
+    type: object
+    properties:
+      data:
+        $ref: '#/definitions/Match'
+      status:
+        type: string
+        value: "success"
+  MatchListResponse:
+    type: object
+    properties:
+      data:
+        type: array
+        items:
+          $ref: '#/definitions/Match'
+      skip:
+        type: integer
+        example: 0
+      limit:
+        type: integer
+        example: 10
+      count: 
+        type: integer
+        example: 43267
+      status:
+        type: string
+        value: "success"
+  TextResponse:
+    type: object
+    properties:
+      data:
+        type: string
+      status:
+        type: string
+        value: "success"
+  ErrorResponse:
+    type: object
+    properties:
+      message:
+        type: string
+      code:
+        type: string
+      response_code:
+        type: integer
+      status:
+        type: string
+responses:
+  MatchListResponse:
+    schema:
+      $ref: '#/definitions/MatchListResponse'
+  MatchResponse:
+    description: A view of the current state of the match including what players are in it.
+    schema:
+      $ref: '#/definitions/MatchResponse'
+  ErrorResponse:
+    description: Error
+    schema:
+      $ref: '#/definitions/ErrorResponse'
+  TextResponse:
+    description: test
+    schema:
+      $ref: '#/definitions/TextResponse'
+
